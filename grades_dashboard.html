@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成績分析儀表板 - 114學年度上學期</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="grades_dashboard.css">
+</head>
+<body>
+    <!-- 背景動畫元素 -->
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="container">
+        <!-- 頂部標題區 -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">📊</div>
+                    <div class="logo-text">
+                        <h1>成績分析儀表板</h1>
+                        <p class="subtitle">114學年度 上學期 期末考</p>
+                    </div>
+                </div>
+                <div class="data-time">
+                    <span class="time-label">資料更新時間</span>
+                    <span class="time-value" id="updateTime">2026/01/17 15:44</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 學生資訊卡片 -->
+        <section class="student-card">
+            <div class="student-avatar">
+                <div class="avatar-ring"></div>
+                <span class="avatar-text" id="avatarText">高</span>
+            </div>
+            <div class="student-info">
+                <h2 class="student-name" id="studentName">高浚瑋</h2>
+                <div class="student-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">🏫</span>
+                        <span class="detail-text" id="studentClass">二年 11 班</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">💺</span>
+                        <span class="detail-text">座號 <span id="studentSeat">20</span></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">🔢</span>
+                        <span class="detail-text">學號 <span id="studentNo">310471</span></span>
+                    </div>
+                </div>
+            </div>
+            <div class="student-stats">
+                <div class="stat-box">
+                    <span class="stat-value" id="avgScore">--</span>
+                    <span class="stat-label">平均成績</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="totalSubjects">7</span>
+                    <span class="stat-label">科目數</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="highestScore">--</span>
+                    <span class="stat-label">最高分</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 成績概覽 -->
+        <section class="scores-overview">
+            <h3 class="section-title">
+                <span class="title-icon">📝</span>
+                各科成績概覽
+            </h3>
+            <div class="scores-grid" id="scoresGrid">
+                <!-- 動態生成成績卡片 -->
+            </div>
+        </section>
+
+        <!-- 圖表區域 -->
+        <section class="charts-section">
+            <div class="chart-row">
+                <!-- 成績對比雷達圖 -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <span class="chart-icon">🎯</span>
+                            個人 vs 班級平均
+                        </h3>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 成績長條圖 -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <span class="chart-icon">📊</span>
+                            成績對比分析
+                        </h3>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 五標分析 -->
+        <section class="standards-section">
+            <h3 class="section-title">
+                <span class="title-icon">📈</span>
+                班級五標分析
+            </h3>
+            <div class="standards-table-wrapper">
+                <table class="standards-table" id="standardsTable">
+                    <thead>
+                        <tr>
+                            <th>科目</th>
+                            <th class="top-mark">頂標</th>
+                            <th class="front-mark">前標</th>
+                            <th class="avg-mark">均標</th>
+                            <th class="back-mark">後標</th>
+                            <th class="bottom-mark">底標</th>
+                            <th>標準差</th>
+                            <th>我的成績</th>
+                            <th>落點分析</th>
+                        </tr>
+                    </thead>
+                    <tbody id="standardsBody">
+                        <!-- 動態生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 分數分佈區 -->
+        <section class="distribution-section">
+            <h3 class="section-title">
+                <span class="title-icon">📉</span>
+                班級分數分佈
+            </h3>
+            <div class="distribution-grid" id="distributionGrid">
+                <!-- 動態生成分佈圖 -->
+            </div>
+        </section>
+
+        <!-- 頁尾 -->
+        <footer class="footer">
+            <p>© 2026 成績分析儀表板 - 數據來源：校務系統</p>
+        </footer>
+    </div>
+
+    <script src="grades_dashboard.js"></script>
+</body>
+</html>

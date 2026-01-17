@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv
+env/
+venv/
+build/
+dist/
+
+# Credentials / Data (Optional - remove if you want to upload these)
+# save_session.py
+# grades_raw.json
+
+# OS
+.DS_Store
+Thumbs.db
