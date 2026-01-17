@@ -16,7 +16,7 @@ EXAM_DROPDOWN = 'span.k-select[aria-controls="gradeExam_listbox"]'
 EXAM_LISTBOX  = '#gradeExam_listbox'
 
 with sync_playwright() as p:
-    browser = p.chromium.launch(headless=False, slow_mo=150)
+    browser = p.chromium.launch(headless=True, slow_mo=150)
     ctx = browser.new_context(storage_state=STATE)
     page = ctx.new_page()
 
