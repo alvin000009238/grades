@@ -10,8 +10,8 @@ build/
 dist/
 
 # Credentials / Data (Optional - remove if you want to upload these)
-# save_session.py
-# grades_raw.json
+save_session.py
+grades_raw.json
 
 # OS
 .DS_Store
