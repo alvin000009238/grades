@@ -1,0 +1,10 @@
+2026-01-20 19:52:50,851 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-20 19:52:50,852 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-20 19:52:51,025 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-20 19:52:51,026 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-20 19:53:03,165 - SchoolGradesServer - INFO - Checking login status
+2026-01-20 19:53:03,166 - SchoolGradesServer - INFO - No fetcher (not logged in)
+2026-01-20 19:53:03,209 - SchoolGradesServer - INFO - Accessing index page
+2026-01-20 19:53:22,120 - SchoolGradesServer - INFO - Accessing index page
+2026-01-20 19:53:45,951 - SchoolGradesServer - INFO - Fetching semester structure
+2026-01-20 19:53:58,011 - SchoolGradesServer - INFO - Successfully retrieved structure

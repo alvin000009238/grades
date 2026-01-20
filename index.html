@@ -39,6 +39,7 @@
                 </div>
                 <div class="data-time-box">
                     <div class="time-info">
+
                         <span class="time-label">資料更新時間</span>
                         <span class="time-value" id="updateTime">--</span>
                     </div>
@@ -95,6 +96,20 @@
                                     <span class="item-hint">直接貼上 JSON 內容</span>
                                 </span>
                             </button>
+                            <button class="dropdown-item" id="syncBtn">
+                                <span class="item-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path
+                                            d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
+                                    </svg>
+                                </span>
+                                <span class="item-text">
+                                    <span class="item-title">雲端同步</span>
+                                    <span class="item-hint">登入學校系統抓取</span>
+                                </span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -115,12 +130,86 @@
                     </h3>
                     <button class="modal-close" id="closeModal">&times;</button>
                 </div>
+
+
                 <div class="modal-body">
                     <textarea id="jsonTextInput" placeholder="在此貼上 JSON 內容..."></textarea>
                 </div>
                 <div class="modal-footer">
                     <button class="modal-btn cancel" id="cancelPaste">取消</button>
                     <button class="modal-btn confirm" id="confirmPaste">確認匯入</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 登入視窗 -->
+        <div class="modal-overlay" id="loginModal">
+            <div class="modal-content sm">
+                <div class="modal-header">
+                    <h3>登入系統</h3>
+                    <button class="modal-close" id="closeLoginModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>帳號</label>
+                        <input type="text" id="usernameInput" placeholder="請輸入帳號">
+                    </div>
+                    <div class="form-group">
+                        <label>密碼</label>
+                        <div class="password-group">
+                            <input type="password" id="passwordInput" placeholder="請輸入密碼">
+                            <button type="button" id="togglePasswordBtn" class="toggle-password-btn" tabindex="-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="eye-icon">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="eye-off-icon" style="display: none;">
+                                    <path
+                                        d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                                    </path>
+                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="loginStatus" class="status-msg"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn cancel" id="cancelLogin">取消</button>
+                    <button class="modal-btn confirm" id="confirmLogin">登入</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 選擇考試視窗 -->
+        <div class="modal-overlay" id="selectExamModal">
+            <div class="modal-content sm">
+                <div class="modal-header">
+                    <h3>選擇考試</h3>
+                    <button class="modal-close" id="closeSelectModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>學年度</label>
+                        <select id="yearSelect">
+                            <option value="">載入中...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>考試名稱</label>
+                        <select id="examSelect">
+                            <option value="">請先選擇學年度</option>
+                        </select>
+                    </div>
+                    <div id="fetchStatus" class="status-msg"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn cancel" id="cancelSelect">取消</button>
+                    <button class="modal-btn confirm" id="confirmFetch">查詢</button>
                 </div>
             </div>
         </div>
@@ -178,7 +267,7 @@
                     <span class="stat-label">平均成績</span>
                 </div>
                 <div class="stat-box">
-                    <span class="stat-value" id="totalSubjects">7</span>
+                    <span class="stat-value" id="totalSubjects">--</span>
                     <span class="stat-label">科目數</span>
                 </div>
                 <div class="stat-box">
