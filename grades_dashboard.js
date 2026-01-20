@@ -5,24 +5,78 @@
 // 初始化
 document.addEventListener('DOMContentLoaded', () => {
     loadGradesData();
-});
+    setupFileImport();
+
 
 async function loadGradesData() {
     try {
+        const storedData = getStoredGrades();
+        if (storedData) {
+            initDashboard(storedData);
+            return;
+        }
+
         const response = await fetch('GetScoreForStudentExamContent.json');
         if (!response.ok) {
             throw new Error(`資料載入失敗: ${response.status}`);
         }
 
         const gradesData = await response.json();
-        if (!gradesData?.Result) {
-            throw new Error('資料格式不正確');
-        }
-
+        validateGradesData(gradesData);
         initDashboard(gradesData);
     } catch (error) {
         console.error(error);
         document.getElementById('updateTime').textContent = '資料載入失敗';
+    }
+}
+
+function setupFileImport() {
+    const fileInput = document.getElementById('gradesFile');
+    if (!fileInput) return;
+
+    fileInput.addEventListener('change', event => {
+        const [file] = event.target.files;
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            try {
+                const gradesData = JSON.parse(reader.result);
+                validateGradesData(gradesData);
+                storeGradesData(gradesData);
+                initDashboard(gradesData);
+            } catch (error) {
+                console.error(error);
+                alert('匯入失敗：檔案格式不正確');
+            } finally {
+                fileInput.value = '';
+            }
+        };
+        reader.readAsText(file);
+    });
+}
+
+function validateGradesData(gradesData) {
+    if (!gradesData?.Result || !Array.isArray(gradesData.Result.SubjectExamInfoList)) {
+        throw new Error('資料格式不正確');
+    }
+}
+
+function storeGradesData(gradesData) {
+    localStorage.setItem('gradesData', JSON.stringify(gradesData));
+}
+
+function getStoredGrades() {
+    const stored = localStorage.getItem('gradesData');
+    if (!stored) return null;
+    try {
+        const parsed = JSON.parse(stored);
+        validateGradesData(parsed);
+        return parsed;
+    } catch (error) {
+        console.warn('儲存的成績資料格式不正確，已忽略。', error);
+        localStorage.removeItem('gradesData');
+        return null;
     }
 }
 
