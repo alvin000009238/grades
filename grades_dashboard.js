@@ -62,17 +62,43 @@ function setupFileImport() {
 }
 
 function setupPasteImport() {
+    const importDropdown = document.querySelector('.import-dropdown');
+    const importDropdownBtn = document.getElementById('importDropdownBtn');
     const pasteBtn = document.getElementById('pasteBtn');
     const pasteModal = document.getElementById('pasteModal');
     const closeModal = document.getElementById('closeModal');
     const cancelPaste = document.getElementById('cancelPaste');
     const confirmPaste = document.getElementById('confirmPaste');
     const jsonTextInput = document.getElementById('jsonTextInput');
+    const gradesFile = document.getElementById('gradesFile');
+
+    if (!importDropdownBtn || !importDropdown) return;
+
+    // 下拉選單開關
+    importDropdownBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        importDropdown.classList.toggle('active');
+    });
+
+    // 點擊外部關閉選單
+    document.addEventListener('click', (e) => {
+        if (!importDropdown.contains(e.target)) {
+            importDropdown.classList.remove('active');
+        }
+    });
+
+    // 選擇檔案後關閉選單
+    if (gradesFile) {
+        gradesFile.addEventListener('change', () => {
+            importDropdown.classList.remove('active');
+        });
+    }
 
     if (!pasteBtn || !pasteModal) return;
 
     // 開啟彈出視窗
     pasteBtn.addEventListener('click', () => {
+        importDropdown.classList.remove('active');
         pasteModal.classList.add('active');
         jsonTextInput.value = '';
         jsonTextInput.focus();
@@ -598,15 +624,15 @@ function generateDistributionCards(subjects, standards) {
             <h4>${subject.SubjectName}</h4>
             <div class="distribution-bars">
                 ${ranges.map(r => {
-            const percentage = (r.count / total) * 100;
+            const percentage = r.count === 0 ? 0 : (r.count / total) * 100;
             const isMine = r.label === myRange;
+            const barClass = r.count === 0 ? '' : r.class;
             return `
                         <div class="dist-row">
                             <span class="dist-label">${r.label}</span>
                             <div class="dist-bar-container">
-                                <div class="dist-bar ${r.class}" style="width: ${Math.max(percentage, 5)}%">
-                                    <span>${r.count}人</span>
-                                </div>
+                                <div class="dist-bar ${barClass}" style="width: ${percentage === 0 ? 0 : Math.max(percentage, 5)}%"></div>
+                                <span class="dist-count">${r.count}人</span>
                                 ${isMine ? '<span class="my-score-marker">我</span>' : ''}
                             </div>
                         </div>

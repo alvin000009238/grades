@@ -174,7 +174,8 @@ body {
     margin-top: 4px;
 }
 
-.data-import {
+/* 匯入下拉選單 */
+.import-dropdown {
     position: relative;
 }
 
@@ -186,122 +187,104 @@ body {
     pointer-events: none;
 }
 
-.import-dropzone {
+.import-dropdown-btn {
     display: flex;
     align-items: center;
-    gap: 16px;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(16, 185, 129, 0.05));
-    padding: 16px 20px;
-    border-radius: var(--radius-lg);
-    border: 2px dashed rgba(99, 102, 241, 0.4);
-    backdrop-filter: blur(10px);
-    cursor: pointer;
-    transition: var(--transition);
-    min-width: 300px;
-}
-
-.import-dropzone:hover {
-    border-color: var(--primary);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(16, 185, 129, 0.1));
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.2);
-}
-
-.import-dropzone:active {
-    transform: translateY(0);
-}
-
-.import-icon {
-    font-size: 32px;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-    animation: bounce 2s ease-in-out infinite;
-}
-
-@keyframes bounce {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-4px);
-    }
-}
-
-.import-text {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    flex: 1;
-}
-
-.import-title {
+    gap: 10px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border: none;
+    border-radius: var(--radius-md);
+    color: white;
     font-size: 14px;
     font-weight: 600;
-    color: var(--text-primary);
-}
-
-.import-hint {
-    font-size: 11px;
-    color: var(--text-muted);
-}
-
-.import-btn {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    color: white;
-    padding: 8px 16px;
-    border-radius: var(--radius-sm);
-    font-size: 12px;
-    font-weight: 600;
-    transition: var(--transition);
-    white-space: nowrap;
-}
-
-.import-dropzone:hover .import-btn {
-    background: linear-gradient(135deg, var(--primary-light), var(--primary));
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-}
-
-.data-import-wrapper {
-    display: flex;
-    gap: 12px;
-    align-items: stretch;
-}
-
-.paste-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 16px 20px;
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.05));
-    border: 2px dashed rgba(16, 185, 129, 0.4);
-    border-radius: var(--radius-lg);
-    color: var(--text-primary);
-    font-size: 13px;
-    font-weight: 500;
     cursor: pointer;
     transition: var(--transition);
-    backdrop-filter: blur(10px);
-    min-width: 100px;
 }
 
-.paste-btn:hover {
-    border-color: var(--secondary);
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.1));
+.import-dropdown-btn:hover {
+    background: linear-gradient(135deg, var(--primary-light), var(--primary));
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
 }
 
-.paste-btn:active {
+.dropdown-icon {
+    font-size: 18px;
+}
+
+.dropdown-arrow {
+    font-size: 10px;
+    transition: var(--transition);
+}
+
+.import-dropdown.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.import-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 220px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    z-index: 100;
+    overflow: hidden;
+}
+
+.import-dropdown.active .import-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
     transform: translateY(0);
 }
 
-.paste-icon {
-    font-size: 24px;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--text-primary);
+}
+
+.dropdown-item:hover {
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.dropdown-item+.dropdown-item {
+    border-top: 1px solid var(--border-color);
+}
+
+.item-icon {
+    font-size: 20px;
+}
+
+.item-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.item-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.item-hint {
+    font-size: 11px;
+    color: var(--text-muted);
 }
 
 /* 彈出視窗樣式 */
@@ -979,25 +962,25 @@ body {
     height: 24px;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 4px;
-    overflow: hidden;
     position: relative;
+    margin-right: 50px;
 }
 
 .dist-bar {
     height: 100%;
     border-radius: 4px;
     transition: width 1s ease-out;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding-right: 8px;
 }
 
-.dist-bar span {
+.dist-bar-container span.dist-count {
+    position: absolute;
+    right: -45px;
+    top: 50%;
+    transform: translateY(-50%);
     font-size: 11px;
     font-weight: 600;
-    color: white;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    color: var(--text-secondary);
+    white-space: nowrap;
 }
 
 .dist-bar.high-score {
