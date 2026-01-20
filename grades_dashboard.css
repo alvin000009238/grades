@@ -234,7 +234,7 @@ body {
     visibility: hidden;
     transform: translateY(-10px);
     transition: all 0.2s ease;
-    z-index: 100;
+    z-index: 1000;
     overflow: hidden;
 }
 
@@ -297,6 +297,8 @@ body {
     border-radius: var(--radius-md);
     border: 1px solid var(--border-color);
     backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 50;
 }
 
 .time-info {
