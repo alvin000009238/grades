@@ -3,6 +3,9 @@
 // ========================================
 
 // 初始化
+let radarChartInstance = null;
+let barChartInstance = null;
+
 document.addEventListener('DOMContentLoaded', () => {
     loadGradesData();
     setupFileImport();
@@ -198,7 +201,10 @@ function generateCharts(subjects) {
 
     // 雷達圖
     const radarCtx = document.getElementById('radarChart').getContext('2d');
-    new Chart(radarCtx, {
+    if (radarChartInstance) {
+        radarChartInstance.destroy();
+    }
+    radarChartInstance = new Chart(radarCtx, {
         type: 'radar',
         data: {
             labels: labels,
@@ -270,7 +276,10 @@ function generateCharts(subjects) {
 
     // 長條圖
     const barCtx = document.getElementById('barChart').getContext('2d');
-    new Chart(barCtx, {
+    if (barChartInstance) {
+        barChartInstance.destroy();
+    }
+    barChartInstance = new Chart(barCtx, {
         type: 'bar',
         data: {
             labels: labels,
