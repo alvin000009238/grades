@@ -44,7 +44,8 @@ function setupFileImport() {
         const reader = new FileReader();
         reader.onload = () => {
             try {
-                const gradesData = JSON.parse(reader.result);
+                const rawContent = normalizeFileContent(reader.result);
+                const gradesData = JSON.parse(rawContent);
                 validateGradesData(gradesData);
                 storeGradesData(gradesData);
                 initDashboard(gradesData);
@@ -59,12 +60,26 @@ function setupFileImport() {
     });
 }
 
+function normalizeFileContent(content) {
+    if (content instanceof ArrayBuffer) {
+        const decoder = new TextDecoder('utf-8');
+        return decoder.decode(content).replace(/^\uFEFF/, '').trim();
+    }
+
+    if (typeof content === 'string') {
+        return content.replace(/^\uFEFF/, '').trim();
+    }
+
+    return '';
+}
+
 function validateGradesData(gradesData) {
     if (!gradesData?.Result) {
         throw new Error('缺少 Result 資料');
     }
 
-    if (!Array.isArray(gradesData.Result.SubjectExamInfoList)) {
+    const subjects = gradesData.Result.SubjectExamInfoList;
+    if (!Array.isArray(subjects)) {
         throw new Error('缺少 SubjectExamInfoList 成績清單');
     }
 }
@@ -122,19 +137,6 @@ function updateStudentInfo(result) {
     document.getElementById('studentNo').textContent = result.StudentNo || '--';
     document.getElementById('avatarText').textContent = studentName.charAt(0) || '--';
     document.getElementById('updateTime').textContent = result.GetDataTimeDisplay || '--';
-}
-
-function updateExamInfo(result) {
-    const examTitle = document.getElementById('examTitle');
-    if (!examTitle) return;
-
-    const termDisplay = result.SubjectExamInfoList?.[0]?.YearTermDisplay;
-    const examName = result.ExamItem?.ExamName;
-    if (termDisplay && examName) {
-        examTitle.textContent = `${termDisplay} ${examName}`;
-    } else if (examName) {
-        examTitle.textContent = examName;
-    }
 }
 
 function updateExamInfo(result) {
