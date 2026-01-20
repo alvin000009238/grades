@@ -6,7 +6,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     loadGradesData();
     setupFileImport();
-});
+
 
 async function loadGradesData() {
     try {
