@@ -9,6 +9,7 @@ let barChartInstance = null;
 document.addEventListener('DOMContentLoaded', () => {
     loadGradesData();
     setupFileImport();
+    setupPasteImport();
 });
 
 async function loadGradesData() {
@@ -57,6 +58,76 @@ function setupFileImport() {
             }
         };
         reader.readAsText(file);
+    });
+}
+
+function setupPasteImport() {
+    const pasteBtn = document.getElementById('pasteBtn');
+    const pasteModal = document.getElementById('pasteModal');
+    const closeModal = document.getElementById('closeModal');
+    const cancelPaste = document.getElementById('cancelPaste');
+    const confirmPaste = document.getElementById('confirmPaste');
+    const jsonTextInput = document.getElementById('jsonTextInput');
+
+    if (!pasteBtn || !pasteModal) return;
+
+    // 開啟彈出視窗
+    pasteBtn.addEventListener('click', () => {
+        pasteModal.classList.add('active');
+        jsonTextInput.value = '';
+        jsonTextInput.focus();
+    });
+
+    // 關閉彈出視窗的方式
+    const closeModalFn = () => {
+        pasteModal.classList.remove('active');
+        jsonTextInput.value = '';
+    };
+
+    closeModal.addEventListener('click', closeModalFn);
+    cancelPaste.addEventListener('click', closeModalFn);
+
+    // 點擊背景關閉
+    pasteModal.addEventListener('click', (e) => {
+        if (e.target === pasteModal) {
+            closeModalFn();
+        }
+    });
+
+    // ESC 鍵關閉
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && pasteModal.classList.contains('active')) {
+            closeModalFn();
+        }
+    });
+
+    // 確認匯入
+    confirmPaste.addEventListener('click', () => {
+        const content = jsonTextInput.value.trim();
+        if (!content) {
+            alert('請輸入 JSON 內容');
+            return;
+        }
+
+        try {
+            const normalizedContent = normalizeFileContent(content);
+            const gradesData = JSON.parse(normalizedContent);
+            validateGradesData(gradesData);
+            storeGradesData(gradesData);
+            initDashboard(gradesData);
+            closeModalFn();
+        } catch (error) {
+            console.error(error);
+            alert(`匯入失敗：${error.message || 'JSON 格式不正確'}`);
+        }
+    });
+
+    // 支援 Ctrl+V 直接貼上
+    jsonTextInput.addEventListener('paste', () => {
+        // 延遲一下讓內容先貼上
+        setTimeout(() => {
+            jsonTextInput.scrollTop = 0;
+        }, 10);
     });
 }
 
@@ -112,6 +183,9 @@ function initDashboard(gradesData) {
     // 更新考試資訊
     updateExamInfo(result);
 
+    // 更新排名資訊
+    updateRankInfo(result);
+
     // 計算統計資料
     updateStatistics(result.SubjectExamInfoList);
 
@@ -126,6 +200,40 @@ function initDashboard(gradesData) {
 
     // 生成分佈圖
     generateDistributionCards(result.SubjectExamInfoList, standards);
+}
+
+// 更新排名資訊
+function updateRankInfo(result) {
+    const examItem = result.ExamItem;
+    if (!examItem) return;
+
+    // 班級排名
+    const classRankBox = document.getElementById('classRankBox');
+    const classRankEl = document.getElementById('classRank');
+    if (result["Show班級排名"] && examItem.ClassRank !== null && examItem.ClassRank !== undefined) {
+        const classRank = Math.floor(examItem.ClassRank);
+        const classCount = examItem.ClassCount || 0;
+        classRankEl.textContent = result["Show班級排名人數"] && classCount > 0
+            ? `${classRank}/${classCount}`
+            : `${classRank}`;
+        classRankBox.style.display = 'block';
+    } else {
+        classRankBox.style.display = 'none';
+    }
+
+    // 類組排名
+    const categoryRankBox = document.getElementById('categoryRankBox');
+    const categoryRankEl = document.getElementById('categoryRank');
+    if (result["Show類組排名"] && examItem["類組排名"] !== null && examItem["類組排名"] !== undefined) {
+        const categoryRank = Math.floor(examItem["類組排名"]);
+        const categoryCount = examItem["類組排名Count"] || 0;
+        categoryRankEl.textContent = result["Show類組排名人數"] && categoryCount > 0
+            ? `${categoryRank}/${categoryCount}`
+            : `${categoryRank}`;
+        categoryRankBox.style.display = 'block';
+    } else {
+        categoryRankBox.style.display = 'none';
+    }
 }
 
 // 更新學生資訊
@@ -152,6 +260,36 @@ function updateExamInfo(result) {
     }
 }
 
+// 科目權重對照表
+const SUBJECT_WEIGHTS = {
+    '國語文': 4,
+    '英語文': 4,
+    '數學A': 4,
+    '歷史': 2,
+    '地理': 2,
+    '公民與社會': 2,
+    '選修化學': 2,
+    '選修化學-物質與能量': 2,
+    '選修物理': 2,
+    '選修物理-力學一': 2
+};
+
+// 取得科目權重
+function getSubjectWeight(subjectName) {
+    // 先嘗試完全匹配
+    if (SUBJECT_WEIGHTS[subjectName] !== undefined) {
+        return SUBJECT_WEIGHTS[subjectName];
+    }
+    // 嘗試部分匹配（例如 "選修化學-物質與能量" 匹配 "選修化學"）
+    for (const key of Object.keys(SUBJECT_WEIGHTS)) {
+        if (subjectName.includes(key) || key.includes(subjectName)) {
+            return SUBJECT_WEIGHTS[key];
+        }
+    }
+    // 預設權重為 1
+    return 1;
+}
+
 // 計算統計
 function updateStatistics(subjects) {
     if (!subjects.length) {
@@ -160,11 +298,24 @@ function updateStatistics(subjects) {
         document.getElementById('highestScore').textContent = '--';
         return;
     }
+
     const scores = subjects.map(subject => getNumericScore(subject.ScoreDisplay, subject.Score));
-    const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
     const highest = Math.max(...scores);
 
-    document.getElementById('avgScore').textContent = avg.toFixed(1);
+    // 計算加權平均
+    let totalWeightedScore = 0;
+    let totalWeight = 0;
+
+    subjects.forEach(subject => {
+        const score = getNumericScore(subject.ScoreDisplay, subject.Score);
+        const weight = getSubjectWeight(subject.SubjectName);
+        totalWeightedScore += score * weight;
+        totalWeight += weight;
+    });
+
+    const weightedAvg = totalWeight > 0 ? totalWeightedScore / totalWeight : 0;
+
+    document.getElementById('avgScore').textContent = weightedAvg.toFixed(1);
     document.getElementById('totalSubjects').textContent = subjects.length;
     document.getElementById('highestScore').textContent = highest;
 }

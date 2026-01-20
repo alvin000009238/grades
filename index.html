@@ -30,10 +30,22 @@
                         <p class="subtitle" id="examTitle">--</p>
                     </div>
                 </div>
-                <div class="data-import">
-                    <label class="import-label" for="gradesFile">匯入成績 JSON</label>
-                    <input type="file" id="gradesFile" accept=".json,application/json">
-                    <span class="import-hint">匯入後將顯示新資料</span>
+                <div class="data-import-wrapper">
+                    <div class="data-import">
+                        <input type="file" id="gradesFile" accept=".json,application/json">
+                        <label class="import-dropzone" for="gradesFile">
+                            <span class="import-icon">📁</span>
+                            <span class="import-text">
+                                <span class="import-title">匯入成績 JSON</span>
+                                <span class="import-hint">點擊選擇檔案或拖放到此處</span>
+                            </span>
+                            <span class="import-btn">選擇檔案</span>
+                        </label>
+                    </div>
+                    <button class="paste-btn" id="pasteBtn" title="貼上 JSON 文字">
+                        <span class="paste-icon">📋</span>
+                        <span>貼上文字</span>
+                    </button>
                 </div>
                 <div class="data-time">
                     <span class="time-label">資料更新時間</span>
@@ -41,6 +53,23 @@
                 </div>
             </div>
         </header>
+
+        <!-- 貼上文字彈出視窗 -->
+        <div class="modal-overlay" id="pasteModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>📋 貼上 JSON 內容</h3>
+                    <button class="modal-close" id="closeModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <textarea id="jsonTextInput" placeholder="在此貼上 JSON 內容..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn cancel" id="cancelPaste">取消</button>
+                    <button class="modal-btn confirm" id="confirmPaste">確認匯入</button>
+                </div>
+            </div>
+        </div>
 
         <!-- 學生資訊卡片 -->
         <section class="student-card">
@@ -77,6 +106,14 @@
                 <div class="stat-box">
                     <span class="stat-value" id="highestScore">--</span>
                     <span class="stat-label">最高分</span>
+                </div>
+                <div class="stat-box" id="classRankBox" style="display: none;">
+                    <span class="stat-value" id="classRank">--</span>
+                    <span class="stat-label">班級排名</span>
+                </div>
+                <div class="stat-box" id="categoryRankBox" style="display: none;">
+                    <span class="stat-value" id="categoryRank">--</span>
+                    <span class="stat-label">類組排名</span>
                 </div>
             </div>
         </section>
