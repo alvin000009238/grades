@@ -2,202 +2,85 @@
 // 成績分析儀表板 - JavaScript
 // ========================================
 
-// 成績資料
-const gradesData = {
-    "Message": "",
-    "Result": {
-        "StudentNo": "310471",
-        "StudentName": "高浚瑋",
-        "StudentClassNo": "211",
-        "StudentClassName": "二年 11 班",
-        "StudentSeatNo": "20",
-        "StudentId": "37083",
-        "ExamItem": {
-            "ExamName": "期末考_1"
-        },
-        "SubjectExamInfoList": [
-            {
-                "SubjectName": "英語文",
-                "Score": 64.0,
-                "ClassAVGScore": 62.76
-            },
-            {
-                "SubjectName": "歷史",
-                "Score": 70.0,
-                "ClassAVGScore": 69.16
-            },
-            {
-                "SubjectName": "地理",
-                "Score": 70.0,
-                "ClassAVGScore": 68.97
-            },
-            {
-                "SubjectName": "公民與社會",
-                "Score": 80.0,
-                "ClassAVGScore": 65.68
-            },
-            {
-                "SubjectName": "數學A",
-                "Score": 54.0,
-                "ClassAVGScore": 65.41
-            },
-            {
-                "SubjectName": "選修化學-物質與能量",
-                "Score": 69.0,
-                "ClassAVGScore": 75.43
-            },
-            {
-                "SubjectName": "選修物理-力學一",
-                "Score": 69.0,
-                "ClassAVGScore": 70.03
-            }
-        ],
-        "GetDataTimeDisplay": "2026/01/17 15:44",
-        "成績五標List": [
-            {
-                "SubjectName": "英語文",
-                "頂標": 82.44,
-                "前標": 74.72,
-                "均標": 62.76,
-                "後標": 50.72,
-                "底標": 43.22,
-                "標準差": 15.29,
-                "大於90Count": 2,
-                "大於80Count": 2,
-                "大於70Count": 5,
-                "大於60Count": 14,
-                "大於50Count": 7,
-                "大於40Count": 5,
-                "大於30Count": 1,
-                "大於20Count": 1,
-                "大於10Count": 0,
-                "大於0Count": 0
-            },
-            {
-                "SubjectName": "歷史",
-                "頂標": 82.11,
-                "前標": 77.0,
-                "均標": 69.16,
-                "後標": 61.28,
-                "底標": 56.89,
-                "標準差": 9.82,
-                "大於90Count": 1,
-                "大於80Count": 5,
-                "大於70Count": 13,
-                "大於60Count": 12,
-                "大於50Count": 6,
-                "大於40Count": 0,
-                "大於30Count": 0,
-                "大於20Count": 0,
-                "大於10Count": 0,
-                "大於0Count": 0
-            },
-            {
-                "SubjectName": "地理",
-                "頂標": 81.33,
-                "前標": 76.22,
-                "均標": 68.97,
-                "後標": 61.78,
-                "底標": 58.67,
-                "標準差": 9.04,
-                "大於90Count": 1,
-                "大於80Count": 3,
-                "大於70Count": 13,
-                "大於60Count": 16,
-                "大於50Count": 4,
-                "大於40Count": 0,
-                "大於30Count": 0,
-                "大於20Count": 0,
-                "大於10Count": 0,
-                "大於0Count": 0
-            },
-            {
-                "SubjectName": "公民與社會",
-                "頂標": 78.44,
-                "前標": 73.44,
-                "均標": 65.68,
-                "後標": 57.89,
-                "底標": 52.78,
-                "標準差": 10.14,
-                "大於90Count": 0,
-                "大於80Count": 3,
-                "大於70Count": 8,
-                "大於60Count": 18,
-                "大於50Count": 7,
-                "大於40Count": 0,
-                "大於30Count": 1,
-                "大於20Count": 0,
-                "大於10Count": 0,
-                "大於0Count": 0
-            },
-            {
-                "SubjectName": "數學A",
-                "頂標": 86.67,
-                "前標": 78.67,
-                "均標": 65.41,
-                "後標": 52.33,
-                "底標": 47.56,
-                "標準差": 15.39,
-                "大於90Count": 3,
-                "大於80Count": 6,
-                "大於70Count": 5,
-                "大於60Count": 7,
-                "大於50Count": 13,
-                "大於40Count": 1,
-                "大於30Count": 2,
-                "大於20Count": 0,
-                "大於10Count": 0,
-                "大於0Count": 0
-            },
-            {
-                "SubjectName": "選修化學-物質與能量",
-                "頂標": 93.44,
-                "前標": 88.56,
-                "均標": 75.43,
-                "後標": 62.17,
-                "底標": 52.78,
-                "標準差": 17.24,
-                "大於90Count": 8,
-                "大於80Count": 9,
-                "大於70Count": 7,
-                "大於60Count": 8,
-                "大於50Count": 3,
-                "大於40Count": 0,
-                "大於30Count": 1,
-                "大於20Count": 0,
-                "大於10Count": 1,
-                "大於0Count": 0
-            },
-            {
-                "SubjectName": "選修物理-力學一",
-                "頂標": 91.22,
-                "前標": 84.22,
-                "均標": 70.03,
-                "後標": 55.83,
-                "底標": 48.22,
-                "標準差": 16.87,
-                "大於90Count": 6,
-                "大於80Count": 5,
-                "大於70Count": 8,
-                "大於60Count": 6,
-                "大於50Count": 8,
-                "大於40Count": 3,
-                "大於30Count": 0,
-                "大於20Count": 1,
-                "大於10Count": 0,
-                "大於0Count": 0
-            }
-        ]
-    },
-    "Status": "Success"
-};
-
 // 初始化
 document.addEventListener('DOMContentLoaded', () => {
-    initDashboard();
+    loadGradesData();
+    setupFileImport();
 });
 
-function initDashboard() {
+async function loadGradesData() {
+    try {
+        const storedData = getStoredGrades();
+        if (storedData) {
+            initDashboard(storedData);
+            return;
+        }
+
+        const response = await fetch('GetScoreForStudentExamContent.json');
+        if (!response.ok) {
+            throw new Error(`資料載入失敗: ${response.status}`);
+        }
+
+        const gradesData = await response.json();
+        validateGradesData(gradesData);
+        initDashboard(gradesData);
+    } catch (error) {
+        console.error(error);
+        document.getElementById('updateTime').textContent = '資料載入失敗';
+    }
+}
+
+function setupFileImport() {
+    const fileInput = document.getElementById('gradesFile');
+    if (!fileInput) return;
+
+    fileInput.addEventListener('change', event => {
+        const [file] = event.target.files;
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            try {
+                const gradesData = JSON.parse(reader.result);
+                validateGradesData(gradesData);
+                storeGradesData(gradesData);
+                initDashboard(gradesData);
+            } catch (error) {
+                console.error(error);
+                alert('匯入失敗：檔案格式不正確');
+            } finally {
+                fileInput.value = '';
+            }
+        };
+        reader.readAsText(file);
+    });
+}
+
+function validateGradesData(gradesData) {
+    if (!gradesData?.Result || !Array.isArray(gradesData.Result.SubjectExamInfoList)) {
+        throw new Error('資料格式不正確');
+    }
+}
+
+function storeGradesData(gradesData) {
+    localStorage.setItem('gradesData', JSON.stringify(gradesData));
+}
+
+function getStoredGrades() {
+    const stored = localStorage.getItem('gradesData');
+    if (!stored) return null;
+    try {
+        const parsed = JSON.parse(stored);
+        validateGradesData(parsed);
+        return parsed;
+    } catch (error) {
+        console.warn('儲存的成績資料格式不正確，已忽略。', error);
+        localStorage.removeItem('gradesData');
+        return null;
+    }
+}
+
+function initDashboard(gradesData) {
     const result = gradesData.Result;
 
     // 更新學生資訊
