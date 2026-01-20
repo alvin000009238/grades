@@ -50,7 +50,7 @@ function setupFileImport() {
                 initDashboard(gradesData);
             } catch (error) {
                 console.error(error);
-                alert('匯入失敗：檔案格式不正確');
+                alert(`匯入失敗：${error.message || '檔案格式不正確'}`);
             } finally {
                 fileInput.value = '';
             }
@@ -60,13 +60,12 @@ function setupFileImport() {
 }
 
 function validateGradesData(gradesData) {
-    if (!gradesData?.Result || !Array.isArray(gradesData.Result.SubjectExamInfoList)) {
-        throw new Error('資料格式不正確');
+    if (!gradesData?.Result) {
+        throw new Error('缺少 Result 資料');
     }
 
-    const result = gradesData.Result;
-    if (!result.StudentName || !result.StudentNo || !result.StudentClassName || !result.StudentSeatNo) {
-        throw new Error('資料格式不正確');
+    if (!Array.isArray(gradesData.Result.SubjectExamInfoList)) {
+        throw new Error('缺少 SubjectExamInfoList 成績清單');
     }
 }
 
@@ -90,6 +89,7 @@ function getStoredGrades() {
 
 function initDashboard(gradesData) {
     const result = gradesData.Result;
+    const standards = Array.isArray(result["成績五標List"]) ? result["成績五標List"] : [];
 
     // 更新學生資訊
     updateStudentInfo(result);
@@ -107,20 +107,34 @@ function initDashboard(gradesData) {
     generateCharts(result.SubjectExamInfoList);
 
     // 生成五標表格
-    generateStandardsTable(result.SubjectExamInfoList, result["成績五標List"]);
+    generateStandardsTable(result.SubjectExamInfoList, standards);
 
     // 生成分佈圖
-    generateDistributionCards(result.SubjectExamInfoList, result["成績五標List"]);
+    generateDistributionCards(result.SubjectExamInfoList, standards);
 }
 
 // 更新學生資訊
 function updateStudentInfo(result) {
-    document.getElementById('studentName').textContent = result.StudentName;
-    document.getElementById('studentClass').textContent = result.StudentClassName;
-    document.getElementById('studentSeat').textContent = result.StudentSeatNo;
-    document.getElementById('studentNo').textContent = result.StudentNo;
-    document.getElementById('avatarText').textContent = result.StudentName.charAt(0);
-    document.getElementById('updateTime').textContent = result.GetDataTimeDisplay;
+    const studentName = result.StudentName || '--';
+    document.getElementById('studentName').textContent = studentName;
+    document.getElementById('studentClass').textContent = result.StudentClassName || '--';
+    document.getElementById('studentSeat').textContent = result.StudentSeatNo || '--';
+    document.getElementById('studentNo').textContent = result.StudentNo || '--';
+    document.getElementById('avatarText').textContent = studentName.charAt(0) || '--';
+    document.getElementById('updateTime').textContent = result.GetDataTimeDisplay || '--';
+}
+
+function updateExamInfo(result) {
+    const examTitle = document.getElementById('examTitle');
+    if (!examTitle) return;
+
+    const termDisplay = result.SubjectExamInfoList?.[0]?.YearTermDisplay;
+    const examName = result.ExamItem?.ExamName;
+    if (termDisplay && examName) {
+        examTitle.textContent = `${termDisplay} ${examName}`;
+    } else if (examName) {
+        examTitle.textContent = examName;
+    }
 }
 
 function updateExamInfo(result) {
@@ -138,6 +152,12 @@ function updateExamInfo(result) {
 
 // 計算統計
 function updateStatistics(subjects) {
+    if (!subjects.length) {
+        document.getElementById('avgScore').textContent = '--';
+        document.getElementById('totalSubjects').textContent = '0';
+        document.getElementById('highestScore').textContent = '--';
+        return;
+    }
     const scores = subjects.map(subject => getNumericScore(subject.ScoreDisplay, subject.Score));
     const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
     const highest = Math.max(...scores);
