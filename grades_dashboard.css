@@ -143,8 +143,73 @@ body {
 }
 
 .logo-icon {
-    font-size: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
     animation: pulse 2s ease-in-out infinite;
+}
+
+.logo-icon svg {
+    width: 32px;
+    height: 32px;
+}
+
+/* ... */
+
+.dropdown-icon,
+.item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dropdown-icon {
+    font-size: 18px;
+    /* Fallback */
+}
+
+.dropdown-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    transition: var(--transition);
+}
+
+.item-icon {
+    font-size: 20px;
+    /* Fallback */
+    color: var(--primary);
+}
+
+/* ... */
+
+.modal-header h3 svg {
+    color: var(--primary);
+}
+
+/* ... */
+
+.detail-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    /* Fallback */
+    color: var(--primary);
+}
+
+.chart-title .chart-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+}
+
+.chart-title .chart-icon svg {
+    width: 20px;
+    height: 20px;
 }
 
 @keyframes pulse {
@@ -633,7 +698,15 @@ body {
 }
 
 .title-icon {
-    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+}
+
+.title-icon svg {
+    width: 24px;
+    height: 24px;
 }
 
 /* 成績概覽 */
