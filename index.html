@@ -27,12 +27,17 @@
                     <div class="logo-icon">📊</div>
                     <div class="logo-text">
                         <h1>成績分析儀表板</h1>
-                        <p class="subtitle">114學年度 上學期 期末考</p>
+                        <p class="subtitle" id="examTitle">--</p>
                     </div>
+                </div>
+                <div class="data-import">
+                    <label class="import-label" for="gradesFile">匯入成績 JSON</label>
+                    <input type="file" id="gradesFile" accept=".json,application/json">
+                    <span class="import-hint">匯入後將顯示新資料</span>
                 </div>
                 <div class="data-time">
                     <span class="time-label">資料更新時間</span>
-                    <span class="time-value" id="updateTime">2026/01/17 15:44</span>
+                    <span class="time-value" id="updateTime">--</span>
                 </div>
             </div>
         </header>
@@ -41,22 +46,22 @@
         <section class="student-card">
             <div class="student-avatar">
                 <div class="avatar-ring"></div>
-                <span class="avatar-text" id="avatarText">高</span>
+                <span class="avatar-text" id="avatarText">--</span>
             </div>
             <div class="student-info">
-                <h2 class="student-name" id="studentName">高浚瑋</h2>
+                <h2 class="student-name" id="studentName">--</h2>
                 <div class="student-details">
                     <div class="detail-item">
                         <span class="detail-icon">🏫</span>
-                        <span class="detail-text" id="studentClass">二年 11 班</span>
+                        <span class="detail-text" id="studentClass">--</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon">💺</span>
-                        <span class="detail-text">座號 <span id="studentSeat">20</span></span>
+                        <span class="detail-text">座號 <span id="studentSeat">--</span></span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon">🔢</span>
-                        <span class="detail-text">學號 <span id="studentNo">310471</span></span>
+                        <span class="detail-text">學號 <span id="studentNo">--</span></span>
                     </div>
                 </div>
             </div>
