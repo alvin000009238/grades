@@ -30,33 +30,35 @@
                         <p class="subtitle" id="examTitle">--</p>
                     </div>
                 </div>
-                <div class="import-dropdown">
-                    <button class="import-dropdown-btn" id="importDropdownBtn">
-                        <span class="dropdown-icon">📥</span>
-                        <span>匯入成績</span>
-                        <span class="dropdown-arrow">▼</span>
-                    </button>
-                    <div class="import-dropdown-menu" id="importDropdownMenu">
-                        <input type="file" id="gradesFile" accept=".json,application/json">
-                        <label class="dropdown-item" for="gradesFile">
-                            <span class="item-icon">📁</span>
-                            <span class="item-text">
-                                <span class="item-title">選擇 JSON 檔案</span>
-                                <span class="item-hint">從電腦選擇檔案</span>
-                            </span>
-                        </label>
-                        <button class="dropdown-item" id="pasteBtn">
-                            <span class="item-icon">📋</span>
-                            <span class="item-text">
-                                <span class="item-title">貼上文字</span>
-                                <span class="item-hint">直接貼上 JSON 內容</span>
-                            </span>
-                        </button>
+                <div class="data-time-box">
+                    <div class="time-info">
+                        <span class="time-label">資料更新時間</span>
+                        <span class="time-value" id="updateTime">--</span>
                     </div>
-                </div>
-                <div class="data-time">
-                    <span class="time-label">資料更新時間</span>
-                    <span class="time-value" id="updateTime">--</span>
+                    <div class="import-dropdown">
+                        <button class="import-dropdown-btn" id="importDropdownBtn">
+                            <span class="dropdown-icon">📥</span>
+                            <span>匯入</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="import-dropdown-menu" id="importDropdownMenu">
+                            <input type="file" id="gradesFile" accept=".json,application/json">
+                            <label class="dropdown-item" for="gradesFile">
+                                <span class="item-icon">📁</span>
+                                <span class="item-text">
+                                    <span class="item-title">選擇 JSON 檔案</span>
+                                    <span class="item-hint">從電腦選擇檔案</span>
+                                </span>
+                            </label>
+                            <button class="dropdown-item" id="pasteBtn">
+                                <span class="item-icon">📋</span>
+                                <span class="item-text">
+                                    <span class="item-title">貼上文字</span>
+                                    <span class="item-hint">直接貼上 JSON 內容</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>

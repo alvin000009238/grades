@@ -287,6 +287,35 @@ body {
     color: var(--text-muted);
 }
 
+/* 資料時間與匯入區塊 */
+.data-time-box {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--bg-glass);
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(10px);
+}
+
+.time-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.time-label {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.time-value {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
 /* 彈出視窗樣式 */
 .modal-overlay {
     position: fixed;
