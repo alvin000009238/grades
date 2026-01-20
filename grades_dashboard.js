@@ -6,7 +6,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     loadGradesData();
     setupFileImport();
-
+});
 
 async function loadGradesData() {
     try {
@@ -60,6 +60,11 @@ function validateGradesData(gradesData) {
     if (!gradesData?.Result || !Array.isArray(gradesData.Result.SubjectExamInfoList)) {
         throw new Error('資料格式不正確');
     }
+
+    const result = gradesData.Result;
+    if (!result.StudentName || !result.StudentNo || !result.StudentClassName || !result.StudentSeatNo) {
+        throw new Error('資料格式不正確');
+    }
 }
 
 function storeGradesData(gradesData) {
@@ -85,6 +90,9 @@ function initDashboard(gradesData) {
 
     // 更新學生資訊
     updateStudentInfo(result);
+
+    // 更新考試資訊
+    updateExamInfo(result);
 
     // 計算統計資料
     updateStatistics(result.SubjectExamInfoList);
@@ -112,9 +120,22 @@ function updateStudentInfo(result) {
     document.getElementById('updateTime').textContent = result.GetDataTimeDisplay;
 }
 
+function updateExamInfo(result) {
+    const examTitle = document.getElementById('examTitle');
+    if (!examTitle) return;
+
+    const termDisplay = result.SubjectExamInfoList?.[0]?.YearTermDisplay;
+    const examName = result.ExamItem?.ExamName;
+    if (termDisplay && examName) {
+        examTitle.textContent = `${termDisplay} ${examName}`;
+    } else if (examName) {
+        examTitle.textContent = examName;
+    }
+}
+
 // 計算統計
 function updateStatistics(subjects) {
-    const scores = subjects.map(s => s.Score);
+    const scores = subjects.map(subject => getNumericScore(subject.ScoreDisplay, subject.Score));
     const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
     const highest = Math.max(...scores);
 
@@ -129,8 +150,10 @@ function generateScoreCards(subjects) {
     grid.innerHTML = '';
 
     subjects.forEach(subject => {
-        const diff = subject.Score - subject.ClassAVGScore;
-        const scoreClass = getScoreClass(subject.Score);
+        const scoreValue = getNumericScore(subject.ScoreDisplay, subject.Score);
+        const classAvgValue = getNumericScore(subject.ClassAVGScoreDisplay, subject.ClassAVGScore);
+        const diff = scoreValue - classAvgValue;
+        const scoreClass = getScoreClass(scoreValue);
         const diffClass = diff >= 0 ? 'positive' : 'negative';
         const diffIcon = diff >= 0 ? '↑' : '↓';
 
@@ -139,12 +162,12 @@ function generateScoreCards(subjects) {
         card.innerHTML = `
             <div class="score-header">
                 <span class="subject-name">${subject.SubjectName}</span>
-                <span class="score-badge ${scoreClass}">${subject.Score}</span>
+                <span class="score-badge ${scoreClass}">${subject.ScoreDisplay ?? scoreValue}</span>
             </div>
             <div class="score-details">
                 <div class="score-row">
                     <span class="score-label">班級平均</span>
-                    <span class="score-value">${subject.ClassAVGScore.toFixed(2)}</span>
+                    <span class="score-value">${subject.ClassAVGScoreDisplay ?? classAvgValue.toFixed(2)}</span>
                 </div>
                 <div class="score-row">
                     <span class="score-label">與班平均差距</span>
@@ -153,7 +176,7 @@ function generateScoreCards(subjects) {
                     </span>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${subject.Score}%"></div>
+                    <div class="progress-fill" style="width: ${scoreValue}%"></div>
                 </div>
             </div>
         `;
@@ -170,8 +193,8 @@ function getScoreClass(score) {
 // 生成圖表
 function generateCharts(subjects) {
     const labels = subjects.map(s => shortenName(s.SubjectName));
-    const myScores = subjects.map(s => s.Score);
-    const avgScores = subjects.map(s => s.ClassAVGScore);
+    const myScores = subjects.map(subject => getNumericScore(subject.ScoreDisplay, subject.Score));
+    const avgScores = subjects.map(subject => getNumericScore(subject.ClassAVGScoreDisplay, subject.ClassAVGScore));
 
     // 雷達圖
     const radarCtx = document.getElementById('radarChart').getContext('2d');
@@ -329,7 +352,7 @@ function generateStandardsTable(subjects, standards) {
         const std = standards.find(s => cleanSubjectName(s.SubjectName) === subject.SubjectName) || standards[index];
         if (!std) return;
 
-        const score = subject.Score;
+        const score = getNumericScore(subject.ScoreDisplay, subject.Score);
         const level = getScoreLevel(score, std);
 
         const row = document.createElement('tr');
@@ -385,7 +408,7 @@ function generateDistributionCards(subjects, standards) {
         ];
 
         // 找出我的成績在哪個區間
-        const myRange = getMyScoreRange(subject.Score);
+        const myRange = getMyScoreRange(getNumericScore(subject.ScoreDisplay, subject.Score));
 
         const card = document.createElement('div');
         card.className = 'distribution-card';
@@ -420,4 +443,14 @@ function getMyScoreRange(score) {
     if (score >= 60) return '60-69';
     if (score >= 50) return '50-59';
     return '0-49';
+}
+
+function getNumericScore(displayValue, fallbackValue) {
+    if (displayValue !== undefined && displayValue !== null && displayValue !== '') {
+        const parsed = Number(displayValue);
+        if (!Number.isNaN(parsed)) {
+            return parsed;
+        }
+    }
+    return Number(fallbackValue ?? 0);
 }
