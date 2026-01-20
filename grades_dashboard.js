@@ -137,6 +137,19 @@ function updateExamInfo(result) {
     }
 }
 
+function updateExamInfo(result) {
+    const examTitle = document.getElementById('examTitle');
+    if (!examTitle) return;
+
+    const termDisplay = result.SubjectExamInfoList?.[0]?.YearTermDisplay;
+    const examName = result.ExamItem?.ExamName;
+    if (termDisplay && examName) {
+        examTitle.textContent = `${termDisplay} ${examName}`;
+    } else if (examName) {
+        examTitle.textContent = examName;
+    }
+}
+
 // 計算統計
 function updateStatistics(subjects) {
     if (!subjects.length) {
