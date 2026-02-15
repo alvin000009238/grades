@@ -8,3 +8,707 @@
 2026-01-20 19:53:22,120 - SchoolGradesServer - INFO - Accessing index page
 2026-01-20 19:53:45,951 - SchoolGradesServer - INFO - Fetching semester structure
 2026-01-20 19:53:58,011 - SchoolGradesServer - INFO - Successfully retrieved structure
+2026-01-20 22:10:51,221 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-20 22:10:51,221 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-21 00:31:20,450 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-21 00:31:20,451 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-21 00:31:21,313 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-21 00:31:21,314 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-21 00:31:50,475 - SchoolGradesServer - INFO - Accessing index page
+2026-01-21 00:31:52,853 - SchoolGradesServer - INFO - Fetching semester structure
+2026-01-21 00:32:14,346 - SchoolGradesServer - INFO - Successfully retrieved structure
+2026-01-21 00:32:21,332 - SchoolGradesServer - INFO - Fetching grades for 114學年度 上學期 - 期末考
+2026-01-21 00:32:32,704 - SchoolGradesServer - INFO - Successfully fetched grades data
+2026-01-21 00:32:32,761 - SchoolGradesServer - INFO - Saved grades to grades_raw.json
+2026-01-21 00:32:58,236 - SchoolGradesServer - INFO - Accessing index page
+2026-01-21 00:33:10,079 - SchoolGradesServer - INFO - Accessing index page
+2026-01-21 00:34:24,823 - SchoolGradesServer - INFO - Fetching semester structure
+2026-01-21 00:34:24,825 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-01-21 00:34:44,733 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-01-21 00:34:52,403 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-01-21 00:34:53,188 - SchoolGradesServer - INFO - Fetching semester structure
+2026-01-21 00:34:53,189 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-01-21 00:38:53,968 - SchoolGradesServer - INFO - Accessing index page
+2026-01-21 00:39:12,856 - SchoolGradesServer - INFO - Accessing index page
+2026-01-21 00:39:24,000 - SchoolGradesServer - INFO - Accessing index page
+2026-01-21 00:39:39,738 - SchoolGradesServer - INFO - Accessing index page
+2026-01-21 00:39:45,130 - SchoolGradesServer - INFO - Accessing index page
+2026-01-21 00:42:22,626 - SchoolGradesServer - INFO - Accessing index page
+2026-01-21 00:42:31,093 - SchoolGradesServer - INFO - Accessing index page
+2026-01-21 17:24:17,268 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-21 17:24:17,269 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-21 17:24:18,234 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-21 17:24:18,235 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-21 17:24:30,931 - SchoolGradesServer - INFO - Accessing index page
+2026-01-21 17:24:37,427 - SchoolGradesServer - INFO - Accessing index page
+2026-01-21 17:24:47,750 - SchoolGradesServer - INFO - Fetching semester structure
+2026-01-21 17:24:47,751 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-01-21 17:24:55,286 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-01-21 17:25:27,472 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-01-21 17:25:28,620 - SchoolGradesServer - INFO - Fetching semester structure
+2026-01-21 17:25:45,403 - SchoolGradesServer - INFO - Successfully retrieved structure
+2026-01-21 17:57:36,432 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-21 17:57:36,433 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-21 17:57:37,565 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-21 17:57:37,566 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-21 18:05:27,100 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-21 18:05:27,100 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-21 18:05:27,721 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-21 18:05:27,722 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-21 18:09:33,431 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-21 18:09:33,432 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-21 18:10:55,726 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-21 18:10:55,727 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-21 18:10:56,331 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-21 18:10:56,332 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-21 18:12:07,692 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-21 18:12:07,693 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-21 18:14:05,535 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-21 18:14:05,536 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-21 18:14:06,459 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-21 18:14:06,460 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-21 18:18:38,827 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-21 18:18:38,828 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-21 18:25:33,380 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-21 18:25:33,381 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-21 18:25:34,333 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-21 18:25:34,334 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-22 14:29:17,027 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-22 14:29:17,029 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-22 14:29:18,028 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-22 14:29:18,029 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-22 14:29:25,020 - SchoolGradesServer - INFO - Accessing index page
+2026-01-22 14:29:38,542 - SchoolGradesServer - INFO - Fetching semester structure
+2026-01-22 14:29:38,543 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-01-22 14:30:09,265 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-01-22 14:30:48,144 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-01-22 14:30:49,038 - SchoolGradesServer - INFO - Fetching semester structure
+2026-01-22 14:30:58,241 - SchoolGradesServer - INFO - Successfully retrieved structure
+2026-01-22 14:32:17,637 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-22 14:32:17,639 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-22 14:32:36,772 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-22 14:32:36,773 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-22 14:33:00,960 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-22 14:33:00,962 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-22 14:34:08,337 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-22 14:34:08,338 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-22 14:34:52,835 - SchoolGradesServer - INFO - Accessing index page
+2026-01-22 14:34:55,755 - SchoolGradesServer - INFO - Fetching semester structure
+2026-01-22 14:34:55,756 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-01-22 14:35:15,181 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-01-22 14:35:27,635 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-01-22 14:35:29,342 - SchoolGradesServer - INFO - Fetching semester structure
+2026-01-22 14:35:35,645 - SchoolGradesServer - INFO - Successfully retrieved structure
+2026-01-22 14:37:27,923 - SchoolGradesServer - INFO - Fetching semester structure
+2026-01-22 14:37:34,355 - SchoolGradesServer - INFO - Successfully retrieved structure
+2026-01-22 14:39:00,979 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-22 14:39:00,980 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-22 14:39:48,241 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-22 14:39:48,242 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-22 14:40:00,321 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-22 14:40:00,322 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-22 14:40:49,289 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-22 14:40:49,290 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-22 14:41:00,010 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-22 14:41:00,011 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-22 14:41:35,379 - SchoolGradesServer - INFO - Accessing index page
+2026-01-22 14:41:38,203 - SchoolGradesServer - INFO - Fetching semester structure
+2026-01-22 14:41:38,205 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-01-22 14:41:50,347 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-01-22 14:41:59,786 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-01-22 14:42:01,655 - SchoolGradesServer - INFO - Fetching semester structure
+2026-01-22 14:42:06,988 - SchoolGradesServer - INFO - Successfully retrieved structure
+2026-01-22 14:46:03,580 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-22 14:46:03,581 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-22 14:46:35,773 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-01-22 14:46:35,774 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-01-22 14:47:01,666 - SchoolGradesServer - INFO - Fetching semester structure
+2026-01-22 14:47:01,668 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-01-22 14:47:07,884 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-01-22 14:47:17,223 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-01-22 14:47:17,224 - SchoolGradesServer - INFO - Fetching structure immediately after login...
+2026-01-22 14:47:20,200 - SchoolGradesServer - INFO - Structure cached: 0 semesters
+2026-01-22 14:47:21,653 - SchoolGradesServer - INFO - Fetching semester structure
+2026-01-22 14:47:27,010 - SchoolGradesServer - INFO - Successfully retrieved structure
+2026-02-10 17:38:03,681 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 17:38:03,682 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 17:38:04,096 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 17:38:04,096 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 17:38:06,851 - SchoolGradesServer - INFO - Accessing index page
+2026-02-10 17:38:10,762 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 17:38:10,762 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-10 17:38:12,290 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-10 17:38:44,267 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-10 17:38:44,267 - SchoolGradesServer - INFO - Fetching structure immediately after login...
+2026-02-10 17:38:48,690 - SchoolGradesServer - INFO - Structure cached: 0 semesters
+2026-02-10 17:38:50,293 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 17:38:56,247 - SchoolGradesServer - INFO - Successfully retrieved structure
+2026-02-10 17:39:04,817 - SchoolGradesServer - INFO - Accessing index page
+2026-02-10 18:14:40,309 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 18:14:40,310 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 18:15:11,765 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 18:15:11,765 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 18:19:35,793 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 18:19:35,794 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 18:19:36,090 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 18:19:36,091 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 18:19:39,330 - SchoolGradesServer - INFO - Accessing index page
+2026-02-10 18:19:41,713 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 18:19:41,714 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-10 18:19:42,917 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-10 18:19:54,076 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-10 18:19:54,076 - SchoolGradesServer - INFO - Fetching structure immediately after login...
+2026-02-10 18:20:11,042 - SchoolGradesServer - INFO - Structure cached: 0 semesters
+2026-02-10 18:20:12,610 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 18:20:29,961 - SchoolGradesServer - INFO - Successfully retrieved structure
+2026-02-10 18:21:59,379 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 18:21:59,379 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 18:21:59,673 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 18:21:59,673 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 18:22:04,170 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 18:22:04,170 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-10 18:22:06,384 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-10 18:22:12,358 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-10 18:22:12,358 - SchoolGradesServer - INFO - Fetching structure immediately after login...
+2026-02-10 18:22:17,615 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 18:22:17,616 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 18:22:17,687 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-10 18:22:24,241 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-10 18:22:24,242 - SchoolGradesServer - INFO - Fetching structure immediately after login...
+2026-02-10 18:22:28,941 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 18:22:28,942 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 18:22:29,632 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 18:22:29,633 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 18:22:32,312 - SchoolGradesServer - INFO - Accessing index page
+2026-02-10 18:22:34,393 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 18:22:34,398 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-10 18:22:35,427 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-10 18:22:42,787 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-10 18:22:42,788 - SchoolGradesServer - INFO - Fetching structure immediately after login...
+2026-02-10 18:24:23,518 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 18:24:23,519 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 18:24:24,304 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 18:24:24,305 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 18:24:26,664 - SchoolGradesServer - INFO - Accessing index page
+2026-02-10 18:24:28,478 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 18:24:28,479 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-10 18:24:29,505 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-10 18:24:38,169 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-10 18:24:38,171 - SchoolGradesServer - INFO - Fetching structure immediately after login...
+2026-02-10 18:25:05,671 - SchoolGradesServer - INFO - Structure cached: 0 semesters
+2026-02-10 18:25:06,888 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 18:28:44,627 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 18:28:44,627 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 18:28:44,921 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 18:28:44,921 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 18:29:04,620 - SchoolGradesServer - INFO - Accessing index page
+2026-02-10 18:29:06,796 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 18:29:06,797 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-10 18:29:07,792 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-10 18:29:17,391 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-10 18:29:17,392 - SchoolGradesServer - INFO - Fetching structure immediately after login...
+2026-02-10 18:29:46,631 - SchoolGradesServer - INFO - Structure cached: 0 semesters
+2026-02-10 18:33:20,362 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 18:33:20,363 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 18:33:21,275 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 18:33:21,276 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 18:33:32,363 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-10 18:33:42,157 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-10 18:33:42,157 - SchoolGradesServer - INFO - Fetching structure immediately after login...
+2026-02-10 18:34:12,102 - SchoolGradesServer - INFO - Structure cached: 0 semesters
+2026-02-10 18:34:13,015 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 18:34:46,348 - SchoolGradesServer - INFO - Successfully retrieved structure
+2026-02-10 18:36:40,710 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 18:36:40,711 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 19:51:49,183 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 19:51:49,184 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 19:51:50,001 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 19:51:50,002 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 19:51:52,958 - SchoolGradesServer - INFO - Accessing index page
+2026-02-10 19:51:56,183 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 19:51:56,184 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-10 19:51:57,302 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-10 19:52:06,480 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-10 19:52:06,480 - SchoolGradesServer - INFO - Fetching structure immediately after login...
+2026-02-10 19:52:26,293 - SchoolGradesServer - INFO - Structure cached: 4 semesters
+2026-02-10 19:52:27,624 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 19:52:27,624 - SchoolGradesServer - INFO - Using cached structure from session
+2026-02-10 19:52:34,609 - SchoolGradesServer - INFO - Fetching grades: year_value=114_1, exam_value=期末考_1
+2026-02-10 19:52:54,277 - SchoolGradesServer - INFO - Successfully fetched grades data
+2026-02-10 19:52:54,283 - SchoolGradesServer - INFO - Saved grades to grades_raw.json
+2026-02-10 19:53:04,952 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 19:53:04,952 - SchoolGradesServer - INFO - Using cached structure from session
+2026-02-10 19:54:50,433 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 19:54:50,435 - SchoolGradesServer - INFO - Using cached structure from session
+2026-02-10 19:57:15,689 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 19:57:15,690 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 19:57:16,312 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 19:57:16,312 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 19:58:39,928 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 19:58:39,929 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 19:58:40,228 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 19:58:40,228 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 19:58:44,108 - SchoolGradesServer - INFO - Accessing index page
+2026-02-10 19:58:46,332 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 19:58:46,334 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-10 19:58:47,502 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-10 19:58:58,647 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-10 19:58:58,647 - SchoolGradesServer - INFO - Fetching structure immediately after login...
+2026-02-10 19:59:18,967 - SchoolGradesServer - INFO - Structure cached: 4 semesters
+2026-02-10 19:59:19,799 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 19:59:19,799 - SchoolGradesServer - INFO - Using cached structure from session
+2026-02-10 19:59:31,600 - SchoolGradesServer - INFO - Fetching grades: year_value=114_1, exam_value=期末考_1
+2026-02-10 19:59:31,616 - SchoolGradesServer - ERROR - Error fetching grades: cannot switch to a different thread (which happens to have exited)
+Traceback (most recent call last):
+  File "C:\Users\USER\Desktop\project\school_grades\school_grades\server.py", line 190, in fetch_grades
+    data = fetcher.fetch_grades(year_value, exam_value)
+  File "C:\Users\USER\Desktop\project\school_grades\school_grades\grade_fetcher.py", line 319, in fetch_grades
+    raise e
+  File "C:\Users\USER\Desktop\project\school_grades\school_grades\grade_fetcher.py", line 270, in fetch_grades
+    self._navigate_to_grades_page()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\USER\Desktop\project\school_grades\school_grades\grade_fetcher.py", line 140, in _navigate_to_grades_page
+    self.page.goto(self.GRADES_URL, wait_until="networkidle", timeout=30000)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\site-packages\playwright\sync_api\_generated.py", line 9050, in goto
+    self._sync(
+    ~~~~~~~~~~^
+        self._impl_obj.goto(
+        ^^^^^^^^^^^^^^^^^^^^
+            url=url, timeout=timeout, waitUntil=wait_until, referer=referer
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+        ^
+    )
+    ^
+  File "C:\Python313\Lib\site-packages\playwright\_impl\_sync_base.py", line 113, in _sync
+    self._dispatcher_fiber.switch()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+greenlet.error: cannot switch to a different thread (which happens to have exited)
+2026-02-10 19:59:37,719 - SchoolGradesServer - INFO - Fetching grades: year_value=114_1, exam_value=期中考2_1
+2026-02-10 19:59:37,734 - SchoolGradesServer - ERROR - Error fetching grades: cannot switch to a different thread (which happens to have exited)
+Traceback (most recent call last):
+  File "C:\Users\USER\Desktop\project\school_grades\school_grades\server.py", line 190, in fetch_grades
+    data = fetcher.fetch_grades(year_value, exam_value)
+  File "C:\Users\USER\Desktop\project\school_grades\school_grades\grade_fetcher.py", line 319, in fetch_grades
+    raise e
+  File "C:\Users\USER\Desktop\project\school_grades\school_grades\grade_fetcher.py", line 270, in fetch_grades
+    self._navigate_to_grades_page()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\USER\Desktop\project\school_grades\school_grades\grade_fetcher.py", line 140, in _navigate_to_grades_page
+    self.page.goto(self.GRADES_URL, wait_until="networkidle", timeout=30000)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\site-packages\playwright\sync_api\_generated.py", line 9050, in goto
+    self._sync(
+    ~~~~~~~~~~^
+        self._impl_obj.goto(
+        ^^^^^^^^^^^^^^^^^^^^
+            url=url, timeout=timeout, waitUntil=wait_until, referer=referer
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+        ^
+    )
+    ^
+  File "C:\Python313\Lib\site-packages\playwright\_impl\_sync_base.py", line 113, in _sync
+    self._dispatcher_fiber.switch()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+greenlet.error: cannot switch to a different thread (which happens to have exited)
+2026-02-10 20:01:41,625 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 20:01:41,625 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 20:01:58,895 - SchoolGradesServer - INFO - Accessing index page
+2026-02-10 20:02:00,558 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 20:02:00,559 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-10 20:02:01,593 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-10 20:02:13,328 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-10 20:02:13,329 - SchoolGradesServer - INFO - Fetching structure immediately after login...
+2026-02-10 20:02:34,431 - SchoolGradesServer - INFO - Structure cached: 4 semesters
+2026-02-10 20:02:34,438 - SchoolGradesServer - INFO - Accessing index page
+2026-02-10 20:02:35,260 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 20:02:35,260 - SchoolGradesServer - INFO - Using cached structure from session
+2026-02-10 20:02:42,629 - SchoolGradesServer - INFO - Fetching grades: year_value=114_1, exam_value=期末考_1
+2026-02-10 20:02:46,334 - SchoolGradesServer - INFO - Successfully fetched grades data
+2026-02-10 20:02:46,342 - SchoolGradesServer - INFO - Saved grades to grades_raw.json
+2026-02-10 20:02:46,369 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 20:02:46,370 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-10 20:02:56,083 - SchoolGradesServer - INFO - Login attempt for user: 310458
+2026-02-10 20:02:56,089 - SchoolGradesServer - WARNING - Login failed for user 310458: 登入發生錯誤: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2026-02-10 20:03:45,547 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 20:03:45,547 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 20:03:57,902 - SchoolGradesServer - INFO - Accessing index page
+2026-02-10 20:03:59,698 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 20:03:59,699 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-10 20:04:05,265 - SchoolGradesServer - INFO - Login attempt for user: 310455
+2026-02-10 20:04:09,641 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 20:04:09,641 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-10 20:04:11,779 - SchoolGradesServer - WARNING - Login failed for user 310455: 登入失敗: 登入失敗，請確認您輸入的身分、學校與帳號密碼是否正確。若嘗試次數過多，系統將暫時鎖定，請稍後再試！
+2026-02-10 20:04:12,269 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-10 20:04:22,877 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-10 20:04:22,878 - SchoolGradesServer - INFO - Fetching structure immediately after login...
+2026-02-10 20:04:24,981 - SchoolGradesServer - INFO - Login attempt for user: 310455
+2026-02-10 20:04:31,503 - SchoolGradesServer - WARNING - Login failed for user 310455: 登入失敗: 登入失敗，請確認您輸入的身分、學校與帳號密碼是否正確。若嘗試次數過多，系統將暫時鎖定，請稍後再試！
+2026-02-10 20:04:43,957 - SchoolGradesServer - INFO - Structure cached: 4 semesters
+2026-02-10 20:04:45,723 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 20:04:45,723 - SchoolGradesServer - INFO - Using cached structure from session
+2026-02-10 20:04:49,819 - SchoolGradesServer - INFO - Fetching grades: year_value=114_1, exam_value=期末考_1
+2026-02-10 20:05:09,586 - SchoolGradesServer - INFO - Successfully fetched grades data
+2026-02-10 20:05:09,589 - SchoolGradesServer - INFO - Saved grades to grades_raw.json
+2026-02-10 20:06:21,729 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 20:06:21,730 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 20:06:57,184 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 20:06:57,185 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 20:07:00,547 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 20:07:00,548 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 20:24:05,141 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 20:24:05,141 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 20:24:05,478 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-10 20:24:05,478 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-10 20:25:13,760 - SchoolGradesServer - INFO - Accessing index page
+2026-02-10 20:25:43,671 - SchoolGradesServer - INFO - Accessing index page
+2026-02-10 20:25:46,848 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 20:25:46,851 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-10 20:25:56,189 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-10 20:26:08,622 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-10 20:26:08,622 - SchoolGradesServer - INFO - Fetching structure immediately after login...
+2026-02-10 20:26:28,560 - SchoolGradesServer - INFO - Structure cached: 4 semesters
+2026-02-10 20:26:29,238 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 20:26:29,239 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-10 20:26:56,082 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-10 20:27:03,922 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-10 20:27:03,922 - SchoolGradesServer - INFO - Fetching structure immediately after login...
+2026-02-10 20:27:23,953 - SchoolGradesServer - INFO - Structure cached: 4 semesters
+2026-02-10 20:27:25,048 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 20:27:25,049 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-10 20:27:41,286 - SchoolGradesServer - INFO - Accessing index page
+2026-02-10 20:27:46,773 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 20:27:46,790 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-10 20:28:06,450 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-10 20:28:22,635 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-10 20:28:22,635 - SchoolGradesServer - INFO - Fetching structure immediately after login...
+2026-02-10 20:28:42,262 - SchoolGradesServer - INFO - Structure cached: 4 semesters
+2026-02-10 20:28:45,071 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-10 20:28:45,071 - SchoolGradesServer - INFO - Using cached structure from session
+2026-02-10 20:28:52,695 - SchoolGradesServer - INFO - Fetching grades: year_value=114_1, exam_value=期末考_1
+2026-02-10 20:29:17,887 - SchoolGradesServer - INFO - Successfully fetched grades data
+2026-02-10 20:29:17,889 - SchoolGradesServer - INFO - Saved grades to grades_raw.json
+2026-02-12 23:06:18,118 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:06:18,119 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:06:18,526 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:06:18,526 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:06:20,675 - SchoolGradesServer - INFO - Accessing index page
+2026-02-12 23:06:22,785 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-12 23:06:22,786 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-12 23:13:54,262 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:13:54,263 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:14:52,815 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:14:52,815 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:17:53,321 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:17:53,322 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:17:53,668 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:17:53,668 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:18:02,572 - SchoolGradesServer - INFO - Accessing index page
+2026-02-12 23:18:23,136 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-12 23:18:23,137 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-12 23:19:36,145 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:19:36,145 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:19:36,516 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:19:36,516 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:19:41,070 - SchoolGradesServer - INFO - Accessing index page
+2026-02-12 23:19:42,675 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-12 23:19:42,675 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-12 23:19:43,849 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-12 23:20:31,943 - SchoolGradesServer - WARNING - Login failed for user 310471: 登入發生錯誤: Locator.click: Error: strict mode violation: get_by_text("學生") resolved to 2 elements:
+    1) <label class="btn btnOutlineBlueWithRounded" data-bind="css:{active:IsStudentTab}">…</label> aka get_by_text("學生", exact=True)
+    2) <b>…</b> aka get_by_text("因高級中等教育階段學生學習歷程資料庫於春節連假期間進行定期維運，故學生歷程系統部分功能無法使用，敬請見諒。 詳見:https://ep.k12ea.gov.")
+
+Call log:
+  - waiting for get_by_text("學生")
+
+2026-02-12 23:24:02,548 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:24:02,549 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:24:02,993 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:24:02,994 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:24:43,248 - SchoolGradesServer - INFO - Accessing index page
+2026-02-12 23:24:45,369 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-12 23:24:45,370 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-12 23:24:46,411 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-12 23:25:32,946 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-12 23:25:32,947 - SchoolGradesServer - ERROR - Login SSE error for user 310471: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+Traceback (most recent call last):
+  File "C:\Users\USER\Desktop\project\school_grades\school_grades\server.py", line 179, in generate
+    session[session_username_key] = username
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\site-packages\werkzeug\local.py", line 318, in __get__
+    obj = instance._get_current_object()
+  File "C:\Python313\Lib\site-packages\werkzeug\local.py", line 519, in _get_current_object
+    raise RuntimeError(unbound_message) from None
+RuntimeError: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+2026-02-12 23:27:51,018 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:27:51,018 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:28:08,464 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:28:08,465 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:28:40,039 - SchoolGradesServer - INFO - Accessing index page
+2026-02-12 23:28:44,287 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:28:44,288 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:28:44,613 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:28:44,613 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:28:49,468 - SchoolGradesServer - INFO - Accessing index page
+2026-02-12 23:28:51,414 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-12 23:28:51,414 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-12 23:28:52,783 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-12 23:29:30,927 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-12 23:29:30,928 - SchoolGradesServer - INFO - Structure cached: 4 semesters
+2026-02-12 23:29:31,744 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-12 23:29:31,745 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-12 23:29:39,020 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-12 23:30:21,009 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-12 23:30:21,010 - SchoolGradesServer - INFO - Structure cached: 4 semesters
+2026-02-12 23:30:21,821 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-12 23:30:21,822 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-12 23:33:04,210 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:33:04,211 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:33:04,228 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:33:04,229 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:34:09,796 - SchoolGradesServer - INFO - Accessing index page
+2026-02-12 23:34:12,994 - SchoolGradesServer - INFO - Accessing index page
+2026-02-12 23:34:15,149 - SchoolGradesServer - INFO - Accessing index page
+2026-02-12 23:34:16,725 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-12 23:34:16,726 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-12 23:34:18,477 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-12 23:35:06,985 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-12 23:35:06,987 - SchoolGradesServer - INFO - Structure cached: 4 semesters
+2026-02-12 23:35:12,532 - SchoolGradesServer - INFO - Fetching grades: year_value=114_1, exam_value=期末考_1
+2026-02-12 23:35:12,533 - SchoolGradesServer - WARNING - Attempted to fetch grades without login
+2026-02-12 23:35:28,473 - SchoolGradesServer - INFO - Fetching grades: year_value=114_1, exam_value=期末考_1
+2026-02-12 23:35:28,474 - SchoolGradesServer - WARNING - Attempted to fetch grades without login
+2026-02-12 23:35:31,900 - SchoolGradesServer - INFO - Fetching grades: year_value=114_1, exam_value=期末考_1
+2026-02-12 23:35:31,901 - SchoolGradesServer - WARNING - Attempted to fetch grades without login
+2026-02-12 23:35:57,505 - SchoolGradesServer - INFO - Fetching grades: year_value=114_1, exam_value=期末考_1
+2026-02-12 23:35:57,506 - SchoolGradesServer - WARNING - Attempted to fetch grades without login
+2026-02-12 23:36:01,411 - SchoolGradesServer - INFO - Fetching grades: year_value=113_2, exam_value=期中考1_1
+2026-02-12 23:36:01,412 - SchoolGradesServer - WARNING - Attempted to fetch grades without login
+2026-02-12 23:36:02,753 - SchoolGradesServer - INFO - Fetching grades: year_value=113_2, exam_value=期中考1_1
+2026-02-12 23:36:02,755 - SchoolGradesServer - WARNING - Attempted to fetch grades without login
+2026-02-12 23:37:08,441 - SchoolGradesServer - INFO - Fetching grades: year_value=114_1, exam_value=期末考_1
+2026-02-12 23:37:08,442 - SchoolGradesServer - WARNING - Attempted to fetch grades without login
+2026-02-12 23:39:09,630 - SchoolGradesServer - INFO - Accessing index page
+2026-02-12 23:39:12,253 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-12 23:39:12,254 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-12 23:39:13,347 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-12 23:39:47,449 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-12 23:39:47,450 - SchoolGradesServer - INFO - Structure cached: 4 semesters
+2026-02-12 23:39:53,057 - SchoolGradesServer - INFO - Fetching grades: year_value=114_1, exam_value=期末考_1
+2026-02-12 23:39:53,059 - SchoolGradesServer - WARNING - Attempted to fetch grades without login
+2026-02-12 23:39:56,769 - SchoolGradesServer - INFO - Fetching grades: year_value=114_1, exam_value=期中考2_1
+2026-02-12 23:39:56,770 - SchoolGradesServer - WARNING - Attempted to fetch grades without login
+2026-02-12 23:40:10,464 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:40:10,464 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:40:10,797 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:40:10,798 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:40:14,861 - SchoolGradesServer - INFO - Accessing index page
+2026-02-12 23:40:16,680 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-12 23:40:16,681 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-12 23:40:18,263 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-12 23:40:51,896 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-12 23:40:51,898 - SchoolGradesServer - INFO - Structure cached: 4 semesters
+2026-02-12 23:40:57,016 - SchoolGradesServer - INFO - Fetching grades: year_value=114_1, exam_value=期末考_1
+2026-02-12 23:40:57,017 - SchoolGradesServer - WARNING - Attempted to fetch grades without login
+2026-02-12 23:42:35,830 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:42:35,831 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:42:36,152 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:42:36,153 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:43:17,836 - SchoolGradesServer - INFO - Accessing index page
+2026-02-12 23:43:19,906 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-12 23:43:19,908 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-12 23:43:20,769 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-12 23:43:53,631 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-12 23:43:53,632 - SchoolGradesServer - INFO - Structure cached: 4 semesters
+2026-02-12 23:43:58,181 - SchoolGradesServer - INFO - Fetching grades: year_value=114_1, exam_value=期末考_1
+2026-02-12 23:43:58,182 - SchoolGradesServer - WARNING - Attempted to fetch grades without login
+2026-02-12 23:44:59,861 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:44:59,861 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:45:00,176 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:45:00,177 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:45:44,357 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:45:44,357 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:45:44,677 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:45:44,678 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:46:47,132 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:46:47,133 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:46:47,499 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:46:47,500 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:47:01,264 - SchoolGradesServer - INFO - Accessing index page
+2026-02-12 23:47:03,185 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-12 23:47:03,186 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-12 23:47:04,345 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-12 23:47:36,447 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-12 23:48:37,019 - SchoolGradesServer - INFO - Accessing index page
+2026-02-12 23:48:51,206 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-12 23:48:51,207 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-12 23:48:53,377 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-12 23:49:23,321 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-12 23:50:11,345 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-12 23:50:42,586 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-12 23:51:08,251 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:51:08,251 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:51:08,534 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:51:08,535 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:51:08,565 - SchoolGradesServer - INFO - Confirm login request with token: 6d5ad9a0-c848-47d7-bac5-cedebc82f061
+2026-02-12 23:51:08,566 - SchoolGradesServer - INFO - Current tokens: []
+2026-02-12 23:51:08,567 - SchoolGradesServer - INFO - Confirm login request with token: 52edd2a8-6251-463e-8e21-870b0a11f821
+2026-02-12 23:51:08,567 - SchoolGradesServer - WARNING - Invalid token: 6d5ad9a0-c848-47d7-bac5-cedebc82f061
+2026-02-12 23:51:08,567 - SchoolGradesServer - INFO - Current tokens: []
+2026-02-12 23:51:08,568 - SchoolGradesServer - WARNING - Invalid token: 52edd2a8-6251-463e-8e21-870b0a11f821
+2026-02-12 23:52:30,516 - SchoolGradesServer - INFO - Accessing index page
+2026-02-12 23:52:52,052 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-12 23:52:52,053 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-12 23:52:56,083 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-12 23:53:26,294 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-12 23:56:17,686 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:56:17,687 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-12 23:56:18,040 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-12 23:56:18,040 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-13 00:03:12,675 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-13 00:03:12,675 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-13 00:03:12,995 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-13 00:03:12,995 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-13 00:03:17,604 - SchoolGradesServer - INFO - Accessing index page
+2026-02-13 00:03:21,736 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-13 00:03:21,737 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-13 00:03:22,711 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-13 00:03:55,087 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-13 00:04:03,224 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-13 00:04:32,125 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-13 00:06:30,270 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-13 00:06:30,271 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-13 00:06:31,107 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-13 00:06:31,107 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-13 00:08:09,001 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-13 00:08:09,001 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-13 00:08:09,338 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-13 00:08:09,338 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-13 00:08:13,653 - SchoolGradesServer - INFO - Accessing index page
+2026-02-13 00:08:22,521 - SchoolGradesServer - INFO - Accessing index page
+2026-02-13 00:10:28,646 - SchoolGradesServer - INFO - Accessing index page
+2026-02-13 00:10:31,184 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-13 00:10:31,185 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-13 00:10:32,424 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-13 00:11:04,346 - SchoolGradesServer - INFO - Status stream finished, preparing result
+2026-02-13 00:11:04,347 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-13 00:11:04,348 - SchoolGradesServer - INFO - Generated token: a15d7e8e-4984-42e7-9c75-d653458bce33
+2026-02-13 00:11:04,351 - SchoolGradesServer - INFO - Sending result event JSON
+2026-02-13 00:11:04,353 - SchoolGradesServer - INFO - Result JSON length: 635
+2026-02-13 00:11:04,353 - SchoolGradesServer - INFO - Result event sent
+2026-02-13 00:11:34,523 - SchoolGradesServer - INFO - Accessing index page
+2026-02-13 00:11:37,221 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-13 00:11:37,224 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-13 00:11:37,983 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-13 00:12:08,493 - SchoolGradesServer - INFO - Status stream finished, preparing result
+2026-02-13 00:12:08,494 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-13 00:12:08,495 - SchoolGradesServer - INFO - Generated token: e94db4fc-0e10-409d-b7b1-920b57805bf0
+2026-02-13 00:12:08,497 - SchoolGradesServer - INFO - Sending result event JSON
+2026-02-13 00:12:08,498 - SchoolGradesServer - INFO - Result JSON length: 635
+2026-02-13 00:12:08,498 - SchoolGradesServer - INFO - Result event sent
+2026-02-14 23:51:52,711 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-14 23:51:52,712 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-14 23:51:53,406 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-14 23:51:53,407 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-14 23:51:55,179 - SchoolGradesServer - INFO - Accessing index page
+2026-02-14 23:51:57,234 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-14 23:51:57,235 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-14 23:52:04,652 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-14 23:52:34,080 - SchoolGradesServer - WARNING - Login failed for user 310471: 登入發生錯誤: Locator.click: Error: strict mode violation: get_by_text("學生") resolved to 2 elements:
+    1) <label class="btn btnOutlineBlueWithRounded" data-bind="css:{active:IsStudentTab}">…</label> aka get_by_text("學生", exact=True)
+    2) <b>…</b> aka get_by_text("因高級中等教育階段學生學習歷程資料庫於春節連假期間進行定期維運，故學生歷程系統部分功能無法使用，敬請見諒。 詳見:https://ep.k12ea.gov.")
+
+Call log:
+  - waiting for get_by_text("學生")
+
+2026-02-14 23:56:23,901 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-14 23:56:23,902 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-14 23:56:24,807 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-14 23:56:24,808 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-14 23:56:26,961 - SchoolGradesServer - INFO - Accessing index page
+2026-02-14 23:56:28,937 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-14 23:56:28,938 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-14 23:56:36,839 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-14 23:56:42,435 - SchoolGradesServer - WARNING - Login failed for user 310471: 登入發生錯誤: Locator.click: Error: strict mode violation: get_by_text("學生") resolved to 2 elements:
+    1) <label class="btn btnOutlineBlueWithRounded" data-bind="css:{active:IsStudentTab}">…</label> aka get_by_text("學生", exact=True)
+    2) <b>…</b> aka get_by_text("因高級中等教育階段學生學習歷程資料庫於春節連假期間進行定期維運，故學生歷程系統部分功能無法使用，敬請見諒。 詳見:https://ep.k12ea.gov.")
+
+Call log:
+  - waiting for get_by_text("學生")
+
+2026-02-14 23:57:57,844 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-14 23:57:57,845 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-14 23:57:58,735 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-14 23:57:58,736 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-14 23:58:02,171 - SchoolGradesServer - INFO - Accessing index page
+2026-02-14 23:58:04,359 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-14 23:58:04,360 - SchoolGradesServer - WARNING - Attempted to get structure without login
+2026-02-14 23:58:10,118 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-14 23:58:15,121 - SchoolGradesServer - WARNING - Login failed for user 310471: 登入發生錯誤: Locator.click: Error: strict mode violation: get_by_text("學生") resolved to 2 elements:
+    1) <label class="btn btnOutlineBlueWithRounded" data-bind="css:{active:IsStudentTab}">…</label> aka get_by_text("學生", exact=True)
+    2) <b>…</b> aka get_by_text("因高級中等教育階段學生學習歷程資料庫於春節連假期間進行定期維運，故學生歷程系統部分功能無法使用，敬請見諒。 詳見:https://ep.k12ea.gov.")
+
+Call log:
+  - waiting for get_by_text("學生")
+
+2026-02-14 23:59:26,366 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-14 23:59:26,367 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-15 00:00:18,670 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-15 00:00:18,671 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-15 00:00:27,401 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-15 00:00:32,601 - SchoolGradesServer - WARNING - Login failed for user 310471: 登入發生錯誤: Locator.click: Error: strict mode violation: get_by_text("學生") resolved to 2 elements:
+    1) <label class="btn btnOutlineBlueWithRounded" data-bind="css:{active:IsStudentTab}">…</label> aka get_by_text("學生", exact=True)
+    2) <b>…</b> aka get_by_text("因高級中等教育階段學生學習歷程資料庫於春節連假期間進行定期維運，故學生歷程系統部分功能無法使用，敬請見諒。 詳見:https://ep.k12ea.gov.")
+
+Call log:
+  - waiting for get_by_text("學生")
+
+2026-02-15 00:01:17,017 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-15 00:01:17,018 - SchoolGradesServer - INFO - Server access: http://localhost:5000
+2026-02-15 00:01:47,253 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-15 00:01:56,696 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-15 00:01:56,697 - SchoolGradesServer - INFO - Fetching structure immediately after login...
+2026-02-15 00:02:17,301 - SchoolGradesServer - INFO - Structure cached: 4 semesters
+2026-02-15 00:02:18,146 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-15 00:02:18,147 - SchoolGradesServer - INFO - Using cached structure from session
+2026-02-15 00:02:25,362 - SchoolGradesServer - INFO - Fetching grades: year_value=114_1, exam_value=期末考_1
+2026-02-15 00:02:43,461 - SchoolGradesServer - INFO - Successfully fetched grades data
+2026-02-15 00:02:43,470 - SchoolGradesServer - INFO - Saved grades to grades_raw.json
+2026-02-15 00:04:17,631 - SchoolGradesServer - INFO - Accessing index page
+2026-02-15 00:04:20,063 - SchoolGradesServer - INFO - Fetching semester structure
+2026-02-15 00:04:20,065 - SchoolGradesServer - INFO - Using cached structure from session
+2026-02-15 19:23:26,913 - SchoolGradesServer - INFO - Starting School Grades Server (Hybrid Mode)...
+2026-02-15 19:23:28,770 - SchoolGradesServer - INFO - Starting School Grades Server (Hybrid Mode)...
+2026-02-15 19:23:38,118 - SchoolGradesServer - INFO - Accessing index page
+2026-02-15 19:23:47,854 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-15 19:26:55,956 - SchoolGradesServer - INFO - Starting School Grades Server (Hybrid Mode)...
+2026-02-15 19:26:57,708 - SchoolGradesServer - INFO - Starting School Grades Server (Hybrid Mode)...
+2026-02-15 19:27:02,700 - SchoolGradesServer - INFO - Accessing index page
+2026-02-15 19:27:25,551 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-15 19:27:36,420 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-15 19:27:36,421 - SchoolGradesServer - INFO - Fetching structure via API...
+2026-02-15 19:27:36,612 - SchoolGradesServer - INFO - Structure cached: 0 semesters
+2026-02-15 19:31:35,067 - SchoolGradesServer - INFO - Starting School Grades Server (Hybrid Mode)...
+2026-02-15 19:31:57,169 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-15 19:32:12,048 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-15 19:32:12,049 - SchoolGradesServer - INFO - Fetching structure via API...
+2026-02-15 19:32:13,279 - SchoolGradesServer - INFO - Structure cached: 4 semesters
+2026-02-15 19:33:52,786 - SchoolGradesServer - INFO - Starting School Grades Server (Hybrid Mode)...
+2026-02-15 19:46:05,849 - SchoolGradesServer - INFO - Starting School Grades Server (Hybrid Mode)...
+2026-02-15 19:46:07,471 - SchoolGradesServer - INFO - Starting School Grades Server (Hybrid Mode)...
+2026-02-15 19:46:10,243 - SchoolGradesServer - INFO - Accessing index page
+2026-02-15 19:46:18,981 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-15 19:46:32,911 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-15 19:46:32,911 - SchoolGradesServer - INFO - Fetching structure via API...
+2026-02-15 19:46:34,216 - SchoolGradesServer - INFO - Structure cached: 4 semesters

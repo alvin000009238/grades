@@ -1,6 +1,9 @@
-import os
-import time
+import requests
+import urllib3
 from playwright.sync_api import sync_playwright
+
+# Disable insecure request warnings
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class GradeFetcher:
     def __init__(self, state_file="state.json", headless=True):
@@ -10,228 +13,251 @@ class GradeFetcher:
         self.browser = None
         self.context = None
         self.page = None
-        
-        # Selectors
+
+        # URLs
         self.LOGIN_URL = "https://shcloud2.k12ea.gov.tw/CLHSTYC/Auth/Auth/CloudLogin?sys=Auth"
         self.GRADES_URL = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/StudentInfo/Index?page=%E6%88%90%E7%B8%BE%E6%9F%A5%E8%A9%A2"
-        self.API_URL = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/TutorShGrade/GetScoreForStudentExamContent"
-        
-        self.TAB = 'div.tabSwitch[data-tab="單次考試所有成績"]'
-        self.BTN_QUERY = "button:has-text('查詢')"
-        self.YEAR_DROPDOWN = 'span.k-select[aria-controls="gradeYearTermFor單次考試所有成績_listbox"]'
-        self.YEAR_LISTBOX  = '#gradeYearTermFor單次考試所有成績_listbox'
-        self.EXAM_DROPDOWN = 'span.k-select[aria-controls="gradeExam_listbox"]'
-        self.EXAM_LISTBOX  = '#gradeExam_listbox'
+        self.API_BASE = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus"
 
     def start_browser(self, use_saved_state=True):
         """Start the browser if not already started."""
         if not self.browser:
             self.playwright = sync_playwright().start()
             self.browser = self.playwright.chromium.launch(headless=self.headless, slow_mo=100)
-            
-            # Check if state file exists and load it ONLY if requested
-            if use_saved_state and os.path.exists(self.state_file):
-                print(f"Loading session from {self.state_file}")
-                self.context = self.browser.new_context(storage_state=self.state_file)
-            else:
-                print("Starting with new session")
-                self.context = self.browser.new_context()
-                
+            self.context = self.browser.new_context()
             self.page = self.context.new_page()
 
-    def check_login_status(self):
-        """Check if current session is valid."""
+    def login_and_get_tokens(self, username, password):
+        """Login, extract tokens, close browser, and return credentials."""
         try:
-            self.start_browser(use_saved_state=True)
-            self.page.goto(self.GRADES_URL, wait_until="networkidle", timeout=10000)
-            # If redirected to login page, session is invalid
-            if "CloudLogin" in self.page.url:
-                return False
-            return True
-        except Exception as e:
-            print(f"Check login error: {e}")
-            return False
-
-    def login(self, username, password):
-        """Login to the system."""
-        try:
-            print(f"Attempting login for user: {username}")
-            # Force new session for login to avoid redirect loop if already logged in
+            print(f"Attempting login for user: {username} (Hybrid Mode)")
             self.start_browser(use_saved_state=False)
             print(f"Navigating to {self.LOGIN_URL}")
             self.page.goto(self.LOGIN_URL)
-            
+
             # Handle popup if exists
-            if self.page.get_by_role("button", name="Close this dialog").is_visible():
-                print("Closing dialog popup")
+            popup_close_btn = self.page.locator("button.swal2-close")
+            if popup_close_btn.is_visible():
+                print("Found swal2 popup, closing it")
+                popup_close_btn.click()
+            elif self.page.get_by_role("button", name="Close this dialog").is_visible():
+                print("Closing dialog popup via aria-label")
                 self.page.get_by_role("button", name="Close this dialog").click()
-                
+
             print("Clicking '學生'")
-            self.page.get_by_text("學生").click()
-            
+            self.page.get_by_text("學生", exact=True).click()
+
             print("Filling credentials")
             self.page.get_by_role('textbox', name='請輸入帳號').fill(username)
             self.page.get_by_placeholder('請輸入密碼').fill(password)
-            
-            print("Clicking checkbox")
-            # Try/Except for checkbox slightly more robustly?
+
             try:
                 self.page.get_by_role('checkbox').click()
-            except Exception as e:
-                print(f"Warning: Could not click checkbox: {e}")
+            except Exception:
+                pass
 
-            print("Clicking Login button and waiting for API check")
-            # Intercept the login check API
-            with self.page.expect_response(
-                lambda response: "DoCloudLoginCheck" in response.url and response.request.method == "POST"
-            ) as response_info:
+            print("Clicking Login button...")
+            with self.page.expect_response(lambda r: "DoCloudLoginCheck" in r.url and r.request.method == "POST") as response_info:
                 self.page.get_by_role('button', name='登入').click()
-            
+
             api_response = response_info.value
             try:
-                result_json = api_response.json()
-                print(f"Login API Response: {result_json}")
-                
-                # Check API result
-                if result_json.get("Status") == "Error" or (result_json.get("Result") and not result_json["Result"].get("IsLoginSuccess")):
-                    error_msg = result_json.get("Message") or (result_json.get("Result") and result_json["Result"].get("DisplayMsg")) or "登入失敗"
-                    print(f"Login API reported failure: {error_msg}")
-                    return False, f"登入失敗: {error_msg}"
-                    
-            except Exception as json_err:
-                print(f"Error parsing login API response: {json_err}")
-                # Continue to check URL if JSON parsing fails, just in case
-            
-            print("API check passed/skipped, waiting for redirect...")
+                result = api_response.json()
+                if result.get("Status") == "Error" or (result.get("Result") and not result["Result"].get("IsLoginSuccess")):
+                    return False, "登入失敗", None, None, None
+            except Exception as e:
+                print(f"Warning: Could not parse login API response (likely redirected): {e}")
+                # Don't return False here, assume potential success and let the URL check decide
+
+            print("Login API passed, waiting for redirect to Grades page...")
             try:
-                # Wait up to 20 seconds for the URL to change to the success page
                 self.page.wait_for_url("**/ICampus/**", timeout=20000)
             except Exception:
                 print("Timed out waiting for URL redirect")
 
-            current_url = self.page.url
-            print(f"Current URL after wait: {current_url}")
+            # Go to Grades page specifically to ensure tokens are present
+            print("Navigating to grades page to scrape tokens...")
+            self.page.goto(self.GRADES_URL, wait_until="networkidle")
+
+            # Scrape tokens
+            print("Scraping tokens...")
+            student_no = username # Confirmed by user
             
-            if "ICampus/Home/Index2" in current_url or "ICampus" in current_url:
-                print("Login successful, saving state")
-                # Save state
-                self.context.storage_state(path=self.state_file)
-                return True, "登入成功"
-            else:
-                print("Login failed: Redirected url does not match expected")
-                return False, f"登入失敗，請檢查帳號密碼 (URL: {current_url})"
-                
+            # Try to get verification token from hidden input
+            token = self.page.locator('input[name="__RequestVerificationToken"]').first.get_attribute('value')
+            
+            if not token:
+                print("Failed to find __RequestVerificationToken")
+                return False, "無法取得驗證代碼", None, None, None
+
+            # Get Cookies
+            cookies = {c['name']: c['value'] for c in self.context.cookies()}
+            
+            print(f"Successfully obtained credentials for {student_no}")
+            
+            # Close browser immediately to save resources
+            self.close()
+            
+            return True, "登入成功", cookies, student_no, token
+
         except Exception as e:
             print(f"Login Exception: {e}")
-            import traceback
-            traceback.print_exc()
-            return False, f"登入發生錯誤: {str(e)}"
+            self.close()
+            return False, f"登入錯誤: {str(e)}", None, None, None
 
-    def _get_options(self, dropdown_selector, listbox_selector):
-        """Helper to get options from Kendo dropdown."""
-        self.page.click(dropdown_selector)
-        self.page.wait_for_selector(listbox_selector, state="visible")
+    @staticmethod
+    def get_structure_via_api(cookies, student_no, token):
+        """Fetch structure using requests"""
+        url = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/CommonData/GetGradeCanQueryYearTermListByStudentNo"
+        headers = {
+            "Accept": "*/*",
+            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "X-Requested-With": "XMLHttpRequest",
+            "Origin": "https://shcloud2.k12ea.gov.tw",
+            "Referer": "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/StudentInfo/Index?page=%E6%88%90%E7%B8%BE%E6%9F%A5%E8%A9%A2"
+        }
+        data = {
+            "searchType": "各次考試單科成績", # Based on user info
+            "studentNo": student_no,
+            "__RequestVerificationToken": token
+        }
         
-        items = self.page.locator(f"{listbox_selector} .k-item").all()
-        if not items:
-            items = self.page.locator(f"{listbox_selector} li").all()
+        try:
+            print(f"Requesting structure for {student_no}...")
+            response = requests.post(url, headers=headers, data=data, cookies=cookies, verify=False)
+            response.raise_for_status()
             
-        options = [item.text_content().strip() for item in items]
+            # Convert API response to format expected by frontend
+            # The API likely returns a list of years/terms. We need to fetch exams for each?
+            # Actually, per user trace, this API returns years.
+            # Let's inspect the raw response logic from previous Playwright code...
+            # The previous code iterated through years and exams.
+            # Ideally we need `GetGradeCanQueryExamNoListByStudentNo` too?
+            # But user only gave `GetGradeCanQueryYearTermListByStudentNo`.
+            # Let's assume for now we return the years and frontend handles it, 
+            # OR we try to fetch exams if we can guess the API.
+            # User trace showed `GetGradeCanQueryExamNoListByStudentNo` in the list!
+            # Let's try to implement a basic structure first.
+            
+            years_data = response.json()
+            structure = {}
+            
+            for item in years_data:
+                # Assuming item has 'text' and 'value' or similar based on Kendo
+                # Kendo usually maps from DisplayText/Value.
+                # Let's handle both.
+                name = item.get('DisplayText') or item.get('text')
+                value = item.get('Value') or item.get('value')
+                
+                if not value: continue
+                
+                # We need exams for each year. 
+                # Attempt to call `GetGradeCanQueryExamNoListByStudentNo`
+                exams = GradeFetcher.get_exams_via_api(cookies, student_no, token, value)
+                
+                structure[name] = {
+                    "year_value": value,
+                    "exams": exams
+                }
+                
+            return structure
+            
+        except Exception as e:
+            print(f"Error fetching structure: {e}")
+            return {}
+
+    @staticmethod
+    def get_exams_via_api(cookies, student_no, token, year_value):
+        """Helper to fetch exams for a year"""
+        url = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/CommonData/GetGradeCanQueryExamNoListByStudentNo"
         
-        # Close dropdown
-        if items:
-            items[0].click()
-            
-        return options
-
-    def _select_option(self, dropdown_selector, listbox_selector, text):
-        """Helper to select an option."""
-        self.page.click(dropdown_selector)
-        self.page.wait_for_selector(listbox_selector, state="visible")
-        self.page.click(f'{listbox_selector} >> li:has-text("{text}")')
-
-    def get_years(self):
-        """Get available academic years."""
+        # Parse year and term from year_value (e.g., "114_1")
         try:
-            self.start_browser()
-            # Ensure we are on grades page
-            if self.GRADES_URL not in self.page.url:
-                self.page.goto(self.GRADES_URL, wait_until="networkidle")
-            
-            self.page.wait_for_selector(self.TAB)
-            self.page.click(self.TAB)
-            time.sleep(1) # Wait for UI
-            
-            return self._get_options(self.YEAR_DROPDOWN, self.YEAR_LISTBOX)
-        except Exception as e:
-            print(f"Error getting years: {e}")
-            return []
+            if "_" in str(year_value):
+                year, term = str(year_value).split("_")
+            elif len(str(year_value)) >= 4:
+                year = year_value[:-1]
+                term = year_value[-1]
+            else:
+                year = "114"
+                term = "1"
+        except:
+            year = "114"
+            term = "1"
 
-    def get_exams(self, year):
-        """Get available exams for a specific year."""
+        headers = {
+            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+             "X-Requested-With": "XMLHttpRequest",
+             "Referer": "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/StudentInfo/Index?page=%E6%88%90%E7%B8%BE%E6%9F%A5%E8%A9%A2"
+        }
+        data = {
+            "searchType": "單次考試所有成績", # Based on user trace
+            "studentNo": student_no,
+            "year": year,
+            "term": term,
+            "__RequestVerificationToken": token
+        }
         try:
-            self.start_browser()
-            if self.GRADES_URL not in self.page.url:
-                self.page.goto(self.GRADES_URL, wait_until="networkidle")
-            
-            self.page.wait_for_selector(self.TAB)
-            self.page.click(self.TAB)
-            
-            # Select year
-            self._select_option(self.YEAR_DROPDOWN, self.YEAR_LISTBOX, year)
-            time.sleep(1) # Wait for exams to load
-            
-            return self._get_options(self.EXAM_DROPDOWN, self.EXAM_LISTBOX)
+            resp = requests.post(url, headers=headers, data=data, cookies=cookies, verify=False)
+            if resp.status_code == 200:
+                exams = []
+                for item in resp.json():
+                     exams.append({
+                         "text": item.get('DisplayText') or item.get('text'),
+                         "value": item.get('Value') or item.get('value')
+                     })
+                return exams
         except Exception as e:
-            print(f"Error getting exams: {e}")
-            return []
+            print(f"Error fetching exams via API: {e}")
+        return []
 
-    def fetch_grades(self, year, exam):
-        """Fetch grades for specific year and exam."""
+    @staticmethod
+    def fetch_grades_via_api(cookies, student_no, token, year_value, exam_value):
+        """Fetch grades using requests"""
+        url = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/TutorShGrade/GetScoreForStudentExamContent"
+        headers = {
+            "Accept": "*/*",
+            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "X-Requested-With": "XMLHttpRequest",
+            "Referer": "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/StudentInfo/Index?page=%E6%88%90%E7%B8%BE%E6%9F%A5%E8%A9%A2"
+        }
+        
+        # Parse Year and Term from year_value (e.g., "114_2" -> Year: 114, Term: 2)
         try:
-            self.start_browser()
-            if self.GRADES_URL not in self.page.url:
-                self.page.goto(self.GRADES_URL, wait_until="networkidle")
-                
-            self.page.wait_for_selector(self.TAB)
-            self.page.click(self.TAB)
-            
-            # Select year and exam
-            self._select_option(self.YEAR_DROPDOWN, self.YEAR_LISTBOX, year)
-            time.sleep(0.5)
-            self._select_option(self.EXAM_DROPDOWN, self.EXAM_LISTBOX, exam)
-            
-            # Query
-            with self.page.expect_response(
-                lambda r: r.url.startswith(self.API_URL) and r.status == 200
-            ) as rinfo:
-                self.page.click(self.BTN_QUERY)
-                
-            resp = rinfo.value
-            return resp.json()
-            
+            if "_" in str(year_value):
+                year, term = str(year_value).split("_")
+            elif len(str(year_value)) >= 4:
+                year = year_value[:-1]
+                term = year_value[-1]
+            else:
+                 # Fallback/Default
+                 year = "114"
+                 term = "2"
+        except:
+            year = "114"
+            term = "2"
+
+        data = {
+            "StudentNo": student_no,
+            "SearchType": "單次考試所有成績",
+            "__RequestVerificationToken": token,
+            "Year": year,
+            "Term": term,
+            "ExamNo": exam_value
+        }
+        
+        print(f"API Fetching grades: Year={year}, Term={term}, Exam={exam_value}")
+        
+        try:
+            response = requests.post(url, headers=headers, data=data, cookies=cookies, verify=False)
+            response.raise_for_status()
+            return response.json()
         except Exception as e:
-            print(f"Error fetching grades: {e}")
+            print(f"API Fetch Error: {e}")
             raise e
-
-    def get_all_structure(self):
-        """Get all years and their corresponding exams."""
-        structure = {}
-        try:
-            print("Fetching all structure...")
-            years = self.get_years()
-            
-            for year in years:
-                print(f"Fetching exams for year: {year}")
-                exams = self.get_exams(year)
-                structure[year] = exams
-                
-            return structure
-        except Exception as e:
-            print(f"Error getting structure: {e}")
-            import traceback
-            traceback.print_exc()
-            return structure
 
     def close(self):
         """Close the browser."""
@@ -254,3 +280,4 @@ class GradeFetcher:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
+

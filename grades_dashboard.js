@@ -21,14 +21,8 @@ async function loadGradesData() {
             return;
         }
 
-        const response = await fetch('GetScoreForStudentExamContent.json');
-        if (!response.ok) {
-            throw new Error(`資料載入失敗: ${response.status}`);
-        }
-
-        const gradesData = await response.json();
-        validateGradesData(gradesData);
-        initDashboard(gradesData);
+        // Default: No data loaded
+        document.getElementById('updateTime').textContent = '無資料';
     } catch (error) {
         console.error(error);
         document.getElementById('updateTime').textContent = '無資料';
@@ -360,6 +354,19 @@ function generateScoreCards(subjects) {
         const diffClass = diff >= 0 ? 'positive' : 'negative';
         const diffIcon = diff >= 0 ? '↑' : '↓';
 
+        // 班排 (Class Rank)
+        const hasClassRank = subject.ClassRank !== null && subject.ClassRank !== undefined;
+        const classRank = hasClassRank ? Math.floor(subject.ClassRank) : null;
+        const classRankCount = subject.ClassRankCount || 0;
+        const classRankPercentile = hasClassRank && classRankCount > 0
+            ? Math.round((1 - (classRank - 1) / classRankCount) * 100)
+            : 0;
+
+        // 校排 (Year/School Rank)
+        const hasYearRank = subject.YearRank !== null && subject.YearRank !== undefined;
+        const yearRank = hasYearRank ? Math.floor(subject.YearRank) : null;
+        const yearRankCount = subject.YearRankCount || 0;
+
         const card = document.createElement('div');
         card.className = 'score-card';
         card.innerHTML = `
@@ -378,6 +385,42 @@ function generateScoreCards(subjects) {
                         ${diffIcon} ${Math.abs(diff).toFixed(2)}
                     </span>
                 </div>
+                ${hasClassRank || hasYearRank ? `
+                <div class="rank-section">
+                    ${hasClassRank ? `
+                    <div class="rank-item">
+                        <div class="rank-icon-wrapper class-rank-color">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </div>
+                        <span class="rank-label">班排</span>
+                        <span class="rank-value">
+                            <span class="rank-number">${classRank}</span>${classRankCount > 0 ? `<span class="rank-total">/${classRankCount}</span>` : ''}
+                        </span>
+                        ${classRankCount > 0 ? `<span class="rank-percentile ${getRankPercentileClass(classRankPercentile)}">PR${classRankPercentile}</span>` : ''}
+                    </div>
+                    ` : ''}
+                    ${hasYearRank ? `
+                    <div class="rank-item">
+                        <div class="rank-icon-wrapper year-rank-color">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 21h18"></path>
+                                <path d="M5 21V7l8-4 8 4v14"></path>
+                                <path d="M17 21v-8H7v8"></path>
+                            </svg>
+                        </div>
+                        <span class="rank-label">校排</span>
+                        <span class="rank-value">
+                            <span class="rank-number">${yearRank}</span>${yearRankCount > 0 ? `<span class="rank-total">/${yearRankCount}</span>` : ''}
+                        </span>
+                    </div>
+                    ` : ''}
+                </div>
+                ` : ''}
                 <div class="progress-bar">
                     <div class="progress-fill" style="width: ${scoreValue}%"></div>
                 </div>
@@ -385,6 +428,15 @@ function generateScoreCards(subjects) {
         `;
         grid.appendChild(card);
     });
+}
+
+// 取得排名百分位 CSS class
+function getRankPercentileClass(percentile) {
+    if (percentile >= 88) return 'pr-excellent';
+    if (percentile >= 75) return 'pr-good';
+    if (percentile >= 50) return 'pr-average';
+    if (percentile >= 25) return 'pr-below';
+    return 'pr-poor';
 }
 
 function getScoreClass(score) {
@@ -690,7 +742,7 @@ function setupSyncFeature() {
     const examSelect = document.getElementById('examSelect');
     const fetchStatus = document.getElementById('fetchStatus');
 
-    const API_BASE = 'http://localhost:5000/api';
+    const API_BASE = '/api';  // 使用相對路徑
     let availableStructure = {}; // Store the loaded structure
 
     // Helper to toggle modal
@@ -727,19 +779,20 @@ function setupSyncFeature() {
             return;
         }
 
-        showStatus(loginStatus, '登入中...', 'normal');
+        showStatus(loginStatus, '載入中...', 'normal');
         confirmLogin.disabled = true;
 
         try {
             const res = await fetch(`${API_BASE}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',  // 確保 cookie 被傳送
                 body: JSON.stringify({ username, password })
             });
             const data = await res.json();
 
             if (data.success) {
-                showStatus(loginStatus, '登入成功', 'success');
+                showStatus(loginStatus, '載入成功', 'success');
                 setTimeout(() => {
                     toggleModal(loginModal, false);
                     openSelectExamModal();
@@ -775,7 +828,9 @@ function setupSyncFeature() {
 
         try {
             // Fetch ALL structure at once
-            const res = await fetch(`${API_BASE}/structure`);
+            const res = await fetch(`${API_BASE}/structure`, {
+                credentials: 'include'  // 確保 cookie 被傳送
+            });
 
             // Handle Unauthorized (401) -> Redirect to Login
             if (res.status === 401) {
@@ -814,14 +869,15 @@ function setupSyncFeature() {
             return;
         }
 
-        const exams = availableStructure[year] || [];
+        const yearData = availableStructure[year];
+        const exams = yearData?.exams || [];
 
         if (exams.length > 0) {
             examSelect.innerHTML = '<option value="">請選擇考試</option>';
             exams.forEach(exam => {
                 const opt = document.createElement('option');
-                opt.value = exam;
-                opt.textContent = exam;
+                opt.value = exam.value;
+                opt.textContent = exam.text;
                 examSelect.appendChild(opt);
             });
             examSelect.disabled = false;
@@ -848,10 +904,15 @@ function setupSyncFeature() {
         confirmFetch.disabled = true;
 
         try {
+            const yearData = availableStructure[year];
             const res = await fetch(`${API_BASE}/fetch`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ year, exam })
+                credentials: 'include',
+                body: JSON.stringify({
+                    year_value: yearData?.year_value,
+                    exam_value: exam
+                })
             });
             const data = await res.json();
 
