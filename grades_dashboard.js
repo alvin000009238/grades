@@ -741,14 +741,21 @@ function setupSyncFeature() {
     const yearSelect = document.getElementById('yearSelect');
     const examSelect = document.getElementById('examSelect');
     const fetchStatus = document.getElementById('fetchStatus');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const reloadStructureBtn = document.getElementById('reloadStructureBtn');
 
-    const API_BASE = '/api';  // 使用相對路徑
+    const API_BASE = '/api';
     let availableStructure = {}; // Store the loaded structure
 
     // Helper to toggle modal
     const toggleModal = (modal, show) => {
         if (show) modal.classList.add('active');
         else modal.classList.remove('active');
+        // When closing select modal, clear interval
+        if (modal === selectExamModal && !show && reloadInterval) {
+            clearInterval(reloadInterval);
+            reloadInterval = null;
+        }
     };
 
     // Helper to show status
@@ -756,6 +763,57 @@ function setupSyncFeature() {
         el.textContent = msg;
         el.className = `status-msg ${type}`;
     };
+
+    // Cooldown Logic
+    const COOLDOWN_MS = 60 * 1000;
+    let reloadInterval = null;
+
+    const updateReloadButtonState = () => {
+        if (!reloadStructureBtn) return;
+
+        const lastReload = parseInt(localStorage.getItem('lastReloadTime') || '0');
+        const now = Date.now();
+        const diff = now - lastReload;
+
+        if (diff < COOLDOWN_MS) {
+            const remain = Math.ceil((COOLDOWN_MS - diff) / 1000);
+            reloadStructureBtn.disabled = true;
+            reloadStructureBtn.textContent = `重載 (${remain}s)`;
+
+            if (!reloadInterval) {
+                reloadInterval = setInterval(updateReloadButtonState, 1000);
+            }
+        } else {
+            reloadStructureBtn.disabled = false;
+            reloadStructureBtn.textContent = '重載';
+            if (reloadInterval) {
+                clearInterval(reloadInterval);
+                reloadInterval = null;
+            }
+        }
+    };
+
+    // Logout Logic
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            if (!confirm('確定要登出嗎？')) return;
+            try {
+                await fetch(`${API_BASE}/logout`, { method: 'POST' });
+                location.reload();
+            } catch (e) {
+                alert('登出失敗');
+            }
+        });
+    }
+
+    // Reload Button Logic
+    if (reloadStructureBtn) {
+        reloadStructureBtn.addEventListener('click', () => {
+            localStorage.setItem('lastReloadTime', Date.now());
+            updateReloadButtonState(); // Update UI immediately
+            openSelectExamModal(true);
+        });
+    }
 
     // 1. Click Sync Button (Optimistic UI)
     syncBtn.addEventListener('click', async () => {
@@ -765,7 +823,6 @@ function setupSyncFeature() {
             importDropdown.classList.remove('active');
         }
 
-        // Directly open Select Modal (Optimistic)
         openSelectExamModal();
     });
 
@@ -786,7 +843,7 @@ function setupSyncFeature() {
             const res = await fetch(`${API_BASE}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',  // 確保 cookie 被傳送
+                credentials: 'include',
                 body: JSON.stringify({ username, password })
             });
             const data = await res.json();
@@ -796,7 +853,6 @@ function setupSyncFeature() {
                 setTimeout(() => {
                     toggleModal(loginModal, false);
                     openSelectExamModal();
-                    // Clear password
                     passwordInput.value = '';
                     loginStatus.textContent = '';
                 }, 500);
@@ -817,8 +873,12 @@ function setupSyncFeature() {
     cancelLogin.addEventListener('click', () => toggleModal(loginModal, false));
 
     // 3. Select Exam Logic
-    const openSelectExamModal = async () => {
+    const openSelectExamModal = async (forceReload = false) => {
         toggleModal(selectExamModal, true);
+
+        // Update reload button state whenever modal opens
+        updateReloadButtonState();
+
         yearSelect.innerHTML = '<option>載入中...</option>';
         examSelect.innerHTML = '<option>請先選擇學年度</option>';
         examSelect.disabled = true;
@@ -828,8 +888,9 @@ function setupSyncFeature() {
 
         try {
             // Fetch ALL structure at once
-            const res = await fetch(`${API_BASE}/structure`, {
-                credentials: 'include'  // 確保 cookie 被傳送
+            const url = forceReload ? `${API_BASE}/structure?reload=true` : `${API_BASE}/structure`;
+            const res = await fetch(url, {
+                credentials: 'include'
             });
 
             // Handle Unauthorized (401) -> Redirect to Login

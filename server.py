@@ -145,12 +145,17 @@ def get_structure():
     if not session.get('api_token'):
         return jsonify({'error': '未登入'}), 401
     
+    force_reload = request.args.get('reload') == 'true'
     cached = session.get('structure')
-    if cached:
+    
+    if cached and not force_reload:
         return jsonify({'structure': cached})
         
-    # Retry fetch if not cached
+    # Retry fetch if not cached or forced
     try:
+        if not session.get('api_cookies') or not session.get('student_no'):
+             return jsonify({'error': '連線過期，請重新登入'}), 401
+
         structure = GradeFetcher.get_structure_via_api(
             session['api_cookies'], 
             session['student_no'], 
@@ -160,6 +165,11 @@ def get_structure():
         return jsonify({'structure': structure})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/logout', methods=['POST'])
+def logout():
+    session.clear()
+    return jsonify({'success': True, 'message': '已登出'})
 
 @app.route('/api/upload', methods=['POST'])
 def upload_grades():

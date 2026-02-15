@@ -42,6 +42,7 @@ state.json
 !requirements.txt
 !package.json
 !manifest.json
+!IMPLEMENTATION_PLAN.md
 # Exclude specific JSONs but allow config templates if any
 
 # Large Files
