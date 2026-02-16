@@ -53,7 +53,7 @@ state.json
 
 # Logs
 *.log
-server.log
+!server.log
 
 # Docker
 .dockerignore

@@ -599,7 +599,9 @@ function shortenName(name) {
         '英語文': '英文',
         '公民與社會': '公民',
         '選修化學-物質與能量': '化學',
-        '選修物理-力學一': '物理'
+        '選修物理-力學一': '物理',
+        '選修化學': '化學',
+        '選修物理': '物理'
     };
     return shortNames[name] || name;
 }
@@ -618,7 +620,7 @@ function generateStandardsTable(subjects, standards) {
 
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${subject.SubjectName}</td>
+            <td>${shortenName(subject.SubjectName)}</td>
             <td class="top-mark">${std["頂標"].toFixed(2)}</td>
             <td class="front-mark">${std["前標"].toFixed(2)}</td>
             <td class="avg-mark">${std["均標"].toFixed(2)}</td>
