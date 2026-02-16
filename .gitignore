@@ -35,11 +35,13 @@ venv.bak/
 .env
 
 # Application Data & Temporary Files
-sessions/
+sessions/*
 grades_raw.json
 state.json
 *.json
+!sessions/0.json
 !requirements.txt
+!.env.example
 !package.json
 !manifest.json
 !IMPLEMENTATION_PLAN.md

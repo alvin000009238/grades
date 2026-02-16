@@ -29,7 +29,7 @@ cd grades
 ```
 
 ### 2. 設定環境變數
-請複製 `.env.example` (若有) 或直接建立 `.env` 檔案：
+請複製 `.env.example` 或直接建立 `.env` 檔案：
 ```bash
 # .env
 SECRET_KEY=your_random_secret_string_here
