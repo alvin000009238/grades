@@ -307,8 +307,8 @@ function getSubjectWeight(subjectName) {
             return SUBJECT_WEIGHTS[key];
         }
     }
-    // 預設權重為 1
-    return 1;
+    // 預設權重為 2
+    return 2;
 }
 
 // 計算統計
