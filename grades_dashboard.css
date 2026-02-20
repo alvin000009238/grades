@@ -264,6 +264,30 @@ body {
     transform: scale(0.98);
 }
 
+.icon-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-main);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--duration) var(--ease);
+}
+
+.icon-btn:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-border);
+}
+
+.icon-btn:active {
+    transform: scale(0.98);
+}
+
 .dropdown-icon,
 .item-icon {
     display: flex;
@@ -443,6 +467,13 @@ body {
     padding: 24px;
     flex: 1;
     overflow: auto;
+}
+
+#sharePreview img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: var(--shadow-card);
 }
 
 #jsonTextInput {
@@ -1558,4 +1589,27 @@ body {
     50% {
         opacity: 0.85;
     }
+}
+
+/* ── Share Feature ─────────────────────── */
+#linkContainer {
+    animation: fadeInUp 0.3s var(--ease);
+}
+
+.share-indicator {
+    display: flex;
+    align-items: center;
+    margin-right: 12px;
+}
+
+/* Read Only Mode */
+body.read-only-mode .import-dropdown,
+body.read-only-mode #shareBtn,
+body.read-only-mode #syncBtn,
+body.read-only-mode #logoutBtn {
+    display: none !important;
+}
+
+body.read-only-mode .header {
+    border-bottom: 1px solid var(--color-warning-muted);
 }

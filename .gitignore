@@ -38,6 +38,7 @@ venv.bak/
 sessions/*
 grades_raw.json
 state.json
+shared_grades/
 *.json
 !sessions/0.json
 !requirements.txt

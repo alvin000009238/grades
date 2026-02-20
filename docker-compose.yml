@@ -5,6 +5,7 @@ services:
       - "5000:5000"
     volumes:
       - ./sessions:/app/sessions
+      - ./shared_grades:/app/shared_grades
       - ./grades_raw.json:/app/grades_raw.json
     environment:
       - PYTHONUNBUFFERED=1

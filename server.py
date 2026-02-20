@@ -6,6 +6,14 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 from grade_fetcher import GradeFetcher
+import time
+import threading
+import secrets
+import string
+
+SHARED_FOLDER = 'shared_grades'
+CLEANUP_INTERVAL = 600  # 10 minutes
+FILE_LIFETIME = 7200    # 2 hours
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -31,6 +39,7 @@ logger.addHandler(ch)
 
 app = Flask(__name__, static_folder='.')
 app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24).hex())
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  # 2MB max upload size
 
 # 信任反向代理 (Caddy) 傳來的 headers
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
@@ -45,13 +54,45 @@ CORS(app, supports_credentials=True)
 
 GRADES_FILE = 'grades_raw.json'
 
+if not os.path.exists(SHARED_FOLDER):
+    os.makedirs(SHARED_FOLDER)
+
+def cleanup_thread():
+    """Background thread to clean up old shared files."""
+    while True:
+        try:
+            now = time.time()
+            for filename in os.listdir(SHARED_FOLDER):
+                file_path = os.path.join(SHARED_FOLDER, filename)
+                if os.path.isfile(file_path):
+                    if now - os.path.getmtime(file_path) > FILE_LIFETIME:
+                        try:
+                            os.remove(file_path)
+                            logger.info(f"Deleted expired file: {filename}")
+                        except Exception as e:
+                            logger.error(f"Error deleting file {filename}: {e}")
+        except Exception as e:
+            logger.error(f"Error in cleanup thread: {e}")
+        time.sleep(CLEANUP_INTERVAL)
+
+# Cleanup thread is started in __main__ block to avoid double-start with debug reloader
+
 @app.route('/')
 def index():
     logger.info("Accessing index page")
     return send_from_directory('.', 'index.html')
 
+ALLOWED_STATIC_EXT = {'.html', '.css', '.js', '.json', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf'}
+
 @app.route('/<path:filename>')
 def static_files(filename):
+    # Block sensitive files
+    ext = os.path.splitext(filename)[1].lower()
+    if ext not in ALLOWED_STATIC_EXT:
+        return jsonify({'error': 'Forbidden'}), 403
+    # Block dotfiles and sensitive paths
+    if any(part.startswith('.') for part in filename.split('/')):
+        return jsonify({'error': 'Forbidden'}), 403
     return send_from_directory('.', filename)
 
 @app.route('/api/grades')
@@ -195,6 +236,56 @@ def upload_grades():
         logger.error(f"Error during upload: {str(e)}", exc_info=True)
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/share', methods=['POST'])
+def create_share_link():
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        # Generate 15-char random URL-safe ID with special chars
+        # Using A-Z, a-z, 0-9, -, _, ., ~
+        chars = string.ascii_letters + string.digits + "-_.~"
+        share_id = ''.join(secrets.choice(chars) for _ in range(15))
+        
+        file_path = os.path.join(SHARED_FOLDER, f"{share_id}.json")
+        
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False)
+            
+        return jsonify({'success': True, 'id': share_id})
+    except Exception as e:
+        logger.error(f"Error creating share: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/share/<share_id>', methods=['GET'])
+def get_shared_grades(share_id):
+    try:
+        # Basic validation for ID (alphanumeric + special chars)
+        if not all(c in string.ascii_letters + string.digits + "-_.~" for c in share_id):
+             return jsonify({'error': 'Invalid ID format'}), 400
+
+        file_path = os.path.join(SHARED_FOLDER, f"{share_id}.json")
+        if not os.path.exists(file_path):
+            return jsonify({'error': 'Link expired or not found'}), 404
+            
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            
+        return jsonify({'success': True, 'data': data})
+    except Exception as e:
+        logger.error(f"Error reading share: {e}")
+        return jsonify({'error': str(e)}), 500
+        
+@app.route('/share/<share_id>')
+def view_shared_page(share_id):
+    # Just serve the index page, JS will handle the rest based on URL
+    return send_from_directory('.', 'index.html')
+
 if __name__ == '__main__':
     logger.info("Starting School Grades Server (Hybrid Mode)...")
+    # Only start cleanup thread in the reloader child process (or when reloader is off)
+    if os.environ.get('WERKZEUG_RUN_MAIN') == 'true' or not app.debug:
+        threading.Thread(target=cleanup_thread, daemon=True).start()
+        logger.info("Cleanup thread started")
     app.run(host='0.0.0.0', port=5000, debug=True)

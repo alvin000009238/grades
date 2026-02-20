@@ -9,7 +9,7 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="grades_dashboard.css">
+    <link rel="stylesheet" href="/grades_dashboard.css">
 </head>
 
 <body>
@@ -44,73 +44,90 @@
                         <span class="time-label">資料更新時間</span>
                         <span class="time-value" id="updateTime">--</span>
                     </div>
-                    <div class="import-dropdown">
-                        <button class="import-dropdown-btn" id="importDropdownBtn">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button class="import-dropdown-btn" id="shareBtn"
+                            style="background: var(--color-surface-elevated); color: var(--color-text-main); border: 1px solid var(--color-border-subtle);">
                             <span class="dropdown-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                    <polyline points="7 10 12 15 17 10"></polyline>
-                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    <circle cx="18" cy="5" r="3"></circle>
+                                    <circle cx="6" cy="12" r="3"></circle>
+                                    <circle cx="18" cy="19" r="3"></circle>
+                                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
                                 </svg>
                             </span>
-                            <span>匯入</span>
-                            <span class="dropdown-arrow">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round">
-                                    <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                            </span>
+                            <span>分享</span>
                         </button>
-                        <div class="import-dropdown-menu" id="importDropdownMenu">
-                            <input type="file" id="gradesFile" accept=".json,application/json">
-                            <label class="dropdown-item" for="gradesFile">
-                                <span class="item-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                        <div class="import-dropdown">
+                            <button class="import-dropdown-btn" id="importDropdownBtn">
+                                <span class="dropdown-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round">
-                                        <path
-                                            d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z">
-                                        </path>
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
                                     </svg>
                                 </span>
-                                <span class="item-text">
-                                    <span class="item-title">選擇 JSON 檔案</span>
-                                    <span class="item-hint">從裝置選擇檔案</span>
-                                </span>
-                            </label>
-                            <button class="dropdown-item" id="pasteBtn">
-                                <span class="item-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                <span>匯入</span>
+                                <span class="dropdown-arrow">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round">
-                                        <path
-                                            d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
-                                        </path>
-                                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                                        <polyline points="6 9 12 15 18 9"></polyline>
                                     </svg>
-                                </span>
-                                <span class="item-text">
-                                    <span class="item-title">貼上文字</span>
-                                    <span class="item-hint">直接貼上 JSON 內容</span>
                                 </span>
                             </button>
-                            <button class="dropdown-item" id="syncBtn">
-                                <span class="item-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round">
-                                        <path
-                                            d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
-                                    </svg>
-                                </span>
-                                <span class="item-text">
-                                    <span class="item-title">雲端同步</span>
-                                    <span class="item-hint">登入學校系統抓取</span>
-                                </span>
-                            </button>
+                            <div class="import-dropdown-menu" id="importDropdownMenu">
+                                <input type="file" id="gradesFile" accept=".json,application/json">
+                                <label class="dropdown-item" for="gradesFile">
+                                    <span class="item-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path
+                                                d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z">
+                                            </path>
+                                        </svg>
+                                    </span>
+                                    <span class="item-text">
+                                        <span class="item-title">選擇 JSON 檔案</span>
+                                        <span class="item-hint">從裝置選擇檔案</span>
+                                    </span>
+                                </label>
+                                <button class="dropdown-item" id="pasteBtn">
+                                    <span class="item-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path
+                                                d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
+                                            </path>
+                                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                                        </svg>
+                                    </span>
+                                    <span class="item-text">
+                                        <span class="item-title">貼上文字</span>
+                                        <span class="item-hint">直接貼上 JSON 內容</span>
+                                    </span>
+                                </button>
+                                <button class="dropdown-item" id="syncBtn">
+                                    <span class="item-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path
+                                                d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
+                                        </svg>
+                                    </span>
+                                    <span class="item-text">
+                                        <span class="item-title">雲端同步(推薦)</span>
+                                        <span class="item-hint">登入學校系統抓取</span>
+                                    </span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -139,6 +156,29 @@
                 <div class="modal-footer">
                     <button class="modal-btn cancel" id="cancelPaste">取消</button>
                     <button class="modal-btn confirm" id="confirmPaste">確認匯入</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分享預覽視窗 -->
+        <div class="modal-overlay" id="shareModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                        分享成績單
+                    </h3>
+                    <button class="modal-close" id="closeShareModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="sharePreview"></div>
                 </div>
             </div>
         </div>
@@ -419,7 +459,7 @@
         </footer>
     </div>
 
-    <script src="grades_dashboard.js"></script>
+    <script src="/grades_dashboard.js"></script>
 </body>
 
 </html>

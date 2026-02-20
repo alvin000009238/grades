@@ -182,7 +182,7 @@ class GradeFetcher:
             else:
                 year = "114"
                 term = "1"
-        except:
+        except Exception:
             year = "114"
             term = "1"
 
@@ -236,7 +236,7 @@ class GradeFetcher:
                  # Fallback/Default
                  year = "114"
                  term = "2"
-        except:
+        except Exception:
             year = "114"
             term = "2"
 

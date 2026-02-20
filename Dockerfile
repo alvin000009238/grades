@@ -10,7 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Create necessary directories
-RUN mkdir -p sessions
+RUN mkdir -p sessions shared_grades
 
 # Expose port
 EXPOSE 5000
