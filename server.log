@@ -29,3 +29,10 @@
 2026-02-20 14:35:08,881 - SchoolGradesServer - INFO - Login successful for user: 310471
 2026-02-20 14:35:08,882 - SchoolGradesServer - INFO - Fetching structure via API...
 2026-02-20 14:35:10,516 - SchoolGradesServer - INFO - Structure cached: 4 semesters
+2026-02-20 20:51:24,716 - SchoolGradesServer - INFO - Cleanup thread started
+2026-02-20 20:51:24,719 - SchoolGradesServer - INFO - Starting School Grades Server (Hybrid Mode)...
+2026-02-20 20:51:24,719 - SchoolGradesServer - INFO - Deleted expired file: RXUIaQLRqDy15Aa.json
+2026-02-20 20:51:25,408 - SchoolGradesServer - INFO - Cleanup thread started
+2026-02-20 20:51:25,411 - SchoolGradesServer - INFO - Starting School Grades Server (Hybrid Mode)...
+2026-02-20 20:52:38,324 - SchoolGradesServer - INFO - Accessing index page
+2026-02-20 20:52:53,755 - SchoolGradesServer - INFO - Accessing index page

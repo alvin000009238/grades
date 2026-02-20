@@ -74,7 +74,14 @@ def cleanup_thread():
             logger.error(f"Error in cleanup thread: {e}")
         time.sleep(CLEANUP_INTERVAL)
 
-# Cleanup thread is started in __main__ block to avoid double-start with debug reloader
+# Start cleanup thread
+# In debug mode, Flask's reloader spawns two processes. We only start the thread
+# in the child (WERKZEUG_RUN_MAIN='true') to avoid running it twice.
+# In production (gunicorn), WERKZEUG_RUN_MAIN is not set, so it always starts.
+_is_reloader_parent = app.debug and os.environ.get('WERKZEUG_RUN_MAIN') != 'true'
+if not _is_reloader_parent:
+    threading.Thread(target=cleanup_thread, daemon=True).start()
+    logger.info("Cleanup thread started")
 
 @app.route('/')
 def index():
@@ -266,8 +273,4 @@ def view_shared_page(share_id):
 
 if __name__ == '__main__':
     logger.info("Starting School Grades Server (Hybrid Mode)...")
-    # Only start cleanup thread in the reloader child process (or when reloader is off)
-    if os.environ.get('WERKZEUG_RUN_MAIN') == 'true' or not app.debug:
-        threading.Thread(target=cleanup_thread, daemon=True).start()
-        logger.info("Cleanup thread started")
     app.run(host='0.0.0.0', port=5000, debug=True)
