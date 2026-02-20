@@ -832,29 +832,10 @@ body {
     overflow: hidden;
 }
 
-/* Hover — clean lift */
-.score-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: var(--color-primary);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s var(--ease);
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-}
-
 .score-card:hover {
     border-color: var(--color-border);
     box-shadow: var(--shadow-hover);
     transform: scale(1.01);
-}
-
-.score-card:hover::before {
-    transform: scaleX(1);
 }
 
 .score-header {

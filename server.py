@@ -272,5 +272,5 @@ def view_shared_page(share_id):
     return send_from_directory('.', 'index.html')
 
 if __name__ == '__main__':
-    logger.info("Starting School Grades Server (Hybrid Mode)...")
+    logger.info("Starting School Grades Server...")
     app.run(host='0.0.0.0', port=5000, debug=True)
