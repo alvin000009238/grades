@@ -52,7 +52,6 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 # CORS 設定 - 允許 credentials
 CORS(app, supports_credentials=True)
 
-GRADES_FILE = 'grades_raw.json'
 
 if not os.path.exists(SHARED_FOLDER):
     os.makedirs(SHARED_FOLDER)
@@ -95,20 +94,6 @@ def static_files(filename):
         return jsonify({'error': 'Forbidden'}), 403
     return send_from_directory('.', filename)
 
-@app.route('/api/grades')
-def get_grades():
-    logger.info("Fetching local grades file")
-    try:
-        with open(GRADES_FILE, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        logger.info("Successfully loaded grades file")
-        return jsonify(data)
-    except FileNotFoundError:
-        logger.warning(f"Grades file not found: {GRADES_FILE}")
-        return jsonify({'error': '找不到成績資料檔案'}), 404
-    except Exception as e:
-        logger.error(f"Error reading grades file: {str(e)}", exc_info=True)
-        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/check_login')
 def check_login():
@@ -168,9 +153,6 @@ def fetch_grades():
     
     try:
         data = GradeFetcher.fetch_grades_via_api(cookies, student_no, token, year_value, exam_value)
-        
-        with open(GRADES_FILE, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
             
         return jsonify({
             'success': True,
