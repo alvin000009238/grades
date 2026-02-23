@@ -1,59 +1,91 @@
 /* ========================================
-   Lumina Academic — Dark Mode
-   "Cupertino Clinical" · Apple Health / Linear
+   Lumina Academic — Material Design 3 (Dark Mode)
    ======================================== */
 
 /* ── Design Tokens ─────────────────────── */
 :root {
-    /* Primary — Apple System Blue */
-    --color-primary: #007AFF;
-    --color-primary-hover: #0A84FF;
-    --color-primary-muted: rgba(0, 122, 255, 0.12);
+    /* M3 Dark Theme Colors (Baseline baseline) */
+    --md-sys-color-primary: #a8c7fa;
+    --md-sys-color-on-primary: #062e6f;
+    --md-sys-color-primary-container: #224a94;
+    --md-sys-color-on-primary-container: #d6e3ff;
 
-    /* Semantic */
-    --color-success: #30D158;
-    --color-success-muted: rgba(48, 209, 88, 0.12);
-    --color-warning: #FF9F0A;
-    --color-warning-muted: rgba(255, 159, 10, 0.12);
-    --color-danger: #FF453A;
-    --color-danger-muted: rgba(255, 69, 58, 0.12);
-    --color-purple: #BF5AF2;
-    --color-purple-muted: rgba(191, 90, 242, 0.12);
+    --md-sys-color-secondary: #c2c7cf;
+    --md-sys-color-on-secondary: #2b313a;
+    --md-sys-color-secondary-container: #424751;
+    --md-sys-color-on-secondary-container: #dee3ec;
 
-    /* Surfaces — Apple Dark palette */
-    --color-bg: #000000;
-    --color-surface: #1C1C1E;
-    --color-surface-elevated: #2C2C2E;
-    --color-surface-hover: #3A3A3C;
-    --color-fill: rgba(120, 120, 128, 0.2);
+    --md-sys-color-error: #ffb4ab;
+    --md-sys-color-on-error: #690005;
+    --md-sys-color-error-container: #93000a;
+    --md-sys-color-on-error-container: #ffdad6;
+
+    --md-sys-color-background: #111318;
+    --md-sys-color-on-background: #e1e2e8;
+
+    --md-sys-color-surface: #111318;
+    --md-sys-color-on-surface: #e1e2e8;
+
+    --md-sys-color-surface-variant: #44474e;
+    --md-sys-color-on-surface-variant: #c4c6d0;
+
+    --md-sys-color-outline: #8e9099;
+    --md-sys-color-outline-variant: #44474e;
+
+    /* Semantic mapping */
+    --color-primary: var(--md-sys-color-primary);
+    --color-primary-hover: var(--md-sys-color-on-primary-container);
+    --color-primary-muted: var(--md-sys-color-primary-container);
+
+    --color-success: #81c995;
+    --color-success-muted: rgba(129, 201, 149, 0.15);
+    --color-warning: #fde293;
+    --color-warning-muted: rgba(253, 226, 147, 0.15);
+    --color-danger: var(--md-sys-color-error);
+    --color-danger-muted: var(--md-sys-color-error-container);
+    --color-purple: #dfbcf1;
+    --color-purple-muted: #583f68;
+
+    /* Surfaces — MD3 Elevations */
+    --color-bg: var(--md-sys-color-background);
+    --color-surface: var(--md-sys-color-surface);
+    --color-surface-elevated: #1e2025;
+    /* elevation 1 */
+    --color-surface-hover: #292b30;
+    /* elevation 2 */
+    --color-fill: var(--md-sys-color-surface-variant);
 
     /* Text */
-    --color-text-main: #F5F5F7;
-    --color-text-secondary: rgba(235, 235, 245, 0.6);
-    --color-text-muted: #86868B;
+    --color-text-main: var(--md-sys-color-on-surface);
+    --color-text-secondary: var(--md-sys-color-on-surface-variant);
+    --color-text-muted: var(--md-sys-color-outline);
 
     /* Separator */
-    --color-border: rgba(84, 84, 88, 0.65);
-    --color-border-subtle: rgba(84, 84, 88, 0.35);
+    --color-border: var(--md-sys-color-outline-variant);
+    --color-border-subtle: rgba(142, 144, 153, 0.2);
 
-    /* Shadow — ultra-diffuse */
-    --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.3);
-    --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.4);
-    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.2);
+    /* Shadow — MD3 Elevations */
+    --shadow-soft: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+    --shadow-hover: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+    --shadow-card: none;
+    /* M3 relies on surface color in dark mode */
 
-    /* Radius — iOS iconography */
-    --radius-lg: 20px;
-    --radius-md: 14px;
-    --radius-sm: 10px;
+    /* Radius — MD3 standard */
+    --radius-lg: 24px;
+    /* Extra large */
+    --radius-md: 16px;
+    /* Large */
+    --radius-sm: 8px;
+    /* Medium/small fallback */
     --radius-pill: 9999px;
 
     /* Motion */
-    --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
-    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease: cubic-bezier(0.2, 0, 0, 1);
+    --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
     --duration: 0.2s;
 
     /* Font */
-    --font-stack: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    --font-stack: 'Roboto', 'Noto Sans TC', sans-serif;
 }
 
 /* ── Reset ─────────────────────────────── */
@@ -243,25 +275,27 @@ body {
 .import-dropdown-btn {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
+    gap: 8px;
+    height: 40px;
+    padding: 0 24px;
     background: var(--color-primary);
     border: none;
-    border-radius: var(--radius-sm);
-    color: white;
-    font-size: 13px;
-    font-weight: 600;
+    border-radius: var(--radius-pill);
+    color: var(--md-sys-color-on-primary);
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
-    transition: opacity var(--duration) var(--ease);
+    transition: background-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
+    box-shadow: none;
 }
 
 .import-dropdown-btn:hover {
-    opacity: 0.85;
+    background: var(--color-primary-hover);
+    box-shadow: var(--shadow-soft);
 }
 
 .import-dropdown-btn:active {
-    opacity: 0.7;
-    transform: scale(0.98);
+    background: var(--color-primary-muted);
 }
 
 .icon-btn {
@@ -400,15 +434,15 @@ body {
 }
 
 .modal-content {
-    background: var(--color-surface);
+    background: var(--color-surface-elevated);
     border-radius: var(--radius-lg);
-    border: 1px solid var(--color-border);
+    border: none;
     width: 90%;
     max-width: 560px;
     max-height: 80vh;
     display: flex;
     flex-direction: column;
-    box-shadow: var(--shadow-soft);
+    box-shadow: var(--shadow-hover);
     transform: scale(0.97) translateY(8px);
     transition: all 0.25s var(--ease-spring);
 }
@@ -425,8 +459,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--color-border-subtle);
+    padding: 24px 24px 16px 24px;
+    border-bottom: none;
 }
 
 .modal-header h3 {
@@ -444,23 +478,27 @@ body {
 }
 
 .modal-close {
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     border: none;
-    background: var(--color-fill);
-    border-radius: 50%;
+    background: transparent;
+    border-radius: var(--radius-pill);
     color: var(--color-text-muted);
-    font-size: 18px;
+    font-size: 20px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all var(--duration) var(--ease);
+    transition: background-color var(--duration) var(--ease), color var(--duration) var(--ease);
 }
 
 .modal-close:hover {
-    background: var(--color-danger-muted);
-    color: var(--color-danger);
+    background: var(--color-surface-hover);
+    color: var(--color-text-main);
+}
+
+.modal-close:active {
+    background: var(--color-fill);
 }
 
 .modal-body {
@@ -506,89 +544,118 @@ body {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
-    padding: 16px 24px;
-    border-top: 1px solid var(--color-border-subtle);
+    padding: 16px 24px 24px 24px;
+    border-top: none;
 }
 
 .modal-btn {
-    padding: 8px 18px;
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    padding: 0 24px;
+    border-radius: var(--radius-pill);
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
-    transition: all var(--duration) var(--ease);
+    transition: background-color var(--duration) var(--ease), color var(--duration) var(--ease);
     border: none;
 }
 
 .modal-btn.cancel {
-    background: var(--color-fill);
-    color: var(--color-text-secondary);
+    background: transparent;
+    color: var(--color-primary);
 }
 
 .modal-btn.cancel:hover {
-    background: var(--color-surface-hover);
-    color: var(--color-text-main);
+    background: var(--color-fill);
 }
 
 .modal-btn.confirm {
     background: var(--color-primary);
-    color: white;
+    color: var(--md-sys-color-on-primary);
 }
 
 .modal-btn.confirm:hover {
-    opacity: 0.85;
+    background: var(--color-primary-hover);
 }
 
 .modal-btn.confirm:active {
-    opacity: 0.7;
-    transform: scale(0.98);
+    background: var(--color-primary-muted);
 }
 
 .modal-btn.reload {
-    background: var(--color-primary-muted);
-    color: var(--color-primary-hover);
+    background: transparent;
+    color: var(--color-primary);
+    border: 1px solid var(--color-border);
 }
 
 .modal-btn.reload:hover {
-    background: rgba(0, 122, 255, 0.2);
+    background: var(--color-fill);
 }
 
 .modal-btn.reload:disabled {
-    opacity: 0.35;
+    opacity: 0.38;
     cursor: not-allowed;
 }
 
 .modal-btn.danger {
-    background: var(--color-danger-muted);
+    background: transparent;
     color: var(--color-danger);
 }
 
 .modal-btn.danger:hover {
-    background: rgba(255, 69, 58, 0.2);
+    background: var(--color-danger-muted);
 }
 
-/* ── Forms ─────────────────────────────── */
 .form-group {
-    margin-bottom: 18px;
+    position: relative;
+    margin-bottom: 24px;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 6px;
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
     color: var(--color-text-secondary);
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 16px;
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    background: transparent;
+    padding: 0 4px;
+    margin: 0;
+}
+
+/* Float label when input is focused, or has content */
+.form-group input:focus~label,
+.form-group input:not(:placeholder-shown)~label,
+.form-group select:focus~label,
+.form-group select:not(:placeholder-shown)~label {
+    top: 0;
+    transform: translateY(-50%) scale(0.75);
+    left: 12px;
+    background: var(--color-surface-elevated);
+    /* Match modal surface */
+    color: var(--color-primary);
+}
+
+.form-group input::placeholder {
+    color: transparent;
+    /* Hide placeholder so :not(:placeholder-shown) works */
 }
 
 .form-group input,
 .form-group select {
+
     width: 100%;
-    padding: 11px 14px;
-    background: var(--color-bg);
-    border: 1px solid var(--color-border-subtle);
+    padding: 16px 16px;
+    background: transparent;
+    border: 1px solid var(--md-sys-color-outline);
     border-radius: var(--radius-sm);
     color: var(--color-text-main);
-    font-size: 14px;
+    font-size: 16px;
+    line-height: 24px;
     transition: border-color var(--duration) var(--ease),
         box-shadow var(--duration) var(--ease);
 }
@@ -596,17 +663,19 @@ body {
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
+    background: transparent;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+    box-shadow: 0 0 0 1px var(--color-primary);
 }
 
 .form-group select {
     cursor: pointer;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2386868B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238e9099' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
-    padding-right: 36px;
+    padding-right: 48px;
 }
 
 .form-group select option {
@@ -662,12 +731,12 @@ body {
     display: flex;
     align-items: center;
     gap: 28px;
-    background: var(--color-surface);
+    background: var(--color-surface-elevated);
     border-radius: var(--radius-lg);
     padding: 28px 32px;
     margin-bottom: 40px;
-    border: 1px solid var(--color-border-subtle);
-    box-shadow: var(--shadow-card);
+    border: none;
+    box-shadow: var(--shadow-soft);
     flex-wrap: wrap;
 }
 
@@ -756,13 +825,13 @@ body {
 }
 
 .stat-box {
-    background: var(--color-surface-elevated);
+    background: var(--color-surface-hover);
     border: none;
     border-radius: var(--radius-md);
     padding: 14px 22px;
     text-align: center;
     min-width: 100px;
-    transition: all var(--duration) var(--ease);
+    transition: background-color var(--duration) var(--ease);
 }
 
 .stat-box:hover {
@@ -823,19 +892,19 @@ body {
 }
 
 .score-card {
-    background: var(--color-surface);
+    background: var(--color-surface-elevated);
     border-radius: var(--radius-lg);
     padding: 20px 22px;
-    border: 1px solid var(--color-border-subtle);
-    transition: all var(--duration) var(--ease);
+    border: none;
+    box-shadow: var(--shadow-soft);
+    transition: background-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
     position: relative;
     overflow: hidden;
 }
 
 .score-card:hover {
-    border-color: var(--color-border);
+    background: var(--color-surface-hover);
     box-shadow: var(--shadow-hover);
-    transform: scale(1.01);
 }
 
 .score-header {
@@ -909,7 +978,7 @@ body {
     gap: 6px;
     padding: 10px 12px;
     margin-top: 4px;
-    background: var(--color-surface-elevated);
+    background: var(--color-fill);
     border-radius: var(--radius-sm);
     border: none;
 }
@@ -1107,8 +1176,8 @@ body {
 
 .standards-table-wrapper {
     overflow-x: auto;
-    background: var(--color-surface);
-    border-radius: var(--radius-lg);
+    background: transparent;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--color-border-subtle);
 }
 
@@ -1126,11 +1195,11 @@ body {
 }
 
 .standards-table th {
-    background: var(--color-surface-elevated);
+    background: transparent;
     font-weight: 600;
     color: var(--color-text-secondary);
     white-space: nowrap;
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: 0.02em;
 }
 

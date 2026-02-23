@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>成績分析平台 - 中大壢中</title>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="/grades_dashboard.css">
@@ -27,12 +30,7 @@
             <div class="header-content">
                 <div class="logo">
                     <div class="logo-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="20" x2="18" y2="10"></line>
-                            <line x1="12" y1="20" x2="12" y2="4"></line>
-                            <line x1="6" y1="20" x2="6" y2="14"></line>
-                        </svg>
+                        <span class="material-symbols-outlined" style="font-size: 24px;">bar_chart</span>
                     </div>
                     <div class="logo-text">
                         <h1>成績分析平台</h1>
@@ -49,49 +47,25 @@
                         <button class="import-dropdown-btn" id="shareBtn"
                             style="background: var(--color-surface-elevated); color: var(--color-text-main); border: 1px solid var(--color-border-subtle);">
                             <span class="dropdown-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round">
-                                    <circle cx="18" cy="5" r="3"></circle>
-                                    <circle cx="6" cy="12" r="3"></circle>
-                                    <circle cx="18" cy="19" r="3"></circle>
-                                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-                                </svg>
+                                <span class="material-symbols-outlined" style="font-size: 18px;">share</span>
                             </span>
                             <span>分享</span>
                         </button>
                         <div class="import-dropdown">
                             <button class="import-dropdown-btn" id="importDropdownBtn">
                                 <span class="dropdown-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round">
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                        <polyline points="7 10 12 15 17 10"></polyline>
-                                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                                    </svg>
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
                                 </span>
                                 <span>匯入</span>
                                 <span class="dropdown-arrow">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round">
-                                        <polyline points="6 9 12 15 18 9"></polyline>
-                                    </svg>
+                                    <span class="material-symbols-outlined" style="font-size: 16px;">expand_more</span>
                                 </span>
                             </button>
                             <div class="import-dropdown-menu" id="importDropdownMenu">
                                 <input type="file" id="gradesFile" accept=".json,application/json">
                                 <label class="dropdown-item" for="gradesFile">
                                     <span class="item-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round">
-                                            <path
-                                                d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z">
-                                            </path>
-                                        </svg>
+                                        <span class="material-symbols-outlined">folder_open</span>
                                     </span>
                                     <span class="item-text">
                                         <span class="item-title">選擇 JSON 檔案</span>
@@ -100,14 +74,7 @@
                                 </label>
                                 <button class="dropdown-item" id="pasteBtn">
                                     <span class="item-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round">
-                                            <path
-                                                d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
-                                            </path>
-                                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-                                        </svg>
+                                        <span class="material-symbols-outlined">content_paste</span>
                                     </span>
                                     <span class="item-text">
                                         <span class="item-title">貼上文字</span>
@@ -116,12 +83,7 @@
                                 </button>
                                 <button class="dropdown-item" id="syncBtn">
                                     <span class="item-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round">
-                                            <path
-                                                d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
-                                        </svg>
+                                        <span class="material-symbols-outlined">cloud_sync</span>
                                     </span>
                                     <span class="item-text">
                                         <span class="item-title">雲端同步(推薦)</span>
@@ -140,11 +102,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-                        </svg>
+                        <span class="material-symbols-outlined" style="font-size: 24px;">content_paste</span>
                         貼上 JSON 內容
                     </h3>
                     <button class="modal-close" id="closeModal">&times;</button>
@@ -166,14 +124,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="18" cy="5" r="3"></circle>
-                            <circle cx="6" cy="12" r="3"></circle>
-                            <circle cx="18" cy="19" r="3"></circle>
-                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-                        </svg>
+                        <span class="material-symbols-outlined" style="font-size: 24px;">share</span>
                         分享成績單
                     </h3>
                     <button class="modal-close" id="closeShareModal">&times;</button>
@@ -193,28 +144,17 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
+                        <input type="text" id="usernameInput" placeholder=" ">
                         <label>帳號</label>
-                        <input type="text" id="usernameInput" placeholder="請輸入帳號">
                     </div>
                     <div class="form-group">
-                        <label>密碼</label>
                         <div class="password-group">
-                            <input type="password" id="passwordInput" placeholder="請輸入密碼">
+                            <input type="password" id="passwordInput" placeholder=" ">
+                            <label>密碼</label>
                             <button type="button" id="togglePasswordBtn" class="toggle-password-btn" tabindex="-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="eye-icon">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="eye-off-icon" style="display: none;">
-                                    <path
-                                        d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
-                                    </path>
-                                    <line x1="1" y1="1" x2="23" y2="23"></line>
-                                </svg>
+                                <span class="material-symbols-outlined eye-icon">visibility</span>
+                                <span class="material-symbols-outlined eye-off-icon"
+                                    style="display: none;">visibility_off</span>
                             </button>
                         </div>
                     </div>
@@ -236,16 +176,16 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>學年度</label>
                         <select id="yearSelect">
                             <option value="">載入中...</option>
                         </select>
+                        <label>學年度</label>
                     </div>
                     <div class="form-group">
-                        <label>考試名稱</label>
                         <select id="examSelect">
                             <option value="">請先選擇學年度</option>
                         </select>
+                        <label>考試名稱</label>
                     </div>
                     <div id="fetchStatus" class="status-msg"></div>
                 </div>
@@ -273,37 +213,19 @@
                 <div class="student-details">
                     <div class="detail-item">
                         <span class="detail-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path d="M3 21h18"></path>
-                                <path d="M5 21V7l8-4 8 4v14"></path>
-                                <path d="M17 21v-8H7v8"></path>
-                            </svg>
+                            <span class="material-symbols-outlined" style="font-size: 18px;">domain</span>
                         </span>
                         <span class="detail-text" id="studentClass">--</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
-                            </svg>
+                            <span class="material-symbols-outlined" style="font-size: 18px;">event_seat</span>
                         </span>
                         <span class="detail-text">座號 <span id="studentSeat">--</span></span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <line x1="4" y1="9" x2="20" y2="9"></line>
-                                <line x1="4" y1="15" x2="20" y2="15"></line>
-                                <line x1="10" y1="3" x2="8" y2="21"></line>
-                                <line x1="16" y1="3" x2="14" y2="21"></line>
-                            </svg>
+                            <span class="material-symbols-outlined" style="font-size: 18px;">numbers</span>
                         </span>
                         <span class="detail-text">學號 <span id="studentNo">--</span></span>
                     </div>
@@ -337,14 +259,7 @@
         <section class="scores-overview">
             <h3 class="section-title">
                 <span class="title-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
+                    <span class="material-symbols-outlined">view_list</span>
                 </span>
                 各科成績概覽
             </h3>
@@ -361,15 +276,7 @@
                     <div class="chart-header">
                         <h3 class="chart-title">
                             <span class="chart-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <circle cx="12" cy="12" r="6"></circle>
-                                    <circle cx="12" cy="12" r="2"></circle>
-                                    <line x1="12" y1="2" x2="12" y2="22"></line>
-                                    <line x1="22" y1="12" x2="2" y2="12"></line>
-                                </svg>
+                                <span class="material-symbols-outlined">radar</span>
                             </span>
                             個人 vs 班級平均
                         </h3>
@@ -384,13 +291,7 @@
                     <div class="chart-header">
                         <h3 class="chart-title">
                             <span class="chart-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round">
-                                    <line x1="18" y1="20" x2="18" y2="10"></line>
-                                    <line x1="12" y1="20" x2="12" y2="4"></line>
-                                    <line x1="6" y1="20" x2="6" y2="14"></line>
-                                </svg>
+                                <span class="material-symbols-outlined">bar_chart</span>
                             </span>
                             成績對比分析
                         </h3>
@@ -406,11 +307,7 @@
         <section class="standards-section">
             <h3 class="section-title">
                 <span class="title-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                        <polyline points="17 6 23 6 23 12"></polyline>
-                    </svg>
+                    <span class="material-symbols-outlined">analytics</span>
                 </span>
                 班級五標分析
             </h3>
@@ -440,12 +337,7 @@
         <section class="distribution-section">
             <h3 class="section-title">
                 <span class="title-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="12" y1="20" x2="12" y2="10"></line>
-                        <line x1="18" y1="20" x2="18" y2="4"></line>
-                        <line x1="6" y1="20" x2="6" y2="16"></line>
-                    </svg>
+                    <span class="material-symbols-outlined">scatter_plot</span>
                 </span>
                 班級分數分佈
             </h3>
