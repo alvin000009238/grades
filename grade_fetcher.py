@@ -1,6 +1,8 @@
+import asyncio
+import threading
 import requests
 import urllib3
-from playwright.sync_api import sync_playwright
+from playwright.async_api import async_playwright
 
 # Disable insecure request warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -21,46 +23,53 @@ class GradeFetcher:
 
     def start_browser(self, use_saved_state=True):
         """Start the browser if not already started."""
+        self._run_coro_sync(self._start_browser())
+
+    async def _start_browser(self):
+        """Async browser startup to support asyncio environments."""
         if not self.browser:
-            self.playwright = sync_playwright().start()
-            self.browser = self.playwright.chromium.launch(headless=self.headless, slow_mo=100)
-            self.context = self.browser.new_context()
-            self.page = self.context.new_page()
+            self.playwright = await async_playwright().start()
+            self.browser = await self.playwright.chromium.launch(headless=self.headless, slow_mo=100)
+            self.context = await self.browser.new_context()
+            self.page = await self.context.new_page()
 
     def login_and_get_tokens(self, username, password):
+        return self._run_coro_sync(self._login_and_get_tokens_async(username, password))
+
+    async def _login_and_get_tokens_async(self, username, password):
         """Login, extract tokens, close browser, and return credentials."""
         try:
             print(f"Attempting login for user: {username} (Hybrid Mode)")
-            self.start_browser(use_saved_state=False)
+            await self._start_browser()
             print(f"Navigating to {self.LOGIN_URL}")
-            self.page.goto(self.LOGIN_URL)
+            await self.page.goto(self.LOGIN_URL)
 
             # Handle popup if exists
             popup_close_btn = self.page.locator("button.swal2-close")
-            if popup_close_btn.is_visible():
+            if await popup_close_btn.is_visible():
                 print("Found swal2 popup, closing it")
-                popup_close_btn.click()
-            elif self.page.get_by_role("button", name="Close this dialog").is_visible():
+                await popup_close_btn.click()
+            elif await self.page.get_by_role("button", name="Close this dialog").is_visible():
                 print("Closing dialog popup via aria-label")
-                self.page.get_by_role("button", name="Close this dialog").click()
+                await self.page.get_by_role("button", name="Close this dialog").click()
 
             print("Clicking '學生'")
-            self.page.get_by_text("學生", exact=True).click()
+            await self.page.get_by_text("學生", exact=True).click()
 
             print("Filling credentials")
-            self.page.get_by_role('textbox', name='請輸入帳號').fill(username)
-            self.page.get_by_placeholder('請輸入密碼').fill(password)
+            await self.page.get_by_role('textbox', name='請輸入帳號').fill(username)
+            await self.page.get_by_placeholder('請輸入密碼').fill(password)
 
             try:
-                self.page.get_by_role('checkbox').click()
+                await self.page.get_by_role('checkbox').click()
             except Exception:
                 pass
 
             print("Clicking Login button...")
-            with self.page.expect_response(lambda r: "DoCloudLoginCheck" in r.url and r.request.method == "POST") as response_info:
-                self.page.get_by_role('button', name='登入').click()
+            async with self.page.expect_response(lambda r: "DoCloudLoginCheck" in r.url and r.request.method == "POST") as response_info:
+                await self.page.get_by_role('button', name='登入').click()
 
-            api_response = response_info.value
+            api_response = await response_info.value
             try:
                 result = api_response.json()
                 if result.get("Status") == "Error" or (result.get("Result") and not result["Result"].get("IsLoginSuccess")):
@@ -71,38 +80,38 @@ class GradeFetcher:
 
             print("Login API passed, waiting for redirect to Grades page...")
             try:
-                self.page.wait_for_url("**/ICampus/**", timeout=20000)
+                await self.page.wait_for_url("**/ICampus/**", timeout=20000)
             except Exception:
                 print("Timed out waiting for URL redirect")
 
             # Go to Grades page specifically to ensure tokens are present
             print("Navigating to grades page to scrape tokens...")
-            self.page.goto(self.GRADES_URL, wait_until="networkidle")
+            await self.page.goto(self.GRADES_URL, wait_until="networkidle")
 
             # Scrape tokens
             print("Scraping tokens...")
             student_no = username # Confirmed by user
             
             # Try to get verification token from hidden input
-            token = self.page.locator('input[name="__RequestVerificationToken"]').first.get_attribute('value')
+            token = await self.page.locator('input[name="__RequestVerificationToken"]').first.get_attribute('value')
             
             if not token:
                 print("Failed to find __RequestVerificationToken")
                 return False, "無法取得驗證代碼", None, None, None
 
             # Get Cookies
-            cookies = {c['name']: c['value'] for c in self.context.cookies()}
+            cookies = {c['name']: c['value'] for c in await self.context.cookies()}
             
             print(f"Successfully obtained credentials for {student_no}")
             
             # Close browser immediately to save resources
-            self.close()
+            await self._close_async()
             
             return True, "登入成功", cookies, student_no, token
 
         except Exception as e:
             print(f"Login Exception: {e}")
-            self.close()
+            await self._close_async()
             return False, f"登入錯誤: {str(e)}", None, None, None
 
     @staticmethod
@@ -261,13 +270,17 @@ class GradeFetcher:
 
     def close(self):
         """Close the browser."""
+        self._run_coro_sync(self._close_async())
+
+    async def _close_async(self):
+        """Async close for playwright resources."""
         try:
             if self.context:
-                self.context.close()
+                await self.context.close()
             if self.browser:
-                self.browser.close()
+                await self.browser.close()
             if self.playwright:
-                self.playwright.stop()
+                await self.playwright.stop()
         except Exception as e:
             print(f"Error closing fetcher: {e}")
         finally:
@@ -275,9 +288,37 @@ class GradeFetcher:
             self.browser = None
             self.playwright = None
 
+    @staticmethod
+    def _run_coro_sync(coro):
+        """Run coroutine from both sync and async environments."""
+        try:
+            asyncio.get_running_loop()
+            in_async_loop = True
+        except RuntimeError:
+            in_async_loop = False
+
+        if not in_async_loop:
+            return asyncio.run(coro)
+
+        result = {}
+        error = {}
+
+        def _runner():
+            try:
+                result['value'] = asyncio.run(coro)
+            except Exception as exc:
+                error['value'] = exc
+
+        thread = threading.Thread(target=_runner, daemon=True)
+        thread.start()
+        thread.join()
+
+        if 'value' in error:
+            raise error['value']
+        return result.get('value')
+
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
-
