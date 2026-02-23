@@ -1,108 +1,95 @@
 import requests
 import urllib3
-from playwright.sync_api import sync_playwright
+from bs4 import BeautifulSoup
+from concurrent.futures import ThreadPoolExecutor
 
 # Disable insecure request warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class GradeFetcher:
-    def __init__(self, state_file="state.json", headless=True):
-        self.state_file = state_file
-        self.headless = headless
-        self.playwright = None
-        self.browser = None
-        self.context = None
-        self.page = None
+    BASE = "https://shcloud2.k12ea.gov.tw/CLHSTYC"
+    LOGIN_PAGE = f"{BASE}/Auth/Auth/CloudLogin"
+    DO_CHECK = f"{BASE}/Auth/Auth/DoCloudLoginCheck"
+    GRADES_PAGE = f"{BASE}/ICampus/StudentInfo/Index?page=%E6%88%90%E7%B8%BE%E6%9F%A5%E8%A9%A2"
+    API_BASE = f"{BASE}/ICampus"
 
-        # URLs
-        self.LOGIN_URL = "https://shcloud2.k12ea.gov.tw/CLHSTYC/Auth/Auth/CloudLogin?sys=Auth"
-        self.GRADES_URL = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/StudentInfo/Index?page=%E6%88%90%E7%B8%BE%E6%9F%A5%E8%A9%A2"
-        self.API_BASE = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus"
+    @staticmethod
+    def _get_hidden_token(html: str) -> str:
+        """Extract __RequestVerificationToken from HTML."""
+        soup = BeautifulSoup(html, "html.parser")
+        el = soup.select_one('input[name="__RequestVerificationToken"]')
+        if not el or not el.get("value"):
+            raise RuntimeError("找不到 __RequestVerificationToken hidden input")
+        return el["value"]
 
-    def start_browser(self, use_saved_state=True):
-        """Start the browser if not already started."""
-        if not self.browser:
-            self.playwright = sync_playwright().start()
-            self.browser = self.playwright.chromium.launch(headless=self.headless, slow_mo=100)
-            self.context = self.browser.new_context()
-            self.page = self.context.new_page()
-
-    def login_and_get_tokens(self, username, password):
-        """Login, extract tokens, close browser, and return credentials."""
+    @staticmethod
+    def login_and_get_tokens(username, password):
+        """Login via requests session, return (success, message, cookies_dict, student_no, token)."""
         try:
-            print(f"Attempting login for user: {username} (Hybrid Mode)")
-            self.start_browser(use_saved_state=False)
-            print(f"Navigating to {self.LOGIN_URL}")
-            self.page.goto(self.LOGIN_URL)
+            print(f"Attempting login for user: {username} (requests mode)")
+            s = requests.Session()
 
-            # Handle popup if exists
-            popup_close_btn = self.page.locator("button.swal2-close")
-            if popup_close_btn.is_visible():
-                print("Found swal2 popup, closing it")
-                popup_close_btn.click()
-            elif self.page.get_by_role("button", name="Close this dialog").is_visible():
-                print("Closing dialog popup via aria-label")
-                self.page.get_by_role("button", name="Close this dialog").click()
+            # 1) GET login page to obtain cookies + hidden token
+            r = s.get(GradeFetcher.LOGIN_PAGE, timeout=30, verify=False)
+            r.raise_for_status()
+            login_token = GradeFetcher._get_hidden_token(r.text)
 
-            print("Clicking '學生'")
-            self.page.get_by_text("學生", exact=True).click()
+            # 2) POST login
+            headers = {
+                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                "Referer": GradeFetcher.LOGIN_PAGE,
+                "Origin": "https://shcloud2.k12ea.gov.tw",
+                "X-Requested-With": "XMLHttpRequest",
+            }
+            data = {
+                "SchoolCode": "030305",
+                "LoginId": username,
+                "PassString": password,
+                "LoginType": "Student",
+                "IsKeepLogin": "false",
+                "IdentityId": "6",
+                "SchoolName": "國立中大壢中",
+                "GoogleToken": "8",
+                "isRegistration": "false",
+                "ShCaptchaGenCode": "10",
+                "__RequestVerificationToken": login_token,
+            }
 
-            print("Filling credentials")
-            self.page.get_by_role('textbox', name='請輸入帳號').fill(username)
-            self.page.get_by_placeholder('請輸入密碼').fill(password)
+            resp = s.post(GradeFetcher.DO_CHECK, data=data, headers=headers, timeout=30, verify=False)
+            resp.raise_for_status()
 
             try:
-                self.page.get_by_role('checkbox').click()
+                j = resp.json()
             except Exception:
-                pass
+                return False, "登入回應格式錯誤", None, None, None
 
-            print("Clicking Login button...")
-            with self.page.expect_response(lambda r: "DoCloudLoginCheck" in r.url and r.request.method == "POST") as response_info:
-                self.page.get_by_role('button', name='登入').click()
+            ok = bool(j.get("Result", {}).get("IsLoginSuccess"))
+            if not ok:
+                msg = j.get("Result", {}).get("DisplayMsg") or j.get("Message") or "登入失敗"
+                return False, msg, None, None, None
 
-            api_response = response_info.value
-            try:
-                result = api_response.json()
-                if result.get("Status") == "Error" or (result.get("Result") and not result["Result"].get("IsLoginSuccess")):
-                    return False, "登入失敗", None, None, None
-            except Exception as e:
-                print(f"Warning: Could not parse login API response (likely redirected): {e}")
-                # Don't return False here, assume potential success and let the URL check decide
+            print("Login OK, fetching grades page for API token...")
 
-            print("Login API passed, waiting for redirect to Grades page...")
-            try:
-                self.page.wait_for_url("**/ICampus/**", timeout=20000)
-            except Exception:
-                print("Timed out waiting for URL redirect")
+            # 3) GET grades page to obtain the API-specific __RequestVerificationToken
+            r2 = s.get(GradeFetcher.GRADES_PAGE, timeout=30, verify=False)
+            r2.raise_for_status()
+            api_token = GradeFetcher._get_hidden_token(r2.text)
 
-            # Go to Grades page specifically to ensure tokens are present
-            print("Navigating to grades page to scrape tokens...")
-            self.page.goto(self.GRADES_URL, wait_until="networkidle")
+            # 4) Extract cookies as dict (filter out malformed cookies like 'no-cache')
+            cookies_dict = {}
+            for c in s.cookies:
+                try:
+                    if c.name and c.value is not None and c.domain is not None:
+                        cookies_dict[c.name] = c.value
+                except Exception:
+                    pass
+            student_no = username
 
-            # Scrape tokens
-            print("Scraping tokens...")
-            student_no = username # Confirmed by user
-            
-            # Try to get verification token from hidden input
-            token = self.page.locator('input[name="__RequestVerificationToken"]').first.get_attribute('value')
-            
-            if not token:
-                print("Failed to find __RequestVerificationToken")
-                return False, "無法取得驗證代碼", None, None, None
-
-            # Get Cookies
-            cookies = {c['name']: c['value'] for c in self.context.cookies()}
-            
             print(f"Successfully obtained credentials for {student_no}")
-            
-            # Close browser immediately to save resources
-            self.close()
-            
-            return True, "登入成功", cookies, student_no, token
+            return True, "登入成功", cookies_dict, student_no, api_token
 
         except Exception as e:
             print(f"Login Exception: {e}")
-            self.close()
             return False, f"登入錯誤: {str(e)}", None, None, None
 
     @staticmethod
@@ -118,7 +105,7 @@ class GradeFetcher:
             "Referer": "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/StudentInfo/Index?page=%E6%88%90%E7%B8%BE%E6%9F%A5%E8%A9%A2"
         }
         data = {
-            "searchType": "各次考試單科成績", # Based on user info
+            "searchType": "各次考試單科成績",
             "studentNo": student_no,
             "__RequestVerificationToken": token
         }
@@ -128,38 +115,29 @@ class GradeFetcher:
             response = requests.post(url, headers=headers, data=data, cookies=cookies, verify=False)
             response.raise_for_status()
             
-            # Convert API response to format expected by frontend
-            # The API likely returns a list of years/terms. We need to fetch exams for each?
-            # Actually, per user trace, this API returns years.
-            # Let's inspect the raw response logic from previous Playwright code...
-            # The previous code iterated through years and exams.
-            # Ideally we need `GetGradeCanQueryExamNoListByStudentNo` too?
-            # But user only gave `GetGradeCanQueryYearTermListByStudentNo`.
-            # Let's assume for now we return the years and frontend handles it, 
-            # OR we try to fetch exams if we can guess the API.
-            # User trace showed `GetGradeCanQueryExamNoListByStudentNo` in the list!
-            # Let's try to implement a basic structure first.
-            
             years_data = response.json()
             structure = {}
             
+            # Collect items to fetch
+            items = []
             for item in years_data:
-                # Assuming item has 'text' and 'value' or similar based on Kendo
-                # Kendo usually maps from DisplayText/Value.
-                # Let's handle both.
                 name = item.get('DisplayText') or item.get('text')
                 value = item.get('Value') or item.get('value')
-                
-                if not value: continue
-                
-                # We need exams for each year. 
-                # Attempt to call `GetGradeCanQueryExamNoListByStudentNo`
-                exams = GradeFetcher.get_exams_via_api(cookies, student_no, token, value)
-                
-                structure[name] = {
-                    "year_value": value,
-                    "exams": exams
-                }
+                if value:
+                    items.append((name, value))
+            
+            # Fetch all exams in parallel
+            def _fetch_one(name_value):
+                n, v = name_value
+                exams = GradeFetcher.get_exams_via_api(cookies, student_no, token, v)
+                return n, v, exams
+            
+            with ThreadPoolExecutor(max_workers=len(items) or 1) as pool:
+                for name, value, exams in pool.map(_fetch_one, items):
+                    structure[name] = {
+                        "year_value": value,
+                        "exams": exams
+                    }
                 
             return structure
             
@@ -172,7 +150,6 @@ class GradeFetcher:
         """Helper to fetch exams for a year"""
         url = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/CommonData/GetGradeCanQueryExamNoListByStudentNo"
         
-        # Parse year and term from year_value (e.g., "114_1")
         try:
             if "_" in str(year_value):
                 year, term = str(year_value).split("_")
@@ -193,7 +170,7 @@ class GradeFetcher:
              "Referer": "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/StudentInfo/Index?page=%E6%88%90%E7%B8%BE%E6%9F%A5%E8%A9%A2"
         }
         data = {
-            "searchType": "單次考試所有成績", # Based on user trace
+            "searchType": "單次考試所有成績",
             "studentNo": student_no,
             "year": year,
             "term": term,
@@ -225,7 +202,6 @@ class GradeFetcher:
             "Referer": "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/StudentInfo/Index?page=%E6%88%90%E7%B8%BE%E6%9F%A5%E8%A9%A2"
         }
         
-        # Parse Year and Term from year_value (e.g., "114_2" -> Year: 114, Term: 2)
         try:
             if "_" in str(year_value):
                 year, term = str(year_value).split("_")
@@ -233,7 +209,6 @@ class GradeFetcher:
                 year = year_value[:-1]
                 term = year_value[-1]
             else:
-                 # Fallback/Default
                  year = "114"
                  term = "2"
         except Exception:
@@ -258,26 +233,3 @@ class GradeFetcher:
         except Exception as e:
             print(f"API Fetch Error: {e}")
             raise e
-
-    def close(self):
-        """Close the browser."""
-        try:
-            if self.context:
-                self.context.close()
-            if self.browser:
-                self.browser.close()
-            if self.playwright:
-                self.playwright.stop()
-        except Exception as e:
-            print(f"Error closing fetcher: {e}")
-        finally:
-            self.context = None
-            self.browser = None
-            self.playwright = None
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
-

@@ -55,3 +55,36 @@
 2026-02-20 22:29:28,554 - SchoolGradesServer - INFO - Starting School Grades Server...
 2026-02-20 22:29:31,657 - SchoolGradesServer - INFO - Accessing index page
 2026-02-20 22:30:13,692 - SchoolGradesServer - INFO - Accessing index page
+2026-02-23 20:21:20,840 - SchoolGradesServer - INFO - Cleanup thread started
+2026-02-23 20:21:20,845 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-23 20:21:21,640 - SchoolGradesServer - INFO - Cleanup thread started
+2026-02-23 20:21:21,644 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-23 20:21:23,602 - SchoolGradesServer - INFO - Accessing index page
+2026-02-23 20:21:31,212 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-23 20:22:13,769 - SchoolGradesServer - INFO - Cleanup thread started
+2026-02-23 20:22:13,772 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-23 20:22:46,193 - SchoolGradesServer - INFO - Accessing index page
+2026-02-23 20:22:53,888 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-23 20:23:48,167 - SchoolGradesServer - INFO - Cleanup thread started
+2026-02-23 20:23:48,170 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-23 20:23:57,268 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-23 20:23:58,374 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-23 20:23:58,375 - SchoolGradesServer - INFO - Fetching structure via API...
+2026-02-23 20:23:59,722 - SchoolGradesServer - INFO - Structure cached: 4 semesters
+2026-02-23 20:24:15,899 - SchoolGradesServer - INFO - Accessing index page
+2026-02-23 20:24:21,912 - SchoolGradesServer - INFO - Accessing index page
+2026-02-23 20:24:27,293 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-23 20:24:35,466 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-23 20:24:39,610 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-23 20:24:39,611 - SchoolGradesServer - INFO - Fetching structure via API...
+2026-02-23 20:24:40,554 - SchoolGradesServer - INFO - Structure cached: 4 semesters
+2026-02-23 20:25:58,107 - SchoolGradesServer - INFO - Cleanup thread started
+2026-02-23 20:25:58,110 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-23 20:26:12,998 - SchoolGradesServer - INFO - Cleanup thread started
+2026-02-23 20:26:13,001 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-23 20:26:19,853 - SchoolGradesServer - INFO - Cleanup thread started
+2026-02-23 20:26:19,856 - SchoolGradesServer - INFO - Starting School Grades Server...
+2026-02-23 20:26:36,639 - SchoolGradesServer - INFO - Login attempt for user: 310471
+2026-02-23 20:26:37,454 - SchoolGradesServer - INFO - Login successful for user: 310471
+2026-02-23 20:26:37,456 - SchoolGradesServer - INFO - Fetching structure via API...
+2026-02-23 20:26:38,757 - SchoolGradesServer - INFO - Structure cached: 4 semesters

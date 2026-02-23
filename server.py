@@ -119,9 +119,8 @@ def login():
     if not username or not data.get('password'):
         return jsonify({'success': False, 'message': '請輸入帳號密碼'}), 400
         
-    fetcher = GradeFetcher(headless=True)
     try:
-        success, message, cookies, student_no, token = fetcher.login_and_get_tokens(username, data.get('password'))
+        success, message, cookies, student_no, token = GradeFetcher.login_and_get_tokens(username, data.get('password'))
         
         if success:
             logger.info(f"Login successful for user: {username}")
