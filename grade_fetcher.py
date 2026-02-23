@@ -1,11 +1,16 @@
 import asyncio
+import logging
 import threading
+
 import requests
 import urllib3
 from playwright.async_api import async_playwright
 
 # Disable insecure request warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+logger = logging.getLogger(__name__)
+
 
 class GradeFetcher:
     def __init__(self, state_file="state.json", headless=True):
@@ -16,14 +21,39 @@ class GradeFetcher:
         self.context = None
         self.page = None
 
+        self._loop = None
+        self._loop_thread = None
+        self._loop_ready = threading.Event()
+
         # URLs
         self.LOGIN_URL = "https://shcloud2.k12ea.gov.tw/CLHSTYC/Auth/Auth/CloudLogin?sys=Auth"
         self.GRADES_URL = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/StudentInfo/Index?page=%E6%88%90%E7%B8%BE%E6%9F%A5%E8%A9%A2"
         self.API_BASE = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus"
 
+    def _ensure_loop_thread(self):
+        if self._loop_thread and self._loop_thread.is_alive() and self._loop:
+            return
+
+        self._loop_ready.clear()
+
+        def _runner():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            self._loop = loop
+            self._loop_ready.set()
+            loop.run_forever()
+
+        self._loop_thread = threading.Thread(target=_runner, daemon=True)
+        self._loop_thread.start()
+        self._loop_ready.wait()
+
     def start_browser(self, use_saved_state=True):
         """Start the browser if not already started."""
         self._run_coro_sync(self._start_browser())
+
+    async def start_browser_async(self, use_saved_state=True):
+        """Start browser in async callers without sync bridge."""
+        await self._start_browser()
 
     async def _start_browser(self):
         """Async browser startup to support asyncio environments."""
@@ -36,83 +66,77 @@ class GradeFetcher:
     def login_and_get_tokens(self, username, password):
         return self._run_coro_sync(self._login_and_get_tokens_async(username, password))
 
+    async def login_and_get_tokens_async(self, username, password):
+        return await self._login_and_get_tokens_async(username, password)
+
     async def _login_and_get_tokens_async(self, username, password):
         """Login, extract tokens, close browser, and return credentials."""
         try:
-            print(f"Attempting login for user: {username} (Hybrid Mode)")
             await self._start_browser()
-            print(f"Navigating to {self.LOGIN_URL}")
             await self.page.goto(self.LOGIN_URL)
 
             # Handle popup if exists
             popup_close_btn = self.page.locator("button.swal2-close")
             if await popup_close_btn.is_visible():
-                print("Found swal2 popup, closing it")
                 await popup_close_btn.click()
             elif await self.page.get_by_role("button", name="Close this dialog").is_visible():
-                print("Closing dialog popup via aria-label")
                 await self.page.get_by_role("button", name="Close this dialog").click()
 
-            print("Clicking '學生'")
             await self.page.get_by_text("學生", exact=True).click()
 
-            print("Filling credentials")
             await self.page.get_by_role('textbox', name='請輸入帳號').fill(username)
             await self.page.get_by_placeholder('請輸入密碼').fill(password)
 
             try:
                 await self.page.get_by_role('checkbox').click()
             except Exception:
+                # Checkbox may not always be present.
                 pass
 
-            print("Clicking Login button...")
-            async with self.page.expect_response(lambda r: "DoCloudLoginCheck" in r.url and r.request.method == "POST") as response_info:
+            async with self.page.expect_response(
+                lambda r: "DoCloudLoginCheck" in r.url and r.request.method == "POST"
+            ) as response_info:
                 await self.page.get_by_role('button', name='登入').click()
 
             api_response = await response_info.value
             try:
                 result = api_response.json()
-                if result.get("Status") == "Error" or (result.get("Result") and not result["Result"].get("IsLoginSuccess")):
+                if result.get("Status") == "Error" or (
+                    result.get("Result") and not result["Result"].get("IsLoginSuccess")
+                ):
+                    await self._close_async()
                     return False, "登入失敗", None, None, None
-            except Exception as e:
-                print(f"Warning: Could not parse login API response (likely redirected): {e}")
-                # Don't return False here, assume potential success and let the URL check decide
+            except Exception:
+                # Some successful flows can redirect and make this payload non-JSON.
+                pass
 
-            print("Login API passed, waiting for redirect to Grades page...")
             try:
                 await self.page.wait_for_url("**/ICampus/**", timeout=20000)
             except Exception:
-                print("Timed out waiting for URL redirect")
+                # Continue; we explicitly navigate to grades page next.
+                pass
 
             # Go to Grades page specifically to ensure tokens are present
-            print("Navigating to grades page to scrape tokens...")
             await self.page.goto(self.GRADES_URL, wait_until="networkidle")
 
             # Scrape tokens
-            print("Scraping tokens...")
-            student_no = username # Confirmed by user
-            
-            # Try to get verification token from hidden input
+            student_no = username
+
             token = await self.page.locator('input[name="__RequestVerificationToken"]').first.get_attribute('value')
-            
+
             if not token:
-                print("Failed to find __RequestVerificationToken")
+                await self._close_async()
                 return False, "無法取得驗證代碼", None, None, None
 
-            # Get Cookies
             cookies = {c['name']: c['value'] for c in await self.context.cookies()}
-            
-            print(f"Successfully obtained credentials for {student_no}")
-            
-            # Close browser immediately to save resources
+
             await self._close_async()
-            
             return True, "登入成功", cookies, student_no, token
 
-        except Exception as e:
-            print(f"Login Exception: {e}")
+        except Exception:
+            logger.warning("Login flow failed due to unexpected browser error")
             await self._close_async()
-            return False, f"登入錯誤: {str(e)}", None, None, None
+            return False, "登入錯誤，請稍後再試", None, None, None
 
     @staticmethod
     def get_structure_via_api(cookies, student_no, token):
@@ -127,61 +151,43 @@ class GradeFetcher:
             "Referer": "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/StudentInfo/Index?page=%E6%88%90%E7%B8%BE%E6%9F%A5%E8%A9%A2"
         }
         data = {
-            "searchType": "各次考試單科成績", # Based on user info
+            "searchType": "各次考試單科成績",
             "studentNo": student_no,
             "__RequestVerificationToken": token
         }
-        
+
         try:
-            print(f"Requesting structure for {student_no}...")
             response = requests.post(url, headers=headers, data=data, cookies=cookies, verify=False)
             response.raise_for_status()
-            
-            # Convert API response to format expected by frontend
-            # The API likely returns a list of years/terms. We need to fetch exams for each?
-            # Actually, per user trace, this API returns years.
-            # Let's inspect the raw response logic from previous Playwright code...
-            # The previous code iterated through years and exams.
-            # Ideally we need `GetGradeCanQueryExamNoListByStudentNo` too?
-            # But user only gave `GetGradeCanQueryYearTermListByStudentNo`.
-            # Let's assume for now we return the years and frontend handles it, 
-            # OR we try to fetch exams if we can guess the API.
-            # User trace showed `GetGradeCanQueryExamNoListByStudentNo` in the list!
-            # Let's try to implement a basic structure first.
-            
+
             years_data = response.json()
             structure = {}
-            
+
             for item in years_data:
-                # Assuming item has 'text' and 'value' or similar based on Kendo
-                # Kendo usually maps from DisplayText/Value.
-                # Let's handle both.
                 name = item.get('DisplayText') or item.get('text')
                 value = item.get('Value') or item.get('value')
-                
-                if not value: continue
-                
-                # We need exams for each year. 
-                # Attempt to call `GetGradeCanQueryExamNoListByStudentNo`
+
+                if not value:
+                    continue
+
                 exams = GradeFetcher.get_exams_via_api(cookies, student_no, token, value)
-                
+
                 structure[name] = {
                     "year_value": value,
                     "exams": exams
                 }
-                
+
             return structure
-            
-        except Exception as e:
-            print(f"Error fetching structure: {e}")
+
+        except Exception:
+            logger.warning("Failed to fetch grade structure")
             return {}
 
     @staticmethod
     def get_exams_via_api(cookies, student_no, token, year_value):
         """Helper to fetch exams for a year"""
         url = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/CommonData/GetGradeCanQueryExamNoListByStudentNo"
-        
-        # Parse year and term from year_value (e.g., "114_1")
+
         try:
             if "_" in str(year_value):
                 year, term = str(year_value).split("_")
@@ -198,11 +204,11 @@ class GradeFetcher:
         headers = {
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-             "X-Requested-With": "XMLHttpRequest",
-             "Referer": "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/StudentInfo/Index?page=%E6%88%90%E7%B8%BE%E6%9F%A5%E8%A9%A2"
+            "X-Requested-With": "XMLHttpRequest",
+            "Referer": "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/StudentInfo/Index?page=%E6%88%90%E7%B8%BE%E6%9F%A5%E8%A9%A2"
         }
         data = {
-            "searchType": "單次考試所有成績", # Based on user trace
+            "searchType": "單次考試所有成績",
             "studentNo": student_no,
             "year": year,
             "term": term,
@@ -213,13 +219,13 @@ class GradeFetcher:
             if resp.status_code == 200:
                 exams = []
                 for item in resp.json():
-                     exams.append({
-                         "text": item.get('DisplayText') or item.get('text'),
-                         "value": item.get('Value') or item.get('value')
-                     })
+                    exams.append({
+                        "text": item.get('DisplayText') or item.get('text'),
+                        "value": item.get('Value') or item.get('value')
+                    })
                 return exams
-        except Exception as e:
-            print(f"Error fetching exams via API: {e}")
+        except Exception:
+            logger.warning("Failed to fetch exam list")
         return []
 
     @staticmethod
@@ -233,8 +239,7 @@ class GradeFetcher:
             "X-Requested-With": "XMLHttpRequest",
             "Referer": "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/StudentInfo/Index?page=%E6%88%90%E7%B8%BE%E6%9F%A5%E8%A9%A2"
         }
-        
-        # Parse Year and Term from year_value (e.g., "114_2" -> Year: 114, Term: 2)
+
         try:
             if "_" in str(year_value):
                 year, term = str(year_value).split("_")
@@ -242,9 +247,8 @@ class GradeFetcher:
                 year = year_value[:-1]
                 term = year_value[-1]
             else:
-                 # Fallback/Default
-                 year = "114"
-                 term = "2"
+                year = "114"
+                term = "2"
         except Exception:
             year = "114"
             term = "2"
@@ -257,20 +261,25 @@ class GradeFetcher:
             "Term": term,
             "ExamNo": exam_value
         }
-        
-        print(f"API Fetching grades: Year={year}, Term={term}, Exam={exam_value}")
-        
+
         try:
             response = requests.post(url, headers=headers, data=data, cookies=cookies, verify=False)
             response.raise_for_status()
             return response.json()
-        except Exception as e:
-            print(f"API Fetch Error: {e}")
-            raise e
+        except Exception:
+            logger.warning("Failed to fetch grades content")
+            raise
 
     def close(self):
         """Close the browser."""
-        self._run_coro_sync(self._close_async())
+        try:
+            self._run_coro_sync(self._close_async())
+        finally:
+            self._stop_loop_thread()
+
+    async def close_async(self):
+        """Close browser in async callers without sync bridge."""
+        await self._close_async()
 
     async def _close_async(self):
         """Async close for playwright resources."""
@@ -281,44 +290,43 @@ class GradeFetcher:
                 await self.browser.close()
             if self.playwright:
                 await self.playwright.stop()
-        except Exception as e:
-            print(f"Error closing fetcher: {e}")
+        except Exception:
+            logger.warning("Error while closing browser resources")
         finally:
             self.context = None
             self.browser = None
             self.playwright = None
 
-    @staticmethod
-    def _run_coro_sync(coro):
-        """Run coroutine from both sync and async environments."""
+    def _stop_loop_thread(self):
+        if self._loop and self._loop.is_running():
+            self._loop.call_soon_threadsafe(self._loop.stop)
+        if self._loop_thread and self._loop_thread.is_alive():
+            self._loop_thread.join(timeout=2)
+        self._loop = None
+        self._loop_thread = None
+
+    def _run_coro_sync(self, coro):
+        """Run coroutine from sync contexts without recreating event loops per call."""
         try:
             asyncio.get_running_loop()
-            in_async_loop = True
-        except RuntimeError:
-            in_async_loop = False
+            coro.close()
+            raise RuntimeError(
+                "Cannot call sync GradeFetcher methods inside an active asyncio loop; "
+                "use the async methods instead."
+            )
+        except RuntimeError as exc:
+            if "Cannot call sync GradeFetcher methods" in str(exc):
+                raise
 
-        if not in_async_loop:
-            return asyncio.run(coro)
-
-        result = {}
-        error = {}
-
-        def _runner():
-            try:
-                result['value'] = asyncio.run(coro)
-            except Exception as exc:
-                error['value'] = exc
-
-        thread = threading.Thread(target=_runner, daemon=True)
-        thread.start()
-        thread.join()
-
-        if 'value' in error:
-            raise error['value']
-        return result.get('value')
+        self._ensure_loop_thread()
+        future = asyncio.run_coroutine_threadsafe(coro, self._loop)
+        return future.result()
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
+        try:
+            self.close()
+        finally:
+            self._stop_loop_thread()
