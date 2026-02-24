@@ -6,6 +6,20 @@
 let radarChartInstance = null;
 let barChartInstance = null;
 
+// HTML 跳脫輔助函數，防範 XSS
+function escapeHTML(str) {
+    if (str === null || str === undefined) return '';
+    const text = String(str);
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, function (m) { return map[m]; });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     loadGradesData();
     setupFileImport();
@@ -377,13 +391,13 @@ function generateScoreCards(subjects) {
         card.className = 'score-card';
         card.innerHTML = `
             <div class="score-header">
-                <span class="subject-name">${subject.SubjectName}</span>
-                <span class="score-badge ${scoreClass}">${subject.ScoreDisplay ?? scoreValue}</span>
+                <span class="subject-name">${escapeHTML(subject.SubjectName)}</span>
+                <span class="score-badge ${scoreClass}">${escapeHTML(subject.ScoreDisplay ?? scoreValue)}</span>
             </div>
             <div class="score-details">
                 <div class="score-row">
                     <span class="score-label">班級平均</span>
-                    <span class="score-value">${subject.ClassAVGScoreDisplay ?? classAvgValue.toFixed(2)}</span>
+                    <span class="score-value">${escapeHTML(subject.ClassAVGScoreDisplay ?? classAvgValue.toFixed(2))}</span>
                 </div>
                 <div class="score-row">
                     <span class="score-label">與班平均差距</span>
@@ -626,7 +640,7 @@ function generateStandardsTable(subjects, standards) {
 
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${shortenName(subject.SubjectName)}</td>
+            <td>${escapeHTML(shortenName(subject.SubjectName))}</td>
             <td class="top-mark">${std["頂標"].toFixed(2)}</td>
             <td class="front-mark">${std["前標"].toFixed(2)}</td>
             <td class="avg-mark">${std["均標"].toFixed(2)}</td>
@@ -682,7 +696,7 @@ function generateDistributionCards(subjects, standards) {
         const card = document.createElement('div');
         card.className = 'distribution-card';
         card.innerHTML = `
-            <h4>${subject.SubjectName}</h4>
+            <h4>${escapeHTML(subject.SubjectName)}</h4>
             <div class="distribution-bars">
                 ${ranges.map(r => {
             const percentage = r.count === 0 ? 0 : (r.count / total) * 100;
@@ -838,9 +852,15 @@ function setupSyncFeature() {
     const handleLogin = async () => {
         const username = usernameInput.value.trim();
         const password = passwordInput.value.trim();
+        const turnstileResponse = typeof turnstile !== 'undefined' ? turnstile.getResponse() : null;
 
         if (!username || !password) {
             showStatus(loginStatus, '請輸入帳號密碼', 'error');
+            return;
+        }
+
+        if (!turnstileResponse) {
+            showStatus(loginStatus, '請完成驗證', 'error');
             return;
         }
 
@@ -852,7 +872,7 @@ function setupSyncFeature() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ username, password, turnstile_response: turnstileResponse })
             });
             const data = await res.json();
 
@@ -866,9 +886,11 @@ function setupSyncFeature() {
                 }, 500);
             } else {
                 showStatus(loginStatus, data.message || '登入失敗', 'error');
+                if (typeof turnstile !== 'undefined') turnstile.reset();
             }
         } catch (error) {
             showStatus(loginStatus, '連線錯誤: ' + error.message, 'error');
+            if (typeof turnstile !== 'undefined') turnstile.reset();
         } finally {
             confirmLogin.disabled = false;
         }
