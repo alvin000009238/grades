@@ -546,6 +546,7 @@ body {
     gap: 8px;
     padding: 16px 24px 24px 24px;
     border-top: none;
+    flex-wrap: wrap;
 }
 
 .modal-btn {
@@ -560,6 +561,7 @@ body {
     cursor: pointer;
     transition: background-color var(--duration) var(--ease), color var(--duration) var(--ease);
     border: none;
+    white-space: nowrap;
 }
 
 .modal-btn.cancel {

@@ -864,7 +864,7 @@ function setupSyncFeature() {
             return;
         }
 
-        showStatus(loginStatus, '載入中...', 'normal');
+        showStatus(loginStatus, '登入中...', 'normal');
         confirmLogin.disabled = true;
 
         try {
@@ -877,7 +877,7 @@ function setupSyncFeature() {
             const data = await res.json();
 
             if (data.success) {
-                showStatus(loginStatus, '載入成功', 'success');
+                showStatus(loginStatus, '登入成功', 'success');
                 setTimeout(() => {
                     toggleModal(loginModal, false);
                     openSelectExamModal();
