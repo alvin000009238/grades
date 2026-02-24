@@ -764,7 +764,6 @@ function setupSyncFeature() {
     const examSelect = document.getElementById('examSelect');
     const fetchStatus = document.getElementById('fetchStatus');
     const logoutBtn = document.getElementById('logoutBtn');
-    const reloadStructureBtn = document.getElementById('reloadStructureBtn');
 
     const API_BASE = '/api';
     let availableStructure = {}; // Store the loaded structure
@@ -773,11 +772,6 @@ function setupSyncFeature() {
     const toggleModal = (modal, show) => {
         if (show) modal.classList.add('active');
         else modal.classList.remove('active');
-        // When closing select modal, clear interval
-        if (modal === selectExamModal && !show && reloadInterval) {
-            clearInterval(reloadInterval);
-            reloadInterval = null;
-        }
     };
 
     // Helper to show status
@@ -788,32 +782,7 @@ function setupSyncFeature() {
 
     // Cooldown Logic
     const COOLDOWN_MS = 60 * 1000;
-    let reloadInterval = null;
-
-    const updateReloadButtonState = () => {
-        if (!reloadStructureBtn) return;
-
-        const lastReload = parseInt(localStorage.getItem('lastReloadTime') || '0');
-        const now = Date.now();
-        const diff = now - lastReload;
-
-        if (diff < COOLDOWN_MS) {
-            const remain = Math.ceil((COOLDOWN_MS - diff) / 1000);
-            reloadStructureBtn.disabled = true;
-            reloadStructureBtn.textContent = `重載 (${remain}s)`;
-
-            if (!reloadInterval) {
-                reloadInterval = setInterval(updateReloadButtonState, 1000);
-            }
-        } else {
-            reloadStructureBtn.disabled = false;
-            reloadStructureBtn.textContent = '重載';
-            if (reloadInterval) {
-                clearInterval(reloadInterval);
-                reloadInterval = null;
-            }
-        }
-    };
+    // 移除 reloadInterval 與 updateReloadButtonState
 
     // Logout Logic
     if (logoutBtn) {
@@ -825,15 +794,6 @@ function setupSyncFeature() {
             } catch (e) {
                 alert('登出失敗');
             }
-        });
-    }
-
-    // Reload Button Logic
-    if (reloadStructureBtn) {
-        reloadStructureBtn.addEventListener('click', () => {
-            localStorage.setItem('lastReloadTime', Date.now());
-            updateReloadButtonState(); // Update UI immediately
-            openSelectExamModal(true);
         });
     }
 
@@ -905,9 +865,6 @@ function setupSyncFeature() {
     // 3. Select Exam Logic
     const openSelectExamModal = async (forceReload = false) => {
         toggleModal(selectExamModal, true);
-
-        // Update reload button state whenever modal opens
-        updateReloadButtonState();
 
         yearSelect.innerHTML = '<option>載入中...</option>';
         examSelect.innerHTML = '<option>請先選擇學年度</option>';
