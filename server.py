@@ -292,6 +292,10 @@ def view_shared_page(share_id):
     # Just serve the index page, JS will handle the rest based on URL
     return send_from_directory('.', 'index.html')
 
+@app.route('/health')
+def health_check():
+    return jsonify({'status': 'ok'}), 200
+
 if __name__ == '__main__':
     logger.info("Starting School Grades Server...")
     app.run(host='0.0.0.0', port=5000, debug=True)
