@@ -1,6 +1,6 @@
 # 專案無停機部署 (Zero-Downtime Deployment) 與 CI/CD 指南
 
-本專案採用 **GitHub Actions** 進行 CI/CD 流水線配置，並在 Ubuntu VPS 上使用 **Docker Swarm (單節點模式)** 達成無停機滾動更新（Rolling Update）。
+本專案採用 **GitHub Actions** 進行 CI/CD 流水線配置，並在 VPS 上使用 **Docker Swarm (單節點模式)** 達成無停機滾動更新（Rolling Update）。
 
 ---
 
@@ -9,7 +9,7 @@
 為了讓 `start-first` 滾動更新生效，我們必須將 Docker 轉換為 Swarm 模式。您只需要在 VPS 上執行一次：
 
 ### 1. 啟用 Docker Swarm
-登入您的 Ubuntu VPS 並執行：
+登入您的 VPS 並執行：
 ```bash
 docker swarm init
 ```
