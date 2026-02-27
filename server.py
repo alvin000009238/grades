@@ -106,9 +106,10 @@ def static_files(filename):
 @app.route('/api/config')
 def get_config():
     is_testing = app.debug or os.environ.get('ENVIRONMENT', '').lower() in ['testing', 'development']
+    site_key = os.environ.get('TURNSTILE_SITE_KEY') or '0x4AAAAAAChO97Yocoqp2iiB'
     return jsonify({
         'turnstile_enabled': not is_testing,
-        'site_key': os.environ.get('TURNSTILE_SITE_KEY', '0x4AAAAAAChO97Yocoqp2iiB')
+        'site_key': site_key
     })
 
 @app.route('/api/check_login')
@@ -132,7 +133,7 @@ def login():
     
     if not is_testing:
         turnstile_response = data.get('turnstile_response')
-        secret_key = os.environ.get('TURNSTILE_SECRET_KEY', '1x0000000000000000000000000000000AA')
+        secret_key = os.environ.get('TURNSTILE_SECRET_KEY') or '1x0000000000000000000000000000000AA'
         
         if not turnstile_response:
             return jsonify({'success': False, 'message': '請完成驗證'}), 400
