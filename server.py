@@ -3,6 +3,7 @@ from flask_cors import CORS
 from werkzeug.middleware.proxy_fix import ProxyFix
 import json
 import os
+import requests as http_requests
 import logging
 from logging.handlers import RotatingFileHandler
 from grade_fetcher import GradeFetcher
@@ -10,8 +11,6 @@ import time
 import threading
 import secrets
 import string
-import requests
-
 SHARED_FOLDER = 'shared_grades'
 CLEANUP_INTERVAL = 600  # 10 minutes
 FILE_LIFETIME = 7200    # 2 hours
@@ -52,6 +51,10 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 
 # CORS 設定 - 允許 credentials
 CORS(app, supports_credentials=True)
+
+# Turnstile 設定
+TURNSTILE_SECRET_KEY = os.environ.get('TURNSTILE_SECRET_KEY', '')
+TURNSTILE_SITE_KEY = os.environ.get('TURNSTILE_SITE_KEY', '')
 
 
 if not os.path.exists(SHARED_FOLDER):
@@ -103,6 +106,10 @@ def static_files(filename):
     return send_from_directory('.', filename)
 
 
+@app.route('/api/turnstile-site-key')
+def get_turnstile_site_key():
+    return jsonify({'siteKey': TURNSTILE_SITE_KEY})
+
 @app.route('/api/check_login')
 def check_login():
     # Only check if we have tokens in session
@@ -119,28 +126,30 @@ def login():
     
     if not username or not data.get('password'):
         return jsonify({'success': False, 'message': '請輸入帳號密碼'}), 400
-        
-    turnstile_response = data.get('turnstile_response')
-    secret_key = os.environ.get('TURNSTILE_SECRET_KEY') or '1x0000000000000000000000000000000AA'
     
-    if not turnstile_response:
-        return jsonify({'success': False, 'message': '請完成驗證'}), 400
+    # Turnstile 驗證
+    turnstile_token = data.get('cf-turnstile-response', '')
+    if TURNSTILE_SECRET_KEY:
+        if not turnstile_token:
+            return jsonify({'success': False, 'message': '請完成人機驗證'}), 400
+        try:
+            verify_res = http_requests.post(
+                'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+                data={
+                    'secret': TURNSTILE_SECRET_KEY,
+                    'response': turnstile_token,
+                    'remoteip': request.remote_addr
+                },
+                timeout=10
+            )
+            verify_data = verify_res.json()
+            if not verify_data.get('success'):
+                logger.warning(f"Turnstile verification failed for user {username}: {verify_data}")
+                return jsonify({'success': False, 'message': '人機驗證失敗，請重試'}), 403
+        except Exception as e:
+            logger.error(f"Turnstile verification error: {e}")
+            return jsonify({'success': False, 'message': '驗證服務暫時無法使用，請稍後再試'}), 500
         
-    try:
-        cf_url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
-        cf_data = {
-            'secret': secret_key,
-            'response': turnstile_response
-        }
-        cf_res = requests.post(cf_url, data=cf_data, timeout=10)
-        cf_json = cf_res.json()
-        if not cf_json.get('success'):
-            logger.warning(f"Turnstile verification failed for user {username}: {cf_json}")
-            return jsonify({'success': False, 'message': '驗證失敗，請重試'}), 400
-    except Exception as e:
-        logger.error(f"Turnstile API error: {e}")
-        return jsonify({'success': False, 'message': '驗證連線失敗，請稍後再試'}), 500
-
     try:
         success, message, cookies, student_no, token = GradeFetcher.login_and_get_tokens(username, data.get('password'))
         

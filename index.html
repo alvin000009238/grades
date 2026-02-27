@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://challenges.cloudflare.com https://cdn.jsdelivr.net; frame-src 'self' https://challenges.cloudflare.com; img-src 'self' data:;">
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://cdn.jsdelivr.net https://challenges.cloudflare.com; img-src 'self' data:; frame-src https://challenges.cloudflare.com;">
     <link
         href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap"
         rel="stylesheet">
@@ -16,7 +16,7 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <link rel="stylesheet" href="/grades_dashboard.css">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
@@ -163,10 +163,9 @@
                             </button>
                         </div>
                     </div>
-                    <div class="form-group" style="display: flex; justify-content: center; margin-top: 15px;">
-                        <div class="cf-turnstile" data-sitekey="0x4AAAAAAChO97Yocoqp2iiB"></div>
-                    </div>
                     <div id="loginStatus" class="status-msg"></div>
+                    <div id="turnstileContainer" style="display: flex; justify-content: center; margin-top: 12px;">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button class="modal-btn cancel" id="cancelLogin">取消</button>

@@ -767,6 +767,55 @@ function setupSyncFeature() {
 
     const API_BASE = '/api';
     let availableStructure = {}; // Store the loaded structure
+    let turnstileSiteKey = '';
+    let turnstileWidgetId = null;
+
+    // 獲取 Turnstile site key
+    async function fetchTurnstileSiteKey() {
+        if (turnstileSiteKey) return turnstileSiteKey;
+        try {
+            const res = await fetch(`${API_BASE}/turnstile-site-key`);
+            const data = await res.json();
+            turnstileSiteKey = data.siteKey || '';
+        } catch (e) {
+            console.warn('Failed to fetch Turnstile site key:', e);
+        }
+        return turnstileSiteKey;
+    }
+
+    // 渲染 Turnstile widget
+    async function renderTurnstile() {
+        const container = document.getElementById('turnstileContainer');
+        if (!container) return;
+
+        // 先重置舊的 widget
+        if (turnstileWidgetId !== null && typeof turnstile !== 'undefined') {
+            try { turnstile.remove(turnstileWidgetId); } catch (e) { /* ignore */ }
+            turnstileWidgetId = null;
+        }
+        container.innerHTML = '';
+
+        const siteKey = await fetchTurnstileSiteKey();
+        if (!siteKey) return;
+
+        // 等待 Turnstile API 載入
+        const waitForTurnstile = () => new Promise((resolve) => {
+            if (typeof turnstile !== 'undefined') return resolve();
+            const interval = setInterval(() => {
+                if (typeof turnstile !== 'undefined') {
+                    clearInterval(interval);
+                    resolve();
+                }
+            }, 100);
+        });
+
+        await waitForTurnstile();
+
+        turnstileWidgetId = turnstile.render(container, {
+            sitekey: siteKey,
+            theme: 'dark',
+        });
+    }
 
     // Helper to toggle modal
     const toggleModal = (modal, show) => {
@@ -812,16 +861,20 @@ function setupSyncFeature() {
     const handleLogin = async () => {
         const username = usernameInput.value.trim();
         const password = passwordInput.value.trim();
-        const turnstileResponse = typeof turnstile !== 'undefined' ? turnstile.getResponse() : null;
 
         if (!username || !password) {
             showStatus(loginStatus, '請輸入帳號密碼', 'error');
             return;
         }
 
-        if (!turnstileResponse) {
-            showStatus(loginStatus, '請完成驗證', 'error');
-            return;
+        // 取得 Turnstile token
+        let turnstileResponse = '';
+        if (typeof turnstile !== 'undefined' && turnstileWidgetId !== null) {
+            turnstileResponse = turnstile.getResponse(turnstileWidgetId) || '';
+            if (!turnstileResponse) {
+                showStatus(loginStatus, '請完成人機驗證', 'error');
+                return;
+            }
         }
 
         showStatus(loginStatus, '登入中...', 'normal');
@@ -832,7 +885,7 @@ function setupSyncFeature() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify({ username, password, turnstile_response: turnstileResponse })
+                body: JSON.stringify({ username, password, 'cf-turnstile-response': turnstileResponse })
             });
             const data = await res.json();
 
@@ -846,11 +899,11 @@ function setupSyncFeature() {
                 }, 500);
             } else {
                 showStatus(loginStatus, data.message || '登入失敗', 'error');
-                if (typeof turnstile !== 'undefined') turnstile.reset();
+                if (typeof turnstile !== 'undefined' && turnstileWidgetId !== null) turnstile.reset(turnstileWidgetId);
             }
         } catch (error) {
             showStatus(loginStatus, '連線錯誤: ' + error.message, 'error');
-            if (typeof turnstile !== 'undefined') turnstile.reset();
+            if (typeof turnstile !== 'undefined' && turnstileWidgetId !== null) turnstile.reset(turnstileWidgetId);
         } finally {
             confirmLogin.disabled = false;
         }
@@ -885,6 +938,7 @@ function setupSyncFeature() {
                 toggleModal(selectExamModal, false);
                 toggleModal(loginModal, true);
                 usernameInput.focus();
+                renderTurnstile();
                 return;
             }
 

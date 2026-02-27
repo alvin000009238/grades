@@ -48,8 +48,6 @@ cd school_grades/school_grades
 ```env
 GHCR_IMAGE=您的GitHub帳號/school_grades
 SECRET_KEY=您的Flask_Secret_Key
-TURNSTILE_SITE_KEY=您的Cloudflare_Turnstile_SiteKey
-TURNSTILE_SECRET_KEY=您的Cloudflare_Turnstile_Secret
 TUNNEL_TOKEN=您的Cloudflare_Tunnel_Token
 ```
 
