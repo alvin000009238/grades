@@ -767,6 +767,22 @@ function setupSyncFeature() {
 
     const API_BASE = '/api';
     let availableStructure = {}; // Store the loaded structure
+    let turnstileEnabled = true;
+
+    // Fetch config
+    fetch(`${API_BASE}/config`)
+        .then(res => res.json())
+        .then(data => {
+            turnstileEnabled = data.turnstile_enabled;
+            if (!turnstileEnabled) {
+                const turnstileDiv = document.querySelector('.cf-turnstile');
+                if (turnstileDiv) turnstileDiv.style.display = 'none';
+            } else if (data.site_key) {
+                const turnstileDiv = document.querySelector('.cf-turnstile');
+                if (turnstileDiv) turnstileDiv.setAttribute('data-sitekey', data.site_key);
+            }
+        })
+        .catch(err => console.error('Failed to load config:', err));
 
     // Helper to toggle modal
     const toggleModal = (modal, show) => {
@@ -819,7 +835,7 @@ function setupSyncFeature() {
             return;
         }
 
-        if (!turnstileResponse) {
+        if (turnstileEnabled && !turnstileResponse) {
             showStatus(loginStatus, '請完成驗證', 'error');
             return;
         }

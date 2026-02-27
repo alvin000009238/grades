@@ -103,6 +103,14 @@ def static_files(filename):
     return send_from_directory('.', filename)
 
 
+@app.route('/api/config')
+def get_config():
+    is_testing = app.debug or os.environ.get('ENVIRONMENT', '').lower() in ['testing', 'development']
+    return jsonify({
+        'turnstile_enabled': not is_testing,
+        'site_key': os.environ.get('TURNSTILE_SITE_KEY', '0x4AAAAAAChO97Yocoqp2iiB')
+    })
+
 @app.route('/api/check_login')
 def check_login():
     # Only check if we have tokens in session
@@ -120,26 +128,29 @@ def login():
     if not username or not data.get('password'):
         return jsonify({'success': False, 'message': '請輸入帳號密碼'}), 400
         
-    turnstile_response = data.get('turnstile_response')
-    secret_key = os.environ.get('TURNSTILE_SECRET_KEY', '1x0000000000000000000000000000000AA')
+    is_testing = app.debug or os.environ.get('ENVIRONMENT', '').lower() in ['testing', 'development']
     
-    if not turnstile_response:
-        return jsonify({'success': False, 'message': '請完成驗證'}), 400
+    if not is_testing:
+        turnstile_response = data.get('turnstile_response')
+        secret_key = os.environ.get('TURNSTILE_SECRET_KEY', '1x0000000000000000000000000000000AA')
         
-    try:
-        cf_url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
-        cf_data = {
-            'secret': secret_key,
-            'response': turnstile_response
-        }
-        cf_res = requests.post(cf_url, data=cf_data, timeout=10)
-        cf_json = cf_res.json()
-        if not cf_json.get('success'):
-            logger.warning(f"Turnstile verification failed for user {username}: {cf_json}")
-            return jsonify({'success': False, 'message': '驗證失敗，請重試'}), 400
-    except Exception as e:
-        logger.error(f"Turnstile API error: {e}")
-        return jsonify({'success': False, 'message': '驗證連線失敗，請稍後再試'}), 500
+        if not turnstile_response:
+            return jsonify({'success': False, 'message': '請完成驗證'}), 400
+            
+        try:
+            cf_url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
+            cf_data = {
+                'secret': secret_key,
+                'response': turnstile_response
+            }
+            cf_res = requests.post(cf_url, data=cf_data, timeout=10)
+            cf_json = cf_res.json()
+            if not cf_json.get('success'):
+                logger.warning(f"Turnstile verification failed for user {username}: {cf_json}")
+                return jsonify({'success': False, 'message': '驗證失敗，請重試'}), 400
+        except Exception as e:
+            logger.error(f"Turnstile API error: {e}")
+            return jsonify({'success': False, 'message': '驗證連線失敗，請稍後再試'}), 500
 
     try:
         success, message, cookies, student_no, token = GradeFetcher.login_and_get_tokens(username, data.get('password'))
