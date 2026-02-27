@@ -1172,11 +1172,14 @@ async function checkSharedLink() {
                 const indicator = document.createElement('div');
                 indicator.className = 'share-indicator';
                 indicator.innerHTML = '<span style="color: var(--color-warning); font-weight: bold; padding: 4px 8px; border: 1px solid var(--color-warning); border-radius: 4px; font-size: 12px;">僅供檢視 (唯讀)</span>';
-                // Insert before data-time-box
+                // Insert indicator and remove the whole time box in share/read-only view
                 const timeBox = document.querySelector('.data-time-box');
-                header.insertBefore(indicator, timeBox);
-
-                if (updateTime) updateTime.textContent = '分享存檔';
+                if (timeBox) {
+                    header.insertBefore(indicator, timeBox);
+                    timeBox.remove();
+                } else {
+                    header.appendChild(indicator);
+                }
             } else {
                 throw new Error(data.error);
             }
