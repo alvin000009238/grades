@@ -1662,6 +1662,17 @@ body.read-only-mode #logoutBtn {
     display: none !important;
 }
 
+body.read-only-mode .data-time-box .time-info,
+body.read-only-mode .data-time-box .time-label,
+body.read-only-mode .data-time-box .time-value,
+body.read-only-mode #updateTime {
+    display: none !important;
+}
+
+body.read-only-mode .data-time-box {
+    gap: 0;
+}
+
 body.read-only-mode .header {
     border-bottom: 1px solid var(--color-warning-muted);
 }
