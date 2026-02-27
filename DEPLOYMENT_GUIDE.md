@@ -8,20 +8,70 @@
 
 為了讓 `start-first` 滾動更新生效，我們必須將 Docker 轉換為 Swarm 模式。您只需要在 VPS 上執行一次：
 
-### 1. 啟用 Docker Swarm
+### 1. 安裝 Docker
+```bash
+# 更新系統
+sudo apt update && sudo apt upgrade -y
+
+# 安裝 Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+
+# 將目前使用者加入 docker 群組
+sudo usermod -aG docker $USER
+newgrp docker
+
+# 驗證安裝
+docker --version
+```
+
+### 2. 啟用 Docker Swarm
 登入您的 VPS 並執行：
 ```bash
 docker swarm init
 ```
 *(如果 VPS 有多張網卡，系統可能會提示您指定 `--advertise-addr`)*
 
-### 2. 環境變數 (.env) 準備
-在您的專案目錄（例如 `~/school_grades`）下建立 `.env` 檔案以存放敏感資訊，確保它們**沒有被提交到 Git 儲存庫**：
+### 3. 取得專案程式碼
+```bash
+git clone <您的儲存庫 URL> school_grades
+cd school_grades/school_grades
+```
+
+### 4. 環境變數準備
+
+> [!CAUTION]
+> Docker Swarm 的 `docker stack deploy` **不會自動讀取 `.env` 檔案**。
+> 您必須在執行部署指令前，手動 `export` 所有環境變數。
+
+在專案目錄下建立 `.env` 檔案以便管理（確保它**不會被提交到 Git**）：
 ```env
 GHCR_IMAGE=您的GitHub帳號/school_grades
 SECRET_KEY=您的Flask_Secret_Key
 TURNSTILE_SECRET_KEY=您的Cloudflare_Turnstile_Secret
 TUNNEL_TOKEN=您的Cloudflare_Tunnel_Token
+```
+
+### 5. 首次部署
+
+首次部署需使用 `docker stack deploy`，**之後的日常更新由 CI/CD 自動處理**：
+
+```bash
+# 先將 .env 的變數載入到 Shell 環境
+export $(grep -v '^#' .env | xargs)
+
+# 登入 GHCR
+echo "<您的 GHCR_PAT>" | docker login ghcr.io -u <您的GitHub帳號> --password-stdin
+
+# 部署
+docker stack deploy --with-registry-auth -c docker-compose.yml school_grades
+```
+
+驗證服務狀態：
+```bash
+docker service ls
+docker service ps school_grades_app
+docker service ps school_grades_tunnel
 ```
 
 ---
@@ -43,26 +93,51 @@ TUNNEL_TOKEN=您的Cloudflare_Tunnel_Token
 
 ---
 
-## 🔄 日常部署與回滾 (Rollback) 流程
+## 🔄 日常部署流程
 
-每次 Push 至 `main` 分支時，GitHub Actions 會自動執行建置、推送 Image 至 GHCR 並觸發 VPS 更新服務。
+每次 Push 至 `main` 分支時，GitHub Actions 會自動：
+1. 建置 Docker Image
+2. 以 **Commit SHA** 為 tag 推送至 GHCR（同時也推送 `latest`）
+3. SSH 至 VPS 執行 `docker service update --image ghcr.io/<repo>:sha-<commit>` 更新 app 服務
 
-### 服務監控與管理
-您可以透過以下指令查看服務運行狀態：
-- 查看運作中的 Services：`docker service ls`
-- 查看 Web App 的詳細狀態與 Healthcheck：`docker service ps school_grades_app`
-- 查看服務 Logs：`docker service logs school_grades_app`
+> [!IMPORTANT]
+> CI/CD 使用明確的 **SHA tag** 而非 `latest` 來觸發更新。
+> 這確保每次部署都會產生真正的 Rolling Update，避免 Swarm 因 image 字串未變而跳過更新。
 
-### 如何進行回滾 (Rollback)
+---
 
-我們在推播 Image 到 GHCR 時，不僅加上了 `latest` 標籤，還會加上 GitHub 的 **Commit SHA** 標籤。
+## 🔧 服務監控與除錯
 
-**1. 自動回滾（健康檢查失敗）**
-如果在 CI/CD 更新後，新版的 API 或系統導致 `/health` 端點檢查無法通過 (回傳非 200)，Docker Swarm 最多重試 3 次，隨後會觸發 `failure_action: rollback`，**自動將系統退回前一個穩定的版本**，全程不會有任何停機斷線。
-
-**2. 手動回滾（業務邏輯瑕疵）**
-如果系統部署成功且 Healthcheck 也通過了，但您發現了業務邏輯上的 Bugs 而想要緊急降版，您只需使用特定的 Commit SHA (例如 `5a2b3c4`) 對服務進行強制更新。這同樣會**以無停機的方式滾動更新到舊版本**：
+### 查看服務狀態
 ```bash
-docker service update --image ghcr.io/<您的GitHub帳號>/school_grades:sha-<退回的Commit_SHA> school_grades_app
+docker service ls                           # 所有服務概覽
+docker service ps school_grades_app         # App 詳細狀態
+docker service ps school_grades_tunnel      # Tunnel 詳細狀態
+```
+
+### 查看 Logs
+```bash
+docker service logs school_grades_app       # App 日誌
+docker service logs school_grades_tunnel    # Tunnel 日誌
+```
+
+### Tunnel 顯示 0/1 的常見原因
+- `TUNNEL_TOKEN` 環境變數未正確注入（首次部署前忘了 `export`）
+- Token 值不正確或已過期
+- 使用 `docker service logs school_grades_tunnel` 查看具體錯誤訊息
+
+---
+
+## ⏪ 回滾 (Rollback)
+
+### 自動回滾（健康檢查失敗）
+如果新版的 `/health` 端點無法通過檢查（回傳非 200），Docker Swarm 最多重試 3 次後會觸發 `failure_action: rollback`，**自動退回前一個穩定版本**，全程無停機。
+
+### 手動回滾（業務邏輯瑕疵）
+如果新版部署成功但發現 Bug，使用特定的 Commit SHA 進行無停機回滾：
+```bash
+docker service update \
+  --image ghcr.io/<您的GitHub帳號>/school_grades:sha-<退回的Commit_SHA> \
+  school_grades_app
 ```
 *(請將 `<您的GitHub帳號>` 與 `<退回的Commit_SHA>` 替換為實際數值)*

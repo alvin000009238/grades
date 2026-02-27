@@ -61,14 +61,14 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script: |
-            cd ${{ secrets.VPS_APP_PATH }}
-            
-            # 拉取最新的 docker-compose.yml
-            git pull origin main
-            
-            # 登入 GHCR (避免 Pull 失敗)
+            # 登入 GHCR
             echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
-            # 設定自動更新的 Image 名稱變數並以 Swarm 發布
-            export GHCR_IMAGE=${{ github.repository }}
-            docker stack deploy --with-registry-auth -c docker-compose.yml school_grades
+            # 使用明確 SHA tag 更新服務 (避免 latest 不觸發更新的問題)
+            docker service update \
+              --with-registry-auth \
+              --image ghcr.io/${{ github.repository }}:sha-${{ github.sha }} \
+              school_grades_app
+            
+            # 等待更新完成並檢查狀態
+            docker service ps school_grades_app --no-trunc --format "{{.CurrentState}}" | head -1
