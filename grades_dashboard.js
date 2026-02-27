@@ -1176,7 +1176,8 @@ async function checkSharedLink() {
                 const timeBox = document.querySelector('.data-time-box');
                 header.insertBefore(indicator, timeBox);
 
-                if (updateTime) updateTime.textContent = '分享存檔';
+                const timeInfo = document.querySelector('.data-time-box .time-info');
+                if (timeInfo) timeInfo.style.display = 'none';
             } else {
                 throw new Error(data.error);
             }
