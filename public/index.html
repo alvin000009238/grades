@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成績分析平台 - 中大壢中</title>
+    <!-- SEO 基本標籤 -->
+    <meta name="description" content="中大壢中成績分析平台，提供中大壢中學生登入查詢平時考、段考及模擬考成績，並透過圖表分析個人與班級平均、五標落點與排名分佈，快速掌握學習狀況。">
+    <meta name="robots" content="index, follow">
+    <!-- Open Graph 標籤 -->
+    <meta property="og:title" content="成績分析平台 - 中大壢中">
+    <meta property="og:description" content="中大壢中學生專屬的成績分析工具，登入即可查詢各科成績、排名與落點分析。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://score.clhs.dev/">
+    <meta property="og:site_name" content="成績分析平台 - 中大壢中">
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+     "@context":"https://schema.org",
+     "@type":"SoftwareApplication",
+     "name":"成績分析平台 - 中大壢中",
+     "applicationCategory":"EducationApplication",
+     "operatingSystem":"Web",
+     "url":"https://score.clhs.dev/"
+    }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://challenges.cloudflare.com https://static.cloudflareinsights.com; script-src-elem 'self' https://cdn.jsdelivr.net https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://cdn.jsdelivr.net https://challenges.cloudflare.com https://cloudflareinsights.com; img-src 'self' data:; frame-src https://challenges.cloudflare.com;">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+
+<body>
+    <!-- 確保搜尋引擎能讀取到頁面詳細介紹的隱藏文字 -->
+    <div
+        style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;">
+        <h2>中大壢中成績分析平台</h2>
+        <p>提供學生安全、快速的平台查詢段考、模擬考與平時考成績。透過視覺化圖表比較個人分數與班級平均，提供五標標準分析、落點預測及排名分佈，有效幫助學生掌握學習進度並規劃未來讀書計畫。</p>
+    </div>
+
+    <!-- 背景動畫元素 -->
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="container">
+        <!-- 頂部標題區 -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <span class="material-symbols-outlined" style="font-size: 24px;">bar_chart</span>
+                    </div>
+                    <div class="logo-text">
+                        <h1>成績分析平台</h1>
+                        <p class="subtitle" id="examTitle">--</p>
+                    </div>
+                </div>
+                <div class="data-time-box">
+                    <div class="time-info">
+
+                        <span class="time-label">資料更新時間</span>
+                        <span class="time-value" id="updateTime">--</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button class="import-dropdown-btn" id="shareBtn"
+                            style="background: var(--color-surface-elevated); color: var(--color-text-main); border: 1px solid var(--color-border-subtle);">
+                            <span class="dropdown-icon">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">share</span>
+                            </span>
+                            <span>分享</span>
+                        </button>
+                        <div class="import-dropdown">
+                            <button class="import-dropdown-btn" id="importDropdownBtn">
+                                <span class="dropdown-icon">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
+                                </span>
+                                <span>匯入</span>
+                                <span class="dropdown-arrow">
+                                    <span class="material-symbols-outlined" style="font-size: 16px;">expand_more</span>
+                                </span>
+                            </button>
+                            <div class="import-dropdown-menu" id="importDropdownMenu">
+
+                                <button class="dropdown-item" id="syncBtn">
+                                    <span class="item-icon">
+                                        <span class="material-symbols-outlined">cloud_sync</span>
+                                    </span>
+                                    <span class="item-text">
+                                        <span class="item-title">雲端同步(推薦)</span>
+                                        <span class="item-hint">登入欣河校園平台取得成績</span>
+                                    </span>
+                                </button>
+
+                                <button class="dropdown-item" id="pasteBtn">
+                                    <span class="item-icon">
+                                        <span class="material-symbols-outlined">content_paste</span>
+                                    </span>
+                                    <span class="item-text">
+                                        <span class="item-title">貼上文字</span>
+                                        <span class="item-hint">直接貼上 JSON 內容</span>
+                                    </span>
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 貼上文字彈出視窗 -->
+        <div class="modal-overlay" id="pasteModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>
+                        <span class="material-symbols-outlined" style="font-size: 24px;">content_paste</span>
+                        貼上 JSON 內容
+                    </h3>
+                    <button class="modal-close" id="closeModal">&times;</button>
+                </div>
+
+
+                <div class="modal-body">
+                    <textarea id="jsonTextInput" placeholder="在此貼上 JSON 內容..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn cancel" id="cancelPaste">取消</button>
+                    <button class="modal-btn confirm" id="confirmPaste">確認匯入</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分享預覽視窗 -->
+        <div class="modal-overlay" id="shareModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>
+                        <span class="material-symbols-outlined" style="font-size: 24px;">share</span>
+                        分享成績單
+                    </h3>
+                    <button class="modal-close" id="closeShareModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="sharePreview"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 登入視窗 -->
+        <div class="modal-overlay" id="loginModal">
+            <div class="modal-content sm">
+                <div class="modal-header">
+                    <h3 style="display: flex; align-items: center; gap: 8px;">
+                        登入系統
+                        <span class="material-symbols-outlined tooltip-icon" tabindex="0"
+                            data-tooltip="請使用欣河校園平台帳密登入">help</span>
+                    </h3>
+                    <button class="modal-close" id="closeLoginModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm" method="post" action="javascript:void(0);">
+                        <div class="form-group">
+                            <input type="text" id="usernameInput" name="username" autocomplete="username"
+                                placeholder=" ">
+                            <label>帳號</label>
+                        </div>
+                        <div class="form-group">
+                            <div class="password-group">
+                                <input type="password" id="passwordInput" name="password"
+                                    autocomplete="current-password" placeholder=" ">
+                                <label>密碼</label>
+                                <button type="button" id="togglePasswordBtn" class="toggle-password-btn" tabindex="-1">
+                                    <span class="material-symbols-outlined eye-icon">visibility</span>
+                                    <span class="material-symbols-outlined eye-off-icon"
+                                        style="display: none;">visibility_off</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="loginStatus" class="status-msg"></div>
+                        <p class="privacy-notice"
+                            style="text-align: center; margin-top: 16px; margin-bottom: 0; font-size: 13px; color: var(--color-text-dim);">
+                            若您繼續，即代表您已閱讀並同意本網站的<a href="/privacy.html" target="_blank"
+                                style="color: var(--color-primary); text-decoration: none;">隱私權政策</a>
+                        </p>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="modal-btn cancel" id="cancelLogin">取消</button>
+                    <button type="submit" class="modal-btn confirm" id="confirmLogin" form="loginForm">登入</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 選擇考試視窗 -->
+        <div class="modal-overlay" id="selectExamModal">
+            <div class="modal-content sm">
+                <div class="modal-header">
+                    <h3>選擇考試</h3>
+                    <button class="modal-close" id="closeSelectModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <select id="yearSelect">
+                            <option value="">載入中...</option>
+                        </select>
+                        <label>學年度</label>
+                    </div>
+                    <div class="form-group">
+                        <select id="examSelect">
+                            <option value="">請先選擇學年度</option>
+                        </select>
+                        <label>考試名稱</label>
+                    </div>
+                    <div id="fetchStatus" class="status-msg"></div>
+                </div>
+                <div class="modal-footer">
+                    <div class="footer-left-group" style="margin-right: auto; display: flex; gap: 12px;">
+                        <button class="modal-btn danger" id="logoutBtn">登出</button>
+                    </div>
+                    <div class="footer-right-group" style="display: flex; gap: 12px;">
+                        <button class="modal-btn cancel" id="cancelSelect">取消</button>
+                        <button class="modal-btn confirm" id="confirmFetch">查詢</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 免責聲明視窗 -->
+        <div class="modal-overlay" id="disclaimerModal">
+            <div class="modal-content sm">
+                <div class="modal-header">
+                    <h3 style="color: var(--color-warning);">
+                        <span class="material-symbols-outlined"
+                            style="color: var(--color-warning); font-size: 24px;">warning</span>
+                        免責聲明
+                    </h3>
+                </div>
+                <div class="modal-body" style="line-height: 1.6; color: var(--color-text-secondary); font-size: 15px;">
+                    <p>歡迎使用中大壢中成績分析平台！</p>
+                    <p style="margin-top: 12px;">請注意，本網站為<strong>非官方</strong>開發之第三方服務，我們與壢中及欣河智慧校園平台無任何直接關聯。</p>
+                    <p style="margin-top: 12px;">您的帳號密碼僅會用於直接向原系統請求成績資料，本站<strong>絕不</strong>記錄或收集您的登入憑證或其他個人隱私資訊。</p>
+                </div>
+                <div class="modal-footer" style="display: flex; justify-content: flex-end;">
+                    <button class="modal-btn confirm" id="confirmDisclaimer">我了解了</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 學生資訊卡片 -->
+        <section class="student-card">
+            <div class="student-avatar">
+                <div class="avatar-ring"></div>
+                <span class="avatar-text" id="avatarText">--</span>
+            </div>
+            <div class="student-info">
+                <h2 class="student-name" id="studentName">--</h2>
+                <div class="student-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">domain</span>
+                        </span>
+                        <span class="detail-text" id="studentClass">--</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">event_seat</span>
+                        </span>
+                        <span class="detail-text">座號 <span id="studentSeat">--</span></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">numbers</span>
+                        </span>
+                        <span class="detail-text">學號 <span id="studentNo">--</span></span>
+                    </div>
+                </div>
+            </div>
+            <div class="student-stats">
+                <div class="stat-box">
+                    <span class="stat-value" id="avgScore">--</span>
+                    <span class="stat-label">平均成績</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="totalSubjects">--</span>
+                    <span class="stat-label">科目數</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="highestScore">--</span>
+                    <span class="stat-label">最高分</span>
+                </div>
+                <div class="stat-box" id="classRankBox" style="display: none;">
+                    <span class="stat-value" id="classRank">--</span>
+                    <span class="stat-label">班級排名</span>
+                </div>
+                <div class="stat-box" id="categoryRankBox" style="display: none;">
+                    <span class="stat-value" id="categoryRank">--</span>
+                    <span class="stat-label">類組排名</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 成績概覽 -->
+        <section class="scores-overview">
+            <h3 class="section-title">
+                <span class="title-icon">
+                    <span class="material-symbols-outlined">view_list</span>
+                </span>
+                各科成績概覽
+            </h3>
+            <div class="scores-grid" id="scoresGrid">
+                <!-- 動態生成成績卡片 -->
+            </div>
+        </section>
+
+        <!-- 圖表區域 -->
+        <section class="charts-section">
+            <div class="chart-row">
+                <!-- 成績對比雷達圖 -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <span class="chart-icon">
+                                <span class="material-symbols-outlined">radar</span>
+                            </span>
+                            個人 vs 班級平均
+                        </h3>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 成績長條圖 -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <span class="chart-icon">
+                                <span class="material-symbols-outlined">bar_chart</span>
+                            </span>
+                            成績對比分析
+                        </h3>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 五標分析 -->
+        <section class="standards-section">
+            <h3 class="section-title">
+                <span class="title-icon">
+                    <span class="material-symbols-outlined">analytics</span>
+                </span>
+                班級五標分析
+            </h3>
+            <div class="standards-table-wrapper">
+                <table class="standards-table" id="standardsTable">
+                    <thead>
+                        <tr>
+                            <th>科目</th>
+                            <th class="top-mark">頂標</th>
+                            <th class="front-mark">前標</th>
+                            <th class="avg-mark">均標</th>
+                            <th class="back-mark">後標</th>
+                            <th class="bottom-mark">底標</th>
+                            <th>標準差</th>
+                            <th>我的成績</th>
+                            <th>落點分析</th>
+                        </tr>
+                    </thead>
+                    <tbody id="standardsBody">
+                        <!-- 動態生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 分數分佈區 -->
+        <section class="distribution-section">
+            <h3 class="section-title">
+                <span class="title-icon">
+                    <span class="material-symbols-outlined">scatter_plot</span>
+                </span>
+                班級分數分佈
+            </h3>
+            <div class="distribution-grid" id="distributionGrid">
+                <!-- 動態生成分佈圖 -->
+            </div>
+        </section>
+
+        <!-- 頁尾 -->
+        <footer class="footer">
+            <p>© 2026 中大壢中成績分析 - 數據來源：欣河智慧校園平台</p>
+            <p style="margin-top: 8px; font-size: 13px;">
+                <a href="mailto:contact@clhs.dev"
+                    style="color: var(--color-text-dim); text-decoration: none; transition: color 0.2s ease;">contact@clhs.dev</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="/app.js"></script>
+</body>
+
+</html>

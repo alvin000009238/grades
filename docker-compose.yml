@@ -1,0 +1,34 @@
+services:
+  app:
+    image: ghcr.io/${GHCR_IMAGE:-alvin000009238/school_grades}:latest
+    volumes:
+      - ./shared_grades:/app/shared_grades
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SECRET_KEY=${SECRET_KEY}
+      - TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}
+      - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
+      - TZ=Asia/Taipei
+
+    deploy:
+      restart_policy:
+        condition: any
+      update_config:
+        order: start-first
+        failure_action: rollback
+        delay: 10s
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5000/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    deploy:
+      restart_policy:
+        condition: any

@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment Variables (CRITICAL for security)
+.env
+
+# Application Data & Temporary Files
+grades_raw.json
+shared_grades/
+*.json
+!requirements.txt
+!.env.example
+!package.json
+!manifest.json
+*.md
+!README.md
+# Exclude specific JSONs but allow config templates if any
+
+# Large Files
+*.tar
+*.tar.gz
+
+# Logs
+*.log
+
+# Docker
+.dockerignore
+
+# IDE & OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
