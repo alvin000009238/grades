@@ -76,7 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
     GlobalTurnstileManager.init();
     checkDisclaimer();
     loadGradesData();
-    setupPasteImport();
     setupSyncFeature();
     setupShareFeature();
 });
@@ -119,95 +118,7 @@ async function loadGradesData() {
 
 
 
-function setupPasteImport() {
-    const importDropdown = document.querySelector('.import-dropdown');
-    const importDropdownBtn = document.getElementById('importDropdownBtn');
-    const pasteBtn = document.getElementById('pasteBtn');
-    const pasteModal = document.getElementById('pasteModal');
-    const closeModal = document.getElementById('closeModal');
-    const cancelPaste = document.getElementById('cancelPaste');
-    const confirmPaste = document.getElementById('confirmPaste');
-    const jsonTextInput = document.getElementById('jsonTextInput');
 
-    if (!importDropdownBtn || !importDropdown) return;
-
-    // 下拉選單開關
-    importDropdownBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        importDropdown.classList.toggle('active');
-    });
-
-    // 點擊外部關閉選單
-    document.addEventListener('click', (e) => {
-        if (!importDropdown.contains(e.target)) {
-            importDropdown.classList.remove('active');
-        }
-    });
-
-
-
-    if (!pasteBtn || !pasteModal) return;
-
-    // 開啟彈出視窗
-    pasteBtn.addEventListener('click', () => {
-        importDropdown.classList.remove('active');
-        pasteModal.classList.add('active');
-        jsonTextInput.value = '';
-        jsonTextInput.focus();
-    });
-
-    // 關閉彈出視窗的方式
-    const closeModalFn = () => {
-        pasteModal.classList.remove('active');
-        jsonTextInput.value = '';
-    };
-
-    closeModal.addEventListener('click', closeModalFn);
-    cancelPaste.addEventListener('click', closeModalFn);
-
-    // 點擊背景關閉
-    pasteModal.addEventListener('click', (e) => {
-        if (e.target === pasteModal) {
-            closeModalFn();
-        }
-    });
-
-    // ESC 鍵關閉
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && pasteModal.classList.contains('active')) {
-            closeModalFn();
-        }
-    });
-
-    // 確認匯入
-    confirmPaste.addEventListener('click', () => {
-        const content = jsonTextInput.value.trim();
-        if (!content) {
-            alert('請輸入 JSON 內容');
-            return;
-        }
-
-        try {
-            const normalizedContent = normalizeFileContent(content);
-            const gradesData = JSON.parse(normalizedContent);
-            validateGradesData(gradesData);
-            storeGradesData(gradesData);
-            initDashboard(gradesData);
-            closeModalFn();
-        } catch (error) {
-            console.error(error);
-            alert(`匯入失敗：${error.message || 'JSON 格式不正確'}`);
-        }
-    });
-
-    // 支援 Ctrl+V 直接貼上
-    jsonTextInput.addEventListener('paste', () => {
-        // 延遲一下讓內容先貼上
-        setTimeout(() => {
-            jsonTextInput.scrollTop = 0;
-        }, 10);
-    });
-}
 
 function normalizeFileContent(content) {
     if (content instanceof ArrayBuffer) {
@@ -836,12 +747,6 @@ function setupSyncFeature() {
 
     // 1. Click Sync Button (Optimistic UI)
     syncBtn.addEventListener('click', async () => {
-        // Close dropdown if it exists
-        const importDropdown = document.querySelector('.import-dropdown');
-        if (importDropdown) {
-            importDropdown.classList.remove('active');
-        }
-
         openSelectExamModal();
     });
 

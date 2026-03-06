@@ -83,66 +83,16 @@
                             </span>
                             <span>分享</span>
                         </button>
-                        <div class="import-dropdown">
-                            <button class="import-dropdown-btn" id="importDropdownBtn">
-                                <span class="dropdown-icon">
-                                    <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
-                                </span>
-                                <span>匯入</span>
-                                <span class="dropdown-arrow">
-                                    <span class="material-symbols-outlined" style="font-size: 16px;">expand_more</span>
-                                </span>
-                            </button>
-                            <div class="import-dropdown-menu" id="importDropdownMenu">
-
-                                <button class="dropdown-item" id="syncBtn">
-                                    <span class="item-icon">
-                                        <span class="material-symbols-outlined">cloud_sync</span>
-                                    </span>
-                                    <span class="item-text">
-                                        <span class="item-title">雲端同步(推薦)</span>
-                                        <span class="item-hint">登入欣河校園平台取得成績</span>
-                                    </span>
-                                </button>
-
-                                <button class="dropdown-item" id="pasteBtn">
-                                    <span class="item-icon">
-                                        <span class="material-symbols-outlined">content_paste</span>
-                                    </span>
-                                    <span class="item-text">
-                                        <span class="item-title">貼上文字</span>
-                                        <span class="item-hint">直接貼上 JSON 內容</span>
-                                    </span>
-                                </button>
-
-                            </div>
-                        </div>
+                        <button class="import-dropdown-btn" id="syncBtn">
+                            <span class="dropdown-icon">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">cloud_sync</span>
+                            </span>
+                            <span>匯入成績</span>
+                        </button>
                     </div>
                 </div>
             </div>
         </header>
-
-        <!-- 貼上文字彈出視窗 -->
-        <div class="modal-overlay" id="pasteModal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>
-                        <span class="material-symbols-outlined" style="font-size: 24px;">content_paste</span>
-                        貼上 JSON 內容
-                    </h3>
-                    <button class="modal-close" id="closeModal">&times;</button>
-                </div>
-
-
-                <div class="modal-body">
-                    <textarea id="jsonTextInput" placeholder="在此貼上 JSON 內容..."></textarea>
-                </div>
-                <div class="modal-footer">
-                    <button class="modal-btn cancel" id="cancelPaste">取消</button>
-                    <button class="modal-btn confirm" id="confirmPaste">確認匯入</button>
-                </div>
-            </div>
-        </div>
 
         <!-- 分享預覽視窗 -->
         <div class="modal-overlay" id="shareModal">
@@ -251,8 +201,10 @@
                 </div>
                 <div class="modal-body" style="line-height: 1.6; color: var(--color-text-secondary); font-size: 15px;">
                     <p>歡迎使用中大壢中成績分析平台！</p>
-                    <p style="margin-top: 12px;">請注意，本網站為<strong>非官方</strong>開發之第三方服務，我們與壢中及欣河智慧校園平台無任何直接關聯。</p>
-                    <p style="margin-top: 12px;">您的帳號密碼僅會用於直接向原系統請求成績資料，本站<strong>絕不</strong>記錄或收集您的登入憑證或其他個人隱私資訊。</p>
+                    <p style="margin-top: 12px;">
+                        請注意，本網站為<strong>非官方</strong>開發之第三方服務，我們與壢中及欣河智慧校園平台無任何直接關聯。</p>
+                    <p style="margin-top: 12px;">
+                        您的帳號密碼僅會用於直接向原系統請求成績資料，本站<strong>絕不</strong>記錄或收集您的登入憑證或其他個人隱私資訊。</p>
                 </div>
                 <div class="modal-footer" style="display: flex; justify-content: flex-end;">
                     <button class="modal-btn confirm" id="confirmDisclaimer">我了解了</button>
@@ -406,6 +358,11 @@
 
         <!-- 頁尾 -->
         <footer class="footer">
+            <p
+                style="margin-bottom: 12px; font-size: 13px; color: var(--color-text-secondary); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">info</span>
+                本平台僅提供成績視覺化分析，實際成績仍以官方系統為準。
+            </p>
             <p>© 2026 中大壢中成績分析 - 數據來源：欣河智慧校園平台</p>
             <p style="margin-top: 8px; font-size: 13px;">
                 <a href="mailto:contact@clhs.dev"
