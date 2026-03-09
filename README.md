@@ -14,6 +14,7 @@
 - [Background](#background)
 - [Install](#install)
 - [Usage](#usage)
+- [Architecture](docs/ARCHITECTURE.md)
 - [Maintainers](#maintainers)
 - [License](#license)
 
