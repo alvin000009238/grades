@@ -85,6 +85,11 @@ python server.py
 > [!WARNING]
 > 本應用預設以 `debug=True` 運行於 Flask 的內建伺服器（Development Server），這並不適合直接暴露於公共網路環境，也不適用於生產模式部署。
 
+
+## Architecture
+
+完整系統架構（C4）、前後端溝通流程與 API 規格請參考 [`ARCHITECTURE.md`](ARCHITECTURE.md)。
+
 ## Maintainers
 
 [@alvin000009238](https://github.com/alvin000009238)
