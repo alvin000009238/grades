@@ -47,9 +47,9 @@ flowchart TD
 | 外部服務 | 學校系統、Cloudflare | 資料來源與人機驗證。 |
 | 佈署層 | `Dockerfile`, `docker-compose.yml` | Gunicorn 啟動、健康檢查、cloudflared tunnel。 |
 
-## 3) 前後端 API 規格（完整）
+## 3) 前後端 API 規格
 
-> Base URL: 同源（例如 `https://score.clhs.dev`）
+> Base URL: https://score.clhs.dev
 
 ### 3.1 安全驗證與登入
 
