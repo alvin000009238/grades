@@ -12,8 +12,6 @@ services:
 
     depends_on:
       - redis
-    networks:
-      - app_network
     deploy:
       restart_policy:
         condition: any
@@ -33,27 +31,17 @@ services:
     command: tunnel run
     environment:
       - TUNNEL_TOKEN=${TUNNEL_TOKEN}
-    networks:
-      - app_network
     deploy:
       restart_policy:
         condition: any
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "127.0.0.1:6379:6379"
-    networks:
-      - app_network
     deploy:
       restart_policy:
         condition: any
     volumes:
       - redis_data:/data
-
-networks:
-  app_network:
-    driver: overlay
 
 volumes:
   redis_data:
