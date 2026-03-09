@@ -6,17 +6,26 @@ let barChartInstance = null;
 const GlobalTurnstileManager = {
     widgetId: null,
     isEnabled: true,
+    siteKey: null,
 
     async init() {
         try {
             const res = await fetch('/api/turnstile-site-key');
             const data = await res.json();
-            const siteKey = data.siteKey || '';
-            if (!siteKey) {
+            this.siteKey = data.siteKey || '';
+            if (!this.siteKey) {
                 this.isEnabled = false;
-                return;
             }
+        } catch (e) {
+            console.warn('Failed to init global Turnstile:', e);
+            this.isEnabled = false;
+        }
+    },
 
+    async render(containerId) {
+        if (!this.isEnabled || !this.siteKey) return;
+
+        try {
             const waitForTurnstile = () => new Promise((resolve) => {
                 if (typeof turnstile !== 'undefined') return resolve();
                 const interval = setInterval(() => {
@@ -29,21 +38,21 @@ const GlobalTurnstileManager = {
 
             await waitForTurnstile();
 
-            let container = document.getElementById('globalTurnstileContainer');
-            if (!container) {
-                container = document.createElement('div');
-                container.id = 'globalTurnstileContainer';
-                container.style.display = 'none';
-                document.body.appendChild(container);
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            if (this.widgetId !== null) {
+                turnstile.remove(this.widgetId);
             }
 
+            container.innerHTML = '';
+
             this.widgetId = turnstile.render(container, {
-                sitekey: siteKey,
-                theme: 'dark',
-                size: 'invisible'
+                sitekey: this.siteKey,
+                theme: 'dark'
             });
         } catch (e) {
-            console.warn('Failed to init global Turnstile:', e);
+            console.warn('Failed to render Turnstile:', e);
         }
     },
 
@@ -841,6 +850,7 @@ function setupSyncFeature() {
             if (res.status === 401) {
                 toggleModal(selectExamModal, false);
                 toggleModal(loginModal, true);
+                GlobalTurnstileManager.render('loginTurnstileContainer');
                 usernameInput.focus();
                 return;
             }
@@ -1003,6 +1013,7 @@ function setupShareFeature() {
                         複製連結
                     </button>
                 </div>
+                <div id="shareTurnstileContainer" style="margin-bottom: 16px; display: flex; justify-content: center;"></div>
                 <button id="createLinkBtn" class="import-dropdown-btn" style="width: 100%; justify-content: center;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -1021,6 +1032,8 @@ function setupShareFeature() {
         const shareLinkInput = document.getElementById('shareLinkInput');
         const copyLinkBtn = document.getElementById('copyLinkBtn');
         const shareStatus = document.getElementById('shareStatus');
+
+        GlobalTurnstileManager.render('shareTurnstileContainer');
 
         createLinkBtn.addEventListener('click', async () => {
             const gradesData = getStoredGrades();
