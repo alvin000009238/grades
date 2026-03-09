@@ -65,11 +65,33 @@ jobs:
             # 登入 GHCR
             echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
-            # 使用明確 SHA tag 更新服務 (避免 latest 不觸發更新的問題)
+            # 確保 overlay 網路存在
+            docker network create -d overlay app_network || true
+            
+            # 使用明確 SHA tag 更新應用程式服務 (避免 latest 不觸發更新的問題)
             docker service update \
               --with-registry-auth \
               --image ghcr.io/${{ github.repository }}:sha-${{ github.sha }} \
-              school_grades_app
+              --network-add app_network \
+              school_grades_app || \
+            docker service create \
+              --with-registry-auth \
+              --name school_grades_app \
+              --network app_network \
+              ghcr.io/${{ github.repository }}:sha-${{ github.sha }}
+              
+            # 確保 Redis 服務啟動並加入網路
+            docker service update \
+              --image redis:7-alpine \
+              --network-add app_network \
+              redis || \
+            docker service create \
+              --name redis \
+              --network app_network \
+              redis:7-alpine
+            
+            # 確保 Tunnel 也加入此網路 (如果您原本有啟動 tunnel)
+            docker service update --network-add app_network school_grades_tunnel || true
             
             # 等待更新完成並檢查狀態
             docker service ps school_grades_app --no-trunc --format "{{.CurrentState}}" | head -1
