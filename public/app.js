@@ -4,11 +4,15 @@ let barChartInstance = null;
 
 // 全域 Turnstile 管理器
 const GlobalTurnstileManager = {
-    widgetId: null,
+    widgetIds: {},
     isEnabled: true,
     siteKey: null,
+    initPromise: null,
 
     async init() {
+        if (this.initPromise) return this.initPromise;
+
+        this.initPromise = (async () => {
         try {
             const res = await fetch('/api/turnstile-site-key');
             const data = await res.json();
@@ -20,9 +24,14 @@ const GlobalTurnstileManager = {
             console.warn('Failed to init global Turnstile:', e);
             this.isEnabled = false;
         }
+        })();
+
+        return this.initPromise;
     },
 
     async render(containerId) {
+        await this.init();
+
         if (!this.isEnabled || !this.siteKey) return;
 
         try {
@@ -41,13 +50,13 @@ const GlobalTurnstileManager = {
             const container = document.getElementById(containerId);
             if (!container) return;
 
-            if (this.widgetId !== null) {
-                turnstile.remove(this.widgetId);
+            if (this.widgetIds[containerId] !== undefined) {
+                turnstile.remove(this.widgetIds[containerId]);
             }
 
             container.innerHTML = '';
 
-            this.widgetId = turnstile.render(container, {
+            this.widgetIds[containerId] = turnstile.render(container, {
                 sitekey: this.siteKey,
                 theme: 'dark'
             });
@@ -56,18 +65,20 @@ const GlobalTurnstileManager = {
         }
     },
 
-    getToken() {
+    getToken(containerId) {
         if (!this.isEnabled) return 'disabled';
-        if (typeof turnstile !== 'undefined' && this.widgetId !== null) {
-            return turnstile.getResponse(this.widgetId) || '';
+        const widgetId = this.widgetIds[containerId];
+        if (typeof turnstile !== 'undefined' && widgetId !== undefined) {
+            return turnstile.getResponse(widgetId) || '';
         }
         return '';
     },
 
-    reset() {
+    reset(containerId) {
         if (!this.isEnabled) return;
-        if (typeof turnstile !== 'undefined' && this.widgetId !== null) {
-            turnstile.reset(this.widgetId);
+        const widgetId = this.widgetIds[containerId];
+        if (typeof turnstile !== 'undefined' && widgetId !== undefined) {
+            turnstile.reset(widgetId);
         }
     }
 };
@@ -776,7 +787,7 @@ function setupSyncFeature() {
         }
 
         // 取得 Turnstile token
-        const turnstileResponse = GlobalTurnstileManager.getToken();
+        const turnstileResponse = GlobalTurnstileManager.getToken('loginTurnstileContainer');
         if (!turnstileResponse) {
             showStatus(loginStatus, '請稍候，系統安全驗證處理中...', 'error');
             return;
@@ -804,11 +815,11 @@ function setupSyncFeature() {
                 }, 500);
             } else {
                 showStatus(loginStatus, data.message || '登入失敗', 'error');
-                GlobalTurnstileManager.reset();
+                GlobalTurnstileManager.reset('loginTurnstileContainer');
             }
         } catch (error) {
             showStatus(loginStatus, '連線錯誤: ' + error.message, 'error');
-            GlobalTurnstileManager.reset();
+            GlobalTurnstileManager.reset('loginTurnstileContainer');
         } finally {
             confirmLogin.disabled = false;
         }
@@ -1044,7 +1055,7 @@ function setupShareFeature() {
             }
 
             // 取得 Turnstile token
-            const turnstileResponse = GlobalTurnstileManager.getToken();
+            const turnstileResponse = GlobalTurnstileManager.getToken('shareTurnstileContainer');
             if (!turnstileResponse) {
                 shareStatus.textContent = '請稍候，系統安全驗證處理中...';
                 shareStatus.className = 'status-msg error';
@@ -1080,7 +1091,7 @@ function setupShareFeature() {
                 shareStatus.className = 'status-msg error';
                 createLinkBtn.disabled = false;
                 createLinkBtn.textContent = '建立分享連結';
-                GlobalTurnstileManager.reset();
+                GlobalTurnstileManager.reset('shareTurnstileContainer');
             }
         });
 
