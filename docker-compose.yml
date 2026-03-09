@@ -8,6 +8,7 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}
       - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
+      - CORS_ORIGINS=${CORS_ORIGINS}
       - TZ=Asia/Taipei
 
     deploy:
