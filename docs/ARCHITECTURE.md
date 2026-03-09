@@ -118,7 +118,7 @@ flowchart TD
 ```
 - **回應 401**
 ```json
-{ "error": "未登入" }
+{ "error": "錯誤訊息" }
 ```
 
 #### `POST /api/fetch`
