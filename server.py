@@ -3,10 +3,10 @@ from flask_cors import CORS
 from werkzeug.middleware.proxy_fix import ProxyFix
 import json
 import os
-import requests as http_requests
 import logging
 from logging.handlers import RotatingFileHandler
 from fetcher import GradeFetcher
+from app.services.http_client import get_http_client
 import time
 import threading
 import secrets
@@ -63,14 +63,13 @@ def verify_turnstile(token, remote_ip, context=''):
     if not token:
         return False, (jsonify({'success': False, 'message': '請完成人機驗證'}), 400)
     try:
-        verify_res = http_requests.post(
+        verify_res = get_http_client().post(
             'https://challenges.cloudflare.com/turnstile/v0/siteverify',
             data={
                 'secret': TURNSTILE_SECRET_KEY,
                 'response': token,
                 'remoteip': remote_ip
             },
-            timeout=10
         )
         verify_data = verify_res.json()
         if not verify_data.get('success'):
