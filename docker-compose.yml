@@ -1,14 +1,16 @@
 services:
   app:
     image: ghcr.io/${GHCR_IMAGE:-alvin000009238/school_grades}:latest
-    volumes:
-      - ./shared_grades:/app/shared_grades
+    depends_on:
+      - redis
     environment:
       - PYTHONUNBUFFERED=1
       - SECRET_KEY=${SECRET_KEY}
       - TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}
       - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
       - TZ=Asia/Taipei
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - SHARE_TTL_SECONDS=${SHARE_TTL_SECONDS:-7200}
 
     deploy:
       restart_policy:
@@ -29,6 +31,13 @@ services:
     command: tunnel run
     environment:
       - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    deploy:
+      restart_policy:
+        condition: any
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
     deploy:
       restart_policy:
         condition: any

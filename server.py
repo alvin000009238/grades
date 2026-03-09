@@ -6,14 +6,13 @@ import os
 import requests as http_requests
 import logging
 from logging.handlers import RotatingFileHandler
+from redis import Redis
 from fetcher import GradeFetcher
-import time
-import threading
-import secrets
-import string
-SHARED_FOLDER = 'shared_grades'
-CLEANUP_INTERVAL = 600  # 10 minutes
-FILE_LIFETIME = 7200    # 2 hours
+from app.services.share_service import ShareService, is_valid_share_id
+from app.services.share_store_redis import RedisShareStore
+
+SHARE_TTL_SECONDS = int(os.environ.get('SHARE_TTL_SECONDS', '7200'))
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://redis:6379/0')
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -82,35 +81,8 @@ def verify_turnstile(token, remote_ip, context=''):
     return True, None
 
 
-if not os.path.exists(SHARED_FOLDER):
-    os.makedirs(SHARED_FOLDER)
-
-def cleanup_thread():
-    """Background thread to clean up old shared files."""
-    while True:
-        try:
-            now = time.time()
-            for filename in os.listdir(SHARED_FOLDER):
-                file_path = os.path.join(SHARED_FOLDER, filename)
-                if os.path.isfile(file_path):
-                    if now - os.path.getmtime(file_path) > FILE_LIFETIME:
-                        try:
-                            os.remove(file_path)
-                            logger.info(f"Deleted expired file: {filename}")
-                        except Exception as e:
-                            logger.error(f"Error deleting file {filename}: {e}")
-        except Exception as e:
-            logger.error(f"Error in cleanup thread: {e}")
-        time.sleep(CLEANUP_INTERVAL)
-
-# Start cleanup thread
-# In debug mode, Flask's reloader spawns two processes. We only start the thread
-# in the child (WERKZEUG_RUN_MAIN='true') to avoid running it twice.
-# In production (gunicorn), WERKZEUG_RUN_MAIN is not set, so it always starts.
-_is_reloader_parent = app.debug and os.environ.get('WERKZEUG_RUN_MAIN') != 'true'
-if not _is_reloader_parent:
-    threading.Thread(target=cleanup_thread, daemon=True).start()
-    logger.info("Cleanup thread started")
+redis_client = Redis.from_url(REDIS_URL)
+share_service = ShareService(store=RedisShareStore(redis_client), ttl_seconds=SHARE_TTL_SECONDS)
 
 @app.route('/')
 def index():
@@ -276,15 +248,7 @@ def create_share_link():
         if not ok:
             return err
 
-        # Generate 15-char random URL-safe ID with special chars
-        # Using A-Z, a-z, 0-9, -, _, ., ~
-        chars = string.ascii_letters + string.digits + "-_.~"
-        share_id = ''.join(secrets.choice(chars) for _ in range(15))
-        
-        file_path = os.path.join(SHARED_FOLDER, f"{share_id}.json")
-        
-        with open(file_path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False)
+        share_id = share_service.create_share(data)
             
         return jsonify({'success': True, 'id': share_id})
     except Exception as e:
@@ -294,16 +258,12 @@ def create_share_link():
 @app.route('/api/share/<share_id>', methods=['GET'])
 def get_shared_grades(share_id):
     try:
-        # Basic validation for ID (alphanumeric + special chars)
-        if not all(c in string.ascii_letters + string.digits + "-_.~" for c in share_id):
+        if not is_valid_share_id(share_id):
              return jsonify({'error': 'Invalid ID format'}), 400
 
-        file_path = os.path.join(SHARED_FOLDER, f"{share_id}.json")
-        if not os.path.exists(file_path):
+        data = share_service.get_share(share_id)
+        if data is None:
             return jsonify({'error': 'Link expired or not found'}), 404
-            
-        with open(file_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
             
         return jsonify({'success': True, 'data': data})
     except Exception as e:
