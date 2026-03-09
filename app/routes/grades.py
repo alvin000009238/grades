@@ -1,5 +1,3 @@
-import json
-
 from flask import Blueprint, current_app, jsonify, request, session
 
 from app.services.grades_service import fetch_grades, get_structure
@@ -59,28 +57,8 @@ def get_structure_route():
         session['structure'] = structure
         return jsonify({'structure': structure})
     except Exception as exc:
+        current_app.config['LOGGER'].error(f'Error getting structure (API): {exc}', exc_info=True)
         return jsonify({'error': str(exc)}), 500
 
 
-@bp.route('/api/upload', methods=['POST'])
-def upload_grades():
-    logger = current_app.config['LOGGER']
-    logger.info('Uploading grades file')
 
-    try:
-        if 'file' in request.files:
-            file = request.files['file']
-            content = file.read().decode('utf-8')
-            data = json.loads(content)
-        elif request.is_json:
-            data = request.get_json()
-        else:
-            return jsonify({'error': '請提供 JSON 檔案或資料'}), 400
-
-        if 'Result' not in data:
-            return jsonify({'error': '無效的成績資料格式'}), 400
-
-        return jsonify({'success': True, 'data': data})
-    except Exception as exc:
-        logger.error(f'Error during upload: {exc}', exc_info=True)
-        return jsonify({'error': str(exc)}), 500

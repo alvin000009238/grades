@@ -5,13 +5,17 @@ let barChartInstance = null;
 // 全域 Turnstile 管理器
 const GlobalTurnstileManager = {
     widgetId: null,
+    isEnabled: true,
 
     async init() {
         try {
             const res = await fetch('/api/turnstile-site-key');
             const data = await res.json();
             const siteKey = data.siteKey || '';
-            if (!siteKey) return;
+            if (!siteKey) {
+                this.isEnabled = false;
+                return;
+            }
 
             const waitForTurnstile = () => new Promise((resolve) => {
                 if (typeof turnstile !== 'undefined') return resolve();
@@ -44,6 +48,7 @@ const GlobalTurnstileManager = {
     },
 
     getToken() {
+        if (!this.isEnabled) return 'disabled';
         if (typeof turnstile !== 'undefined' && this.widgetId !== null) {
             return turnstile.getResponse(this.widgetId) || '';
         }
@@ -51,6 +56,7 @@ const GlobalTurnstileManager = {
     },
 
     reset() {
+        if (!this.isEnabled) return;
         if (typeof turnstile !== 'undefined' && this.widgetId !== null) {
             turnstile.reset(this.widgetId);
         }

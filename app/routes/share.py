@@ -33,7 +33,7 @@ def create_share_link():
         write_shared_data(current_app.config['SHARED_FOLDER'], share_id, data)
         return jsonify({'success': True, 'id': share_id})
     except Exception as exc:
-        current_app.config['LOGGER'].error(f'Error creating share: {exc}')
+        current_app.config['LOGGER'].error(f'Error creating share: {exc}', exc_info = True)
         return jsonify({'error': str(exc)}), 500
 
 
@@ -49,7 +49,7 @@ def get_shared_grades(share_id):
 
         return jsonify({'success': True, 'data': data})
     except Exception as exc:
-        current_app.config['LOGGER'].error(f'Error reading share: {exc}')
+        current_app.config['LOGGER'].error(f'Error reading share: {exc}', exc_info = True)
         return jsonify({'error': str(exc)}), 500
 
 

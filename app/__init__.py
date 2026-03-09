@@ -5,14 +5,23 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 from app.extensions import configure_logger, cors
 from app.routes import auth_bp, grades_bp, share_bp, system_bp
-from app.services.share_service import ensure_shared_folder, start_cleanup_thread
+from app.services.share_service import ensure_shared_folder
 from fetcher import GradeFetcher
 
 
 def create_app():
-    app = Flask(__name__, static_folder='.')
+    root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    app = Flask(__name__, static_folder='.', root_path=root_path)
 
-    app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24).hex())
+    secret_key = os.environ.get('SECRET_KEY')
+    if not secret_key:
+        flask_env = os.environ.get('FLASK_ENV', '').lower()
+        app_env = os.environ.get('APP_ENV', '').lower()
+        if flask_env in ('development', 'testing') or app_env in ('development', 'testing'):
+            secret_key = os.urandom(24).hex()
+        else:
+            raise RuntimeError("SECRET_KEY environment variable must be set in production.")
+    app.secret_key = secret_key
     app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
     app.config['SESSION_COOKIE_SECURE'] = True
@@ -27,13 +36,13 @@ def create_app():
 
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
-    cors.init_app(app, supports_credentials=True)
+    allowed_origins = os.environ.get('CORS_ORIGINS', 'http://localhost:5000,http://127.0.0.1:5000').split(',')
+    cors.init_app(app, supports_credentials=True, origins=allowed_origins)
 
     logger = configure_logger()
     app.config['LOGGER'] = logger
 
     ensure_shared_folder(app.config['SHARED_FOLDER'])
-    start_cleanup_thread(app, logger)
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(grades_bp)

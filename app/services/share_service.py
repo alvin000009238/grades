@@ -60,7 +60,10 @@ def start_cleanup_thread(app, logger):
                 logger.error(f'Error in cleanup thread: {exc}')
             time.sleep(cleanup_interval)
 
-    is_reloader_parent = app.debug and os.environ.get('WERKZEUG_RUN_MAIN') != 'true'
-    if not is_reloader_parent:
+    run_main = os.environ.get('WERKZEUG_RUN_MAIN')
+    # Start the cleanup thread once:
+    # - In non-reloader environments (run_main is None)
+    # - In the Werkzeug reloader child process (run_main == 'true')
+    if run_main is None or run_main == 'true':
         threading.Thread(target=cleanup_loop, daemon=True).start()
         logger.info('Cleanup thread started')
