@@ -186,13 +186,6 @@ flowchart TD
 
 ### 3.4 其他
 
-#### `POST /api/upload`
-- **用途**：上傳 JSON 檔或直接送 JSON；檢查是否含 `Result`。
-- **回應 200**
-```json
-{ "success": true, "data": { "Result": {} } }
-```
-
 #### `GET /health`
 - **用途**：健康檢查。
 - **回應 200**
