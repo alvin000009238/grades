@@ -6,21 +6,34 @@
 
 ```mermaid
 flowchart TD
-    U[使用者瀏覽器]\nindex.html + app.js
-    FE[前端 SPA 邏輯\npublic/app.js]
-    BE[Flask API\nserver.py]
-    GF[GradeFetcher\nfetcher.py requests]
-    SCH[學校系統 API\nshcloud2.k12ea.gov.tw]
-    TS[Cloudflare Turnstile\nsiteverify]
-    SF[(shared_grades/*.json)]
+
+    U[使用者瀏覽器<br/>index.html]
+    FE[Frontend SPA<br/>public/app.js]
+
+    BE[Flask API<br/>server.py]
+
+    GF[GradeFetcher<br/>fetcher.py<br/>requests]
+
+    SCH[School System API<br/>shcloud2.k12ea.gov.tw]
+
+    TS[Cloudflare Turnstile<br/>siteverify]
+
+    SF[(shared_grades<br/>JSON Cache)]
 
     U --> FE
-    FE -->|fetch /api/login /api/structure /api/fetch /api/share| BE
-    BE -->|登入/取結構/取成績| GF
-    GF --> SCH
-    BE -->|驗證 cf-turnstile-response| TS
-    BE <--> SF
+
+    FE -->|POST /api/login| BE
+    FE -->|GET /api/structure| BE
+    FE -->|POST /api/fetch| BE
+    FE -->|POST /api/share| BE
     FE -->|GET /api/share/:id| BE
+
+    BE -->|fetch grades| GF
+    GF --> SCH
+
+    BE -->|verify token| TS
+
+    BE <--> SF
 ```
 
 ## 2) 元件分層與責任
