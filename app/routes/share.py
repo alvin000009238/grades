@@ -30,7 +30,7 @@ def create_share_link():
             return err
 
         share_id = generate_share_id()
-        write_shared_data(current_app.config['SHARED_FOLDER'], share_id, data)
+        write_shared_data(current_app.config['REDIS_CLIENT'], share_id, data, current_app.config['SHARE_TTL'])
         return jsonify({'success': True, 'id': share_id})
     except Exception as exc:
         current_app.config['LOGGER'].error(f'Error creating share: {exc}', exc_info = True)
@@ -43,7 +43,7 @@ def get_shared_grades(share_id):
         if not is_valid_share_id(share_id):
             return jsonify({'error': 'Invalid ID format'}), 400
 
-        data = read_shared_data(current_app.config['SHARED_FOLDER'], share_id)
+        data = read_shared_data(current_app.config['REDIS_CLIENT'], share_id)
         if data is None:
             return jsonify({'error': 'Link expired or not found'}), 404
 

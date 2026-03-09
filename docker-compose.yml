@@ -1,14 +1,13 @@
 services:
   app:
     image: ghcr.io/${GHCR_IMAGE:-alvin000009238/school_grades}:latest
-    volumes:
-      - ./shared_grades:/app/shared_grades
     environment:
       - PYTHONUNBUFFERED=1
       - SECRET_KEY=${SECRET_KEY}
       - TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}
       - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
       - CORS_ORIGINS=${CORS_ORIGINS}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
       - TZ=Asia/Taipei
 
     deploy:
@@ -33,3 +32,16 @@ services:
     deploy:
       restart_policy:
         condition: any
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+    deploy:
+      restart_policy:
+        condition: any
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:

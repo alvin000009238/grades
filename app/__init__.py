@@ -1,11 +1,11 @@
 import os
+import redis
 
 from flask import Flask
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from app.extensions import configure_logger, cors
 from app.routes import auth_bp, grades_bp, share_bp, system_bp
-from app.services.share_service import ensure_shared_folder
 from fetcher import GradeFetcher
 
 
@@ -29,9 +29,11 @@ def create_app():
 
     app.config['TURNSTILE_SECRET_KEY'] = os.environ.get('TURNSTILE_SECRET_KEY', '')
     app.config['TURNSTILE_SITE_KEY'] = os.environ.get('TURNSTILE_SITE_KEY', '')
-    app.config['SHARED_FOLDER'] = 'shared_grades'
-    app.config['CLEANUP_INTERVAL'] = 600
-    app.config['FILE_LIFETIME'] = 7200
+    
+    redis_url = os.environ.get('REDIS_URL', 'redis://redis:6379/0')
+    app.config['REDIS_CLIENT'] = redis.from_url(redis_url, decode_responses=True)
+    app.config['SHARE_TTL'] = 7200
+
     app.config['GRADE_FETCHER'] = GradeFetcher
 
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
@@ -41,8 +43,6 @@ def create_app():
 
     logger = configure_logger()
     app.config['LOGGER'] = logger
-
-    ensure_shared_folder(app.config['SHARED_FOLDER'])
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(grades_bp)
