@@ -10,6 +10,8 @@ services:
       - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
       - TZ=Asia/Taipei
 
+    depends_on:
+      - redis
     deploy:
       restart_policy:
         condition: any
