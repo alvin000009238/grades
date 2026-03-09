@@ -1,4 +1,4 @@
-import requests as http_requests
+from app.services.http_client import get_http_session
 from flask import jsonify
 
 
@@ -11,7 +11,8 @@ def verify_turnstile(token, remote_ip, secret_key, logger, context=''):
         return False, (jsonify({'success': False, 'message': '請完成人機驗證'}), 400)
 
     try:
-        verify_res = http_requests.post(
+        session = get_http_session()
+        verify_res = session.post(
             'https://challenges.cloudflare.com/turnstile/v0/siteverify',
             data={'secret': secret_key, 'response': token, 'remoteip': remote_ip},
             timeout=10,

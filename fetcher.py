@@ -1,7 +1,7 @@
-import requests
 import urllib3
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
+from app.services.http_client import get_http_session
 
 # Disable insecure request warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -27,10 +27,10 @@ class GradeFetcher:
         """Login via requests session, return (success, message, cookies_dict, student_no, token)."""
         try:
             print(f"Attempting login for user: {username} (requests mode)")
-            s = requests.Session()
+            s = get_http_session()
 
             # 1) GET login page to obtain cookies + hidden token
-            r = s.get(GradeFetcher.LOGIN_PAGE, timeout=30, verify=False)
+            r = s.get(GradeFetcher.LOGIN_PAGE, verify=False)
             r.raise_for_status()
             login_token = GradeFetcher._get_hidden_token(r.text)
 
@@ -55,7 +55,7 @@ class GradeFetcher:
                 "__RequestVerificationToken": login_token,
             }
 
-            resp = s.post(GradeFetcher.DO_CHECK, data=data, headers=headers, timeout=30, verify=False)
+            resp = s.post(GradeFetcher.DO_CHECK, data=data, headers=headers, verify=False)
             resp.raise_for_status()
 
             try:
@@ -71,7 +71,7 @@ class GradeFetcher:
             print("Login OK, fetching grades page for API token...")
 
             # 3) GET grades page to obtain the API-specific __RequestVerificationToken
-            r2 = s.get(GradeFetcher.GRADES_PAGE, timeout=30, verify=False)
+            r2 = s.get(GradeFetcher.GRADES_PAGE, verify=False)
             r2.raise_for_status()
             api_token = GradeFetcher._get_hidden_token(r2.text)
 
@@ -112,7 +112,8 @@ class GradeFetcher:
         
         try:
             print(f"Requesting structure for {student_no}...")
-            response = requests.post(url, headers=headers, data=data, cookies=cookies, verify=False)
+            session = get_http_session()
+            response = session.post(url, headers=headers, data=data, cookies=cookies, verify=False)
             response.raise_for_status()
             
             years_data = response.json()
@@ -177,7 +178,8 @@ class GradeFetcher:
             "__RequestVerificationToken": token
         }
         try:
-            resp = requests.post(url, headers=headers, data=data, cookies=cookies, verify=False)
+            session = get_http_session()
+            resp = session.post(url, headers=headers, data=data, cookies=cookies, verify=False)
             if resp.status_code == 200:
                 exams = []
                 for item in resp.json():
@@ -227,7 +229,8 @@ class GradeFetcher:
         print(f"API Fetching grades: Year={year}, Term={term}, Exam={exam_value}")
         
         try:
-            response = requests.post(url, headers=headers, data=data, cookies=cookies, verify=False)
+            session = get_http_session()
+            response = session.post(url, headers=headers, data=data, cookies=cookies, verify=False)
             response.raise_for_status()
             return response.json()
         except Exception as e:
