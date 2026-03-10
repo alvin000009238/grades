@@ -2,139 +2,76 @@
 let radarChartInstance = null;
 let barChartInstance = null;
 
-// 全域 Turnstile 管理器
-const GlobalTurnstileManager = {
-    siteKey: '',
-    initPromise: null,
-    scriptPromise: null,
-    lastError: '',
+// ========================================
+// Turnstile 人機驗證
+// ========================================
+let turnstileSiteKey = '';
 
-    async init(force = false) {
-        if (this.initPromise && !force) return this.initPromise;
+async function loadTurnstileConfig() {
+    try {
+        const res = await fetch('/api/turnstile-config');
+        const data = await res.json();
+        turnstileSiteKey = data.siteKey || '';
+    } catch (e) {
+        console.warn('Failed to load Turnstile config', e);
+    }
+}
 
-        this.initPromise = (async () => {
-            this.lastError = '';
-            try {
-                const res = await fetch('/api/turnstile-site-key');
-                if (!res.ok) {
-                    this.siteKey = '';
-                    this.lastError = '無法取得 Turnstile 設定';
-                    return;
-                }
-
-                const data = await res.json();
-                this.siteKey = (data.siteKey || '').trim();
-                if (!this.siteKey) {
-                    this.lastError = 'Turnstile Site Key 未設定';
-                }
-            } catch (e) {
-                console.warn('Failed to init global Turnstile:', e);
-                this.siteKey = '';
-                this.lastError = '無法連線到驗證服務';
-            }
-        })();
-
-        return this.initPromise;
-    },
-
-    getLastError() {
-        return this.lastError;
-    },
-
-    async ensureScriptLoaded() {
-        if (typeof turnstile !== 'undefined') {
+function requestTurnstileVerification() {
+    return new Promise((resolve, reject) => {
+        // 若未設定 site key，直接放行
+        if (!turnstileSiteKey) {
+            resolve('');
             return;
         }
 
-        if (!this.scriptPromise) {
-            this.scriptPromise = new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-                script.async = true;
-                script.defer = true;
-                script.onload = () => resolve();
-                script.onerror = () => reject(new Error('Failed to load Turnstile script'));
-                document.head.appendChild(script);
-            });
-        }
+        const modal = document.getElementById('turnstileModal');
+        const container = document.getElementById('turnstileWidgetContainer');
+        const cancelBtn = document.getElementById('cancelTurnstile');
 
-        await this.scriptPromise;
-    },
+        // 清空舊 widget
+        container.innerHTML = '';
+        modal.classList.add('active');
 
-    async verify(actionLabel = '此操作') {
-        // 每次驗證前都嘗試重新抓一次設定，避免首次失敗後永久不可用
-        await this.init(true);
+        let widgetId = null;
+        let settled = false;
 
-        if (!this.siteKey) {
-            return '';
-        }
-
-        try {
-            await Promise.race([
-                this.ensureScriptLoaded(),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Turnstile script load timeout')), 5000)),
-            ]);
-        } catch (e) {
-            console.warn('Turnstile script not available:', e);
-            this.lastError = 'Turnstile 腳本載入逾時';
-            return '';
-        }
-
-        return new Promise((resolve) => {
-            const overlay = document.createElement('div');
-            overlay.className = 'modal-overlay active';
-            overlay.innerHTML = `
-                <div class="modal-content sm">
-                    <div class="modal-header">
-                        <h3>安全驗證</h3>
-                    </div>
-                    <div class="modal-body" style="text-align:center;">
-                        <p style="margin-bottom:12px; color: var(--color-text-secondary);">請先完成人機驗證，再繼續${actionLabel}</p>
-                        <div id="popupTurnstileContainer" style="display:flex; justify-content:center;"></div>
-                    </div>
-                    <div class="modal-footer" style="justify-content:center;">
-                        <button type="button" class="modal-btn cancel" id="popupTurnstileCancel">取消</button>
-                    </div>
-                </div>
-            `;
-
-            const cleanup = () => {
-                if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-            };
-
-            overlay.querySelector('#popupTurnstileCancel').addEventListener('click', () => {
-                cleanup();
-                resolve('');
-            });
-
-            document.body.appendChild(overlay);
-
-            try {
-                turnstile.render(overlay.querySelector('#popupTurnstileContainer'), {
-                    sitekey: this.siteKey,
-                    theme: 'dark',
-                    callback: (token) => {
-                        cleanup();
-                        resolve(token || '');
-                    },
-                    'error-callback': () => {
-                        cleanup();
-                        resolve('');
-                    },
-                    'expired-callback': () => {
-                        cleanup();
-                        resolve('');
-                    }
-                });
-            } catch (e) {
-                console.warn('Failed to render Turnstile popup:', e);
-                this.lastError = 'Turnstile 元件渲染失敗';
-                cleanup();
-                resolve('');
+        const cleanup = () => {
+            if (!settled) settled = true;
+            modal.classList.remove('active');
+            if (widgetId !== null && typeof turnstile !== 'undefined') {
+                try { turnstile.remove(widgetId); } catch (_) { /* ignore */ }
             }
-        });
-    }
-};
+            container.innerHTML = '';
+        };
+
+        // 等待 Turnstile SDK 載入
+        const renderWidget = () => {
+            if (typeof turnstile === 'undefined') {
+                setTimeout(renderWidget, 200);
+                return;
+            }
+            widgetId = turnstile.render(container, {
+                sitekey: turnstileSiteKey,
+                callback: (token) => {
+                    cleanup();
+                    resolve(token);
+                },
+                'error-callback': () => {
+                    cleanup();
+                    reject(new Error('人機驗證失敗'));
+                },
+            });
+        };
+
+        renderWidget();
+
+        cancelBtn.onclick = () => {
+            cleanup();
+            reject(new Error('cancelled'));
+        };
+    });
+}
 
 // HTML 跳脫輔助函數，防範 XSS
 
@@ -153,6 +90,7 @@ function escapeHTML(str) {
 
 document.addEventListener('DOMContentLoaded', () => {
     checkDisclaimer();
+    loadTurnstileConfig();
     loadGradesData();
     setupSyncFeature();
     setupShareFeature();
@@ -838,10 +776,13 @@ function setupSyncFeature() {
             return;
         }
 
-        // 取得 Turnstile token
-        const turnstileResponse = await GlobalTurnstileManager.verify('登入');
-        if (!turnstileResponse) {
-            showStatus(loginStatus, `請先完成人機驗證（${GlobalTurnstileManager.getLastError() || '請重試'}）`, 'error');
+        // Turnstile 人機驗證
+        let turnstileToken = '';
+        try {
+            turnstileToken = await requestTurnstileVerification();
+        } catch (e) {
+            if (e.message === 'cancelled') return;
+            showStatus(loginStatus, e.message, 'error');
             return;
         }
 
@@ -853,7 +794,7 @@ function setupSyncFeature() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify({ username, password, 'cf-turnstile-response': turnstileResponse })
+                body: JSON.stringify({ username, password, turnstile_token: turnstileToken })
             });
             const data = await res.json();
 
@@ -1102,10 +1043,13 @@ function setupShareFeature() {
                 return;
             }
 
-            // 取得 Turnstile token
-            const turnstileResponse = await GlobalTurnstileManager.verify('建立分享連結');
-            if (!turnstileResponse) {
-                shareStatus.textContent = `請先完成人機驗證（${GlobalTurnstileManager.getLastError() || '請重試'}）`;
+            // Turnstile 人機驗證
+            let turnstileToken = '';
+            try {
+                turnstileToken = await requestTurnstileVerification();
+            } catch (e) {
+                if (e.message === 'cancelled') return;
+                shareStatus.textContent = e.message;
                 shareStatus.className = 'status-msg error';
                 return;
             }
@@ -1115,7 +1059,7 @@ function setupShareFeature() {
             shareStatus.textContent = '';
 
             try {
-                const payload = { ...gradesData, 'cf-turnstile-response': turnstileResponse };
+                const payload = { ...gradesData, turnstile_token: turnstileToken };
                 const res = await fetch('/api/share', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

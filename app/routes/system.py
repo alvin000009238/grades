@@ -28,11 +28,12 @@ def static_files(filename):
     return send_from_directory('public', filename)
 
 
-@bp.route('/api/turnstile-site-key')
-def get_turnstile_site_key():
-    return jsonify({'siteKey': current_app.config['TURNSTILE_SITE_KEY']})
-
-
 @bp.route('/health')
 def health_check():
     return jsonify({'status': 'ok'}), 200
+
+
+@bp.route('/api/turnstile-config')
+def turnstile_config():
+    site_key = current_app.config.get('TURNSTILE_SITE_KEY', '')
+    return jsonify({'siteKey': site_key})

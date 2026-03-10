@@ -16,7 +16,7 @@ flowchart TD
 
     SCH[School System API<br/>shcloud2.k12ea.gov.tw]
 
-    TS[Cloudflare Turnstile<br/>siteverify]
+    CF[Cloudflare Turnstile<br/>challenges.cloudflare.com]
 
     SF[(shared_grades<br/>JSON Cache)]
 
@@ -27,11 +27,11 @@ flowchart TD
     FE -->|POST /api/fetch| BE
     FE -->|POST /api/share| BE
     FE -->|GET /api/share/:id| BE
+    FE -->|Turnstile Widget| CF
 
+    BE -->|siteverify| CF
     BE -->|fetch grades| GF
     GF --> SCH
-
-    BE -->|verify token| TS
 
     BE <--> SF
 ```
@@ -41,10 +41,11 @@ flowchart TD
 | 層級 | 元件 | 責任 |
 |---|---|---|
 | 前端呈現層 | `public/index.html`, `public/style.css` | 提供儀表板、Modal、分享 UI。 |
-| 前端邏輯層 | `public/app.js` | API 呼叫、表單互動、localStorage、圖表渲染、分享頁唯讀模式。 |
-| API 層 | `server.py` | 路由、Session、Turnstile 驗證、分享檔案讀寫、靜態檔案服務。 |
+| 前端邏輯層 | `public/app.js` | API 呼叫、表單互動、localStorage、圖表渲染、分享頁唯讀模式、Turnstile 驗證 Modal。 |
+| API 層 | `server.py` | 路由、Session、分享檔案讀寫、靜態檔案服務。 |
+| 驗證層 | `turnstile_service.py` | Cloudflare Turnstile token 驗證（登入/分享前）。 |
 | 整合層 | `fetcher.py` | 以 requests 登入學校系統並抓取結構/成績。 |
-| 外部服務 | 學校系統、Cloudflare | 資料來源與人機驗證。 |
+| 外部服務 | 學校系統 | 資料來源。 |
 | 佈署層 | `Dockerfile`, `docker-compose.yml` | Gunicorn 啟動、健康檢查、cloudflared tunnel。 |
 
 ## 3) 前後端 API 規格
@@ -53,21 +54,13 @@ flowchart TD
 
 ### 3.1 安全驗證與登入
 
-#### `GET /api/turnstile-site-key`
-- **用途**：取得前端初始化 Turnstile 的 site key。
-- **回應 200**
-```json
-{ "siteKey": "<TURNSTILE_SITE_KEY or empty>" }
-```
-
 #### `POST /api/login`
 - **用途**：登入學校系統，建立後端 session。
 - **Request JSON**
 ```json
 {
   "username": "學號",
-  "password": "密碼",
-  "cf-turnstile-response": "token"
+  "password": "密碼"
 }
 ```
 - **回應 200**
@@ -78,6 +71,8 @@ flowchart TD
 ```json
 { "success": false, "message": "錯誤訊息" }
 ```
+
+> **附註**：登入請求需附帶 `turnstile_token` 欄位（Turnstile 驗證 token），後端驗證失敗回傳 `403`。
 
 #### `GET /api/check_login`
 - **用途**：確認當前 session 是否已登入。
@@ -154,11 +149,10 @@ flowchart TD
 
 #### `POST /api/share`
 - **用途**：將前端成績 JSON 產生分享連結。
-- **Request JSON**：任意成績資料（需包含前端使用資料），且附帶 `cf-turnstile-response`。
+- **Request JSON**：任意成績資料（需包含前端使用資料）。
 ```json
 {
-  "Result": {},
-  "cf-turnstile-response": "token"
+  "Result": {}
 }
 ```
 - **回應 200**
@@ -169,6 +163,8 @@ flowchart TD
 ```json
 { "error": "錯誤訊息" }
 ```
+
+> **附註**：分享請求需附帶 `turnstile_token` 欄位（Turnstile 驗證 token），後端驗證失敗回傳 `403`。
 
 #### `GET /api/share/:share_id`
 - **用途**：讀取分享資料。
@@ -193,6 +189,13 @@ flowchart TD
 { "status": "ok" }
 ```
 
+#### `GET /api/turnstile-config`
+- **用途**：取得 Turnstile site key 供前端渲染 Widget。
+- **回應 200**
+```json
+{ "siteKey": "1x00000000000000000000AA" }
+```
+
 ## 4) 核心流程時序圖（Mermaid）
 
 ### 4.1 登入 + 預抓結構
@@ -200,30 +203,26 @@ flowchart TD
 ```mermaid
 sequenceDiagram
     participant Browser as Browser(app.js)
+    participant CF as Cloudflare Turnstile
     participant Server as Flask(server.py)
-    participant Turnstile as Cloudflare Turnstile
     participant Fetcher as GradeFetcher(fetcher.py)
     participant School as School API
 
-    Browser->>Server: GET /api/turnstile-site-key
-    Server-->>Browser: {siteKey}
-
-    Browser->>Server: POST /api/login (username/password/token)
-    Server->>Turnstile: siteverify(token)
-    Turnstile-->>Server: success/fail
-    alt 驗證成功
-        Server->>Fetcher: login_and_get_tokens()
-        Fetcher->>School: GET login page + token
-        Fetcher->>School: POST DoCloudLoginCheck
-        Fetcher->>School: GET grades page + API token
-        Fetcher-->>Server: cookies + student_no + api_token
-        Server->>Fetcher: get_structure_via_api()
-        Fetcher->>School: 取年期 + 平行取考試
-        Fetcher-->>Server: structure
-        Server-->>Browser: {success:true}
-    else 驗證失敗
-        Server-->>Browser: 403
-    end
+    Browser->>Browser: 使用者點擊「登入」
+    Browser->>CF: 顯示 Turnstile Widget
+    CF-->>Browser: turnstile_token
+    Browser->>Server: POST /api/login (username/password/turnstile_token)
+    Server->>CF: POST siteverify (token)
+    CF-->>Server: {success: true}
+    Server->>Fetcher: login_and_get_tokens()
+    Fetcher->>School: GET login page + token
+    Fetcher->>School: POST DoCloudLoginCheck
+    Fetcher->>School: GET grades page + API token
+    Fetcher-->>Server: cookies + student_no + api_token
+    Server->>Fetcher: get_structure_via_api()
+    Fetcher->>School: 取年期 + 平行取考試
+    Fetcher-->>Server: structure
+    Server-->>Browser: {success:true}
 ```
 
 ### 4.2 查詢成績
@@ -252,13 +251,16 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Browser(app.js)
+    participant CF as Cloudflare Turnstile
     participant Server as Flask(server.py)
-    participant Turnstile as Cloudflare Turnstile
     participant FS as shared_grades folder
 
-    Browser->>Server: POST /api/share (grades + token)
-    Server->>Turnstile: siteverify(token)
-    Turnstile-->>Server: success
+    Browser->>Browser: 使用者點擊「建立分享連結」
+    Browser->>CF: 顯示 Turnstile Widget
+    CF-->>Browser: turnstile_token
+    Browser->>Server: POST /api/share (grades + turnstile_token)
+    Server->>CF: POST siteverify (token)
+    CF-->>Server: {success: true}
     Server->>FS: write <share_id>.json
     Server-->>Browser: {success:true,id}
 
@@ -284,3 +286,5 @@ sequenceDiagram
 - `SESSION_COOKIE_SECURE=True`，部署需 HTTPS。
 - `shared_grades` 檔案有背景清理機制：每 10 分鐘掃描，2 小時過期刪除。
 - 前端會將最近一次查詢成績存放在 `localStorage.gradesData`，以提升重開頁面體驗。
+- 登入與建立分享連結前須通過 Cloudflare Turnstile 人機驗證；後端透過 `turnstile_service.py` 向 Cloudflare 驗證 token，驗證失敗回傳 `403`。
+- 若 `TURNSTILE_SECRET_KEY` 環境變數未設定，後端自動跳過驗證（供本機開發使用）。

@@ -27,12 +27,12 @@ def create_app():
     app.config['SESSION_COOKIE_SECURE'] = True
     app.config['SESSION_COOKIE_HTTPONLY'] = True
 
-    app.config['TURNSTILE_SECRET_KEY'] = os.environ.get('TURNSTILE_SECRET_KEY', '')
-    app.config['TURNSTILE_SITE_KEY'] = os.environ.get('TURNSTILE_SITE_KEY', '')
-    
     redis_url = os.environ.get('REDIS_URL', 'redis://redis:6379/0')
     app.config['REDIS_CLIENT'] = redis.from_url(redis_url, decode_responses=True)
     app.config['SHARE_TTL'] = 7200
+
+    app.config['TURNSTILE_SITE_KEY'] = os.environ.get('TURNSTILE_SITE_KEY', '')
+    app.config['TURNSTILE_SECRET_KEY'] = os.environ.get('TURNSTILE_SECRET_KEY', '')
 
     app.config['GRADE_FETCHER'] = GradeFetcher
 

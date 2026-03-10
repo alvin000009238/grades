@@ -28,7 +28,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://challenges.cloudflare.com https://static.cloudflareinsights.com; script-src-elem 'self' https://cdn.jsdelivr.net https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://cdn.jsdelivr.net https://challenges.cloudflare.com https://cloudflareinsights.com; img-src 'self' data:; frame-src https://challenges.cloudflare.com;">
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://challenges.cloudflare.com; script-src-elem 'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://cdn.jsdelivr.net https://cloudflareinsights.com; frame-src https://challenges.cloudflare.com; img-src 'self' data:;">
     <link
         href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap"
         rel="stylesheet">
@@ -36,6 +36,7 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <link rel="stylesheet" href="/style.css">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
@@ -207,6 +208,24 @@
                 </div>
                 <div class="modal-footer" style="display: flex; justify-content: flex-end;">
                     <button class="modal-btn confirm" id="confirmDisclaimer">我了解了</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Turnstile 人機驗證視窗 -->
+        <div class="modal-overlay" id="turnstileModal">
+            <div class="modal-content sm">
+                <div class="modal-header">
+                    <h3>安全驗證</h3>
+                </div>
+                <div class="modal-body" style="text-align: center; padding: 24px 16px;">
+                    <p style="color: var(--color-text-secondary); margin-bottom: 20px; font-size: 15px;">
+                        請先完成人機驗證，再繼續操作
+                    </p>
+                    <div id="turnstileWidgetContainer" style="display: flex; justify-content: center;"></div>
+                </div>
+                <div class="modal-footer" style="display: flex; justify-content: center;">
+                    <button class="modal-btn cancel" id="cancelTurnstile">取消</button>
                 </div>
             </div>
         </div>

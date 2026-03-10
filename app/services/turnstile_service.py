@@ -1,29 +1,45 @@
-from app.services.http_client import get_http_session
-from flask import jsonify
+import requests as http_requests
+
+from flask import current_app
+
+VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
 
 
-def verify_turnstile(token, remote_ip, secret_key, logger, context=''):
-    """共用 Turnstile 驗證函式。回傳 (success: bool, error_response or None)。"""
+def verify_turnstile_token(token):
+    """驗證 Cloudflare Turnstile token。
+
+    若 TURNSTILE_SECRET_KEY 未設定，視為本機開發，直接放行。
+    回傳 (success, error_message)。
+    """
+    secret_key = current_app.config.get('TURNSTILE_SECRET_KEY')
+
     if not secret_key:
+        current_app.config['LOGGER'].warning(
+            'TURNSTILE_SECRET_KEY not set – skipping Turnstile verification'
+        )
         return True, None
 
     if not token:
-        return False, (jsonify({'success': False, 'message': '請完成人機驗證'}), 400)
+        return False, '缺少人機驗證 token'
 
     try:
-        session = get_http_session()
-        verify_res = session.post(
-            'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-            data={'secret': secret_key, 'response': token, 'remoteip': remote_ip},
+        resp = http_requests.post(
+            VERIFY_URL,
+            data={'secret': secret_key, 'response': token},
             timeout=10,
         )
-        verify_res.raise_for_status()
-        verify_data = verify_res.json()
-        if not verify_data.get('success'):
-            logger.warning(f"Turnstile verification failed ({context}): {verify_data}")
-            return False, (jsonify({'success': False, 'message': '人機驗證失敗，請重試'}), 403)
-    except Exception as exc:
-        logger.error(f"Turnstile verification error ({context}): {exc}", exc_info=True)
-        return False, (jsonify({'success': False, 'message': '驗證服務暫時無法使用，請稍後再試'}), 500)
+        result = resp.json()
 
-    return True, None
+        if result.get('success'):
+            return True, None
+
+        error_codes = result.get('error-codes', [])
+        current_app.config['LOGGER'].warning(
+            f'Turnstile verification failed: {error_codes}'
+        )
+        return False, '人機驗證失敗，請重試'
+    except Exception as exc:
+        current_app.config['LOGGER'].error(
+            f'Turnstile verification error: {exc}', exc_info=True
+        )
+        return False, '驗證服務異常，請稍後再試'

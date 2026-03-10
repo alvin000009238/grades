@@ -6,7 +6,7 @@ from app.services.share_service import (
     read_shared_data,
     write_shared_data,
 )
-from app.services.turnstile_service import verify_turnstile
+from app.services.turnstile_service import verify_turnstile_token
 
 bp = Blueprint('share', __name__)
 
@@ -18,16 +18,10 @@ def create_share_link():
         if not data:
             return jsonify({'error': 'No data provided'}), 400
 
-        turnstile_token = data.pop('cf-turnstile-response', '')
-        ok, err = verify_turnstile(
-            turnstile_token,
-            request.remote_addr,
-            current_app.config['TURNSTILE_SECRET_KEY'],
-            current_app.config['LOGGER'],
-            context='share',
-        )
-        if not ok:
-            return err
+        # Turnstile 人機驗證
+        ts_ok, ts_err = verify_turnstile_token(data.get('turnstile_token'))
+        if not ts_ok:
+            return jsonify({'error': ts_err}), 403
 
         share_id = generate_share_id()
         write_shared_data(current_app.config['REDIS_CLIENT'], share_id, data, current_app.config['SHARE_TTL'])

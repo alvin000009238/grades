@@ -2,7 +2,7 @@ from flask import Blueprint, current_app, jsonify, request, session
 
 from app.services.auth_service import is_logged_in, login_and_build_session_payload
 from app.services.grades_service import get_structure
-from app.services.turnstile_service import verify_turnstile
+from app.services.turnstile_service import verify_turnstile_token
 
 bp = Blueprint('auth', __name__)
 
@@ -23,19 +23,13 @@ def login():
 
     logger.info(f'Login attempt for user: {username}')
 
+    # Turnstile 人機驗證
+    ts_ok, ts_err = verify_turnstile_token(data.get('turnstile_token'))
+    if not ts_ok:
+        return jsonify({'success': False, 'message': ts_err}), 403
+
     if not username or not password:
         return jsonify({'success': False, 'message': '請輸入帳號密碼'}), 400
-
-    turnstile_token = data.get('cf-turnstile-response', '')
-    ok, err = verify_turnstile(
-        turnstile_token,
-        request.remote_addr,
-        current_app.config['TURNSTILE_SECRET_KEY'],
-        logger,
-        context=f'login:{username}',
-    )
-    if not ok:
-        return err
 
     fetcher = current_app.config['GRADE_FETCHER']
     success, message, payload = login_and_build_session_payload(fetcher, username, password)
