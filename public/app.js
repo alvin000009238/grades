@@ -4,71 +4,135 @@ let barChartInstance = null;
 
 // 全域 Turnstile 管理器
 const GlobalTurnstileManager = {
-    widgetId: null,
-    isEnabled: true,
-    siteKey: null,
+    siteKey: '',
+    initPromise: null,
+    scriptPromise: null,
+    lastError: '',
 
-    async init() {
-        try {
-            const res = await fetch('/api/turnstile-site-key');
-            const data = await res.json();
-            this.siteKey = data.siteKey || '';
-            if (!this.siteKey) {
-                this.isEnabled = false;
+    async init(force = false) {
+        if (this.initPromise && !force) return this.initPromise;
+
+        this.initPromise = (async () => {
+            this.lastError = '';
+            try {
+                const res = await fetch('/api/turnstile-site-key');
+                if (!res.ok) {
+                    this.siteKey = '';
+                    this.lastError = '無法取得 Turnstile 設定';
+                    return;
+                }
+
+                const data = await res.json();
+                this.siteKey = (data.siteKey || '').trim();
+                if (!this.siteKey) {
+                    this.lastError = 'Turnstile Site Key 未設定';
+                }
+            } catch (e) {
+                console.warn('Failed to init global Turnstile:', e);
+                this.siteKey = '';
+                this.lastError = '無法連線到驗證服務';
             }
-        } catch (e) {
-            console.warn('Failed to init global Turnstile:', e);
-            this.isEnabled = false;
-        }
+        })();
+
+        return this.initPromise;
     },
 
-    async render(containerId) {
-        if (!this.isEnabled || !this.siteKey) return;
+    getLastError() {
+        return this.lastError;
+    },
+
+    async ensureScriptLoaded() {
+        if (typeof turnstile !== 'undefined') {
+            return;
+        }
+
+        if (!this.scriptPromise) {
+            this.scriptPromise = new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+                script.async = true;
+                script.defer = true;
+                script.onload = () => resolve();
+                script.onerror = () => reject(new Error('Failed to load Turnstile script'));
+                document.head.appendChild(script);
+            });
+        }
+
+        await this.scriptPromise;
+    },
+
+    async verify(actionLabel = '此操作') {
+        // 每次驗證前都嘗試重新抓一次設定，避免首次失敗後永久不可用
+        await this.init(true);
+
+        if (!this.siteKey) {
+            return '';
+        }
 
         try {
-            const waitForTurnstile = () => new Promise((resolve) => {
-                if (typeof turnstile !== 'undefined') return resolve();
-                const interval = setInterval(() => {
-                    if (typeof turnstile !== 'undefined') {
-                        clearInterval(interval);
-                        resolve();
+            await Promise.race([
+                this.ensureScriptLoaded(),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Turnstile script load timeout')), 5000)),
+            ]);
+        } catch (e) {
+            console.warn('Turnstile script not available:', e);
+            this.lastError = 'Turnstile 腳本載入逾時';
+            return '';
+        }
+
+        return new Promise((resolve) => {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay active';
+            overlay.innerHTML = `
+                <div class="modal-content sm">
+                    <div class="modal-header">
+                        <h3>安全驗證</h3>
+                    </div>
+                    <div class="modal-body" style="text-align:center;">
+                        <p style="margin-bottom:12px; color: var(--color-text-secondary);">請先完成人機驗證，再繼續${actionLabel}</p>
+                        <div id="popupTurnstileContainer" style="display:flex; justify-content:center;"></div>
+                    </div>
+                    <div class="modal-footer" style="justify-content:center;">
+                        <button type="button" class="modal-btn cancel" id="popupTurnstileCancel">取消</button>
+                    </div>
+                </div>
+            `;
+
+            const cleanup = () => {
+                if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            };
+
+            overlay.querySelector('#popupTurnstileCancel').addEventListener('click', () => {
+                cleanup();
+                resolve('');
+            });
+
+            document.body.appendChild(overlay);
+
+            try {
+                turnstile.render(overlay.querySelector('#popupTurnstileContainer'), {
+                    sitekey: this.siteKey,
+                    theme: 'dark',
+                    callback: (token) => {
+                        cleanup();
+                        resolve(token || '');
+                    },
+                    'error-callback': () => {
+                        cleanup();
+                        resolve('');
+                    },
+                    'expired-callback': () => {
+                        cleanup();
+                        resolve('');
                     }
-                }, 100);
-            });
-
-            await waitForTurnstile();
-
-            const container = document.getElementById(containerId);
-            if (!container) return;
-
-            if (this.widgetId !== null) {
-                turnstile.remove(this.widgetId);
+                });
+            } catch (e) {
+                console.warn('Failed to render Turnstile popup:', e);
+                this.lastError = 'Turnstile 元件渲染失敗';
+                cleanup();
+                resolve('');
             }
-
-            container.innerHTML = '';
-
-            this.widgetId = turnstile.render(container, {
-                sitekey: this.siteKey,
-                theme: 'dark'
-            });
-        } catch (e) {
-            console.warn('Failed to render Turnstile:', e);
-        }
-    },
-
-    getToken() {
-        if (!this.isEnabled) return 'disabled';
-        if (typeof turnstile !== 'undefined' && this.widgetId !== null) {
-            return turnstile.getResponse(this.widgetId) || '';
-        }
-        return '';
-    },
-
-    reset() {
-        if (!this.isEnabled) return;
-        if (typeof turnstile !== 'undefined' && this.widgetId !== null) {
-            turnstile.reset(this.widgetId);
-        }
+        });
     }
 };
 
@@ -88,7 +152,6 @@ function escapeHTML(str) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    GlobalTurnstileManager.init();
     checkDisclaimer();
     loadGradesData();
     setupSyncFeature();
@@ -776,9 +839,9 @@ function setupSyncFeature() {
         }
 
         // 取得 Turnstile token
-        const turnstileResponse = GlobalTurnstileManager.getToken();
+        const turnstileResponse = await GlobalTurnstileManager.verify('登入');
         if (!turnstileResponse) {
-            showStatus(loginStatus, '請稍候，系統安全驗證處理中...', 'error');
+            showStatus(loginStatus, `請先完成人機驗證（${GlobalTurnstileManager.getLastError() || '請重試'}）`, 'error');
             return;
         }
 
@@ -804,11 +867,11 @@ function setupSyncFeature() {
                 }, 500);
             } else {
                 showStatus(loginStatus, data.message || '登入失敗', 'error');
-                GlobalTurnstileManager.reset();
+
             }
         } catch (error) {
             showStatus(loginStatus, '連線錯誤: ' + error.message, 'error');
-            GlobalTurnstileManager.reset();
+
         } finally {
             confirmLogin.disabled = false;
         }
@@ -850,7 +913,6 @@ function setupSyncFeature() {
             if (res.status === 401) {
                 toggleModal(selectExamModal, false);
                 toggleModal(loginModal, true);
-                GlobalTurnstileManager.render('loginTurnstileContainer');
                 usernameInput.focus();
                 return;
             }
@@ -1013,7 +1075,6 @@ function setupShareFeature() {
                         複製連結
                     </button>
                 </div>
-                <div id="shareTurnstileContainer" style="margin-bottom: 16px; display: flex; justify-content: center;"></div>
                 <button id="createLinkBtn" class="import-dropdown-btn" style="width: 100%; justify-content: center;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -1033,8 +1094,6 @@ function setupShareFeature() {
         const copyLinkBtn = document.getElementById('copyLinkBtn');
         const shareStatus = document.getElementById('shareStatus');
 
-        GlobalTurnstileManager.render('shareTurnstileContainer');
-
         createLinkBtn.addEventListener('click', async () => {
             const gradesData = getStoredGrades();
             if (!gradesData) {
@@ -1044,9 +1103,9 @@ function setupShareFeature() {
             }
 
             // 取得 Turnstile token
-            const turnstileResponse = GlobalTurnstileManager.getToken();
+            const turnstileResponse = await GlobalTurnstileManager.verify('建立分享連結');
             if (!turnstileResponse) {
-                shareStatus.textContent = '請稍候，系統安全驗證處理中...';
+                shareStatus.textContent = `請先完成人機驗證（${GlobalTurnstileManager.getLastError() || '請重試'}）`;
                 shareStatus.className = 'status-msg error';
                 return;
             }
@@ -1080,7 +1139,6 @@ function setupShareFeature() {
                 shareStatus.className = 'status-msg error';
                 createLinkBtn.disabled = false;
                 createLinkBtn.textContent = '建立分享連結';
-                GlobalTurnstileManager.reset();
             }
         });
 
