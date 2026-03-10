@@ -29,7 +29,7 @@ def create_app():
     app.config['SESSION_COOKIE_HTTPONLY'] = True
 
     redis_url = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/0')
-    redis_client = redis.from_url(redis_url, decode_responses=True)
+    redis_client = redis.from_url(redis_url)
     
     flask_env = os.environ.get('FLASK_ENV', '').lower()
     app_env = os.environ.get('APP_ENV', '').lower()
@@ -41,7 +41,7 @@ def create_app():
         app.config['REDIS_CLIENT'] = redis_client
         app.config['SESSION_TYPE'] = 'redis'
         app.config['SESSION_REDIS'] = redis_client
-        app.config['SESSION_USE_SIGNER'] = True
+        app.config['SESSION_USE_SIGNER'] = False
         app.config['SESSION_KEY_PREFIX'] = 'session:'
         app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # 1 day
         Session(app)
