@@ -4,43 +4,75 @@ let barChartInstance = null;
 
 // 全域 Turnstile 管理器
 const GlobalTurnstileManager = {
-    isEnabled: true,
-    siteKey: null,
+    siteKey: '',
     initPromise: null,
+    lastError: '',
 
-    async init() {
-        if (this.initPromise) return this.initPromise;
+    async init(force = false) {
+        if (this.initPromise && !force) return this.initPromise;
 
         this.initPromise = (async () => {
+            this.lastError = '';
             try {
                 const res = await fetch('/api/turnstile-site-key');
+                if (!res.ok) {
+                    this.siteKey = '';
+                    this.lastError = '無法取得 Turnstile 設定';
+                    return;
+                }
+
                 const data = await res.json();
-                this.siteKey = data.siteKey || '';
-                if (!this.siteKey) this.isEnabled = false;
+                this.siteKey = (data.siteKey || '').trim();
+                if (!this.siteKey) {
+                    this.lastError = 'Turnstile Site Key 未設定';
+                }
             } catch (e) {
                 console.warn('Failed to init global Turnstile:', e);
-                this.isEnabled = false;
+                this.siteKey = '';
+                this.lastError = '無法連線到驗證服務';
             }
         })();
 
         return this.initPromise;
     },
 
-    async verify(actionLabel = '此操作') {
-        await this.init();
-        if (!this.isEnabled || !this.siteKey) return 'disabled';
+    getLastError() {
+        return this.lastError;
+    },
 
-        const waitForTurnstile = () => new Promise((resolve) => {
+    async verify(actionLabel = '此操作') {
+        // 每次驗證前都嘗試重新抓一次設定，避免首次失敗後永久不可用
+        await this.init(true);
+
+        if (!this.siteKey) {
+            return '';
+        }
+
+        const waitForTurnstile = (timeoutMs = 5000) => new Promise((resolve, reject) => {
+            const startedAt = Date.now();
             if (typeof turnstile !== 'undefined') return resolve();
+
             const interval = setInterval(() => {
                 if (typeof turnstile !== 'undefined') {
                     clearInterval(interval);
                     resolve();
+                    return;
+                }
+
+                if (Date.now() - startedAt >= timeoutMs) {
+                    clearInterval(interval);
+                    reject(new Error('Turnstile script load timeout'));
                 }
             }, 100);
         });
 
-        await waitForTurnstile();
+        try {
+            await waitForTurnstile();
+        } catch (e) {
+            console.warn('Turnstile script not available:', e);
+            this.lastError = 'Turnstile 腳本載入逾時';
+            return '';
+        }
 
         return new Promise((resolve) => {
             const overlay = document.createElement('div');
@@ -90,6 +122,7 @@ const GlobalTurnstileManager = {
                 });
             } catch (e) {
                 console.warn('Failed to render Turnstile popup:', e);
+                this.lastError = 'Turnstile 元件渲染失敗';
                 cleanup();
                 resolve('');
             }
@@ -113,7 +146,6 @@ function escapeHTML(str) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    GlobalTurnstileManager.init();
     checkDisclaimer();
     loadGradesData();
     setupSyncFeature();
@@ -803,7 +835,7 @@ function setupSyncFeature() {
         // 取得 Turnstile token
         const turnstileResponse = await GlobalTurnstileManager.verify('登入');
         if (!turnstileResponse) {
-            showStatus(loginStatus, '請先完成人機驗證', 'error');
+            showStatus(loginStatus, `請先完成人機驗證（${GlobalTurnstileManager.getLastError() || '請重試'}）`, 'error');
             return;
         }
 
@@ -1067,7 +1099,7 @@ function setupShareFeature() {
             // 取得 Turnstile token
             const turnstileResponse = await GlobalTurnstileManager.verify('建立分享連結');
             if (!turnstileResponse) {
-                shareStatus.textContent = '請先完成人機驗證';
+                shareStatus.textContent = `請先完成人機驗證（${GlobalTurnstileManager.getLastError() || '請重試'}）`;
                 shareStatus.className = 'status-msg error';
                 return;
             }
