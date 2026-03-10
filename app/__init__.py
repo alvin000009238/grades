@@ -3,6 +3,7 @@ import redis
 
 from flask import Flask
 from werkzeug.middleware.proxy_fix import ProxyFix
+from flask_session import Session
 
 from app.extensions import configure_logger, cors
 from app.routes import auth_bp, grades_bp, share_bp, system_bp
@@ -28,8 +29,16 @@ def create_app():
     app.config['SESSION_COOKIE_HTTPONLY'] = True
 
     redis_url = os.environ.get('REDIS_URL', 'redis://redis:6379/0')
-    app.config['REDIS_CLIENT'] = redis.from_url(redis_url, decode_responses=True)
+    redis_client = redis.from_url(redis_url, decode_responses=True)
+    app.config['REDIS_CLIENT'] = redis_client
     app.config['SHARE_TTL'] = 7200
+    
+    app.config['SESSION_TYPE'] = 'redis'
+    app.config['SESSION_REDIS'] = redis_client
+    app.config['SESSION_USE_SIGNER'] = True
+    app.config['SESSION_KEY_PREFIX'] = 'session:'
+    app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # 1 day
+    Session(app)
 
     app.config['TURNSTILE_SITE_KEY'] = os.environ.get('TURNSTILE_SITE_KEY', '')
     app.config['TURNSTILE_SECRET_KEY'] = os.environ.get('TURNSTILE_SECRET_KEY', '')
