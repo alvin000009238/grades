@@ -73,12 +73,22 @@ jobs:
               docker service update \
                 --with-registry-auth \
                 --image ghcr.io/${{ github.repository }}:sha-${{ github.sha }} \
+                --env-add REDIS_URL=redis://redis:6379/0 \
+                --env-add SECRET_KEY=${{ secrets.SECRET_KEY }} \
+                --env-add CORS_ORIGINS=${{ secrets.CORS_ORIGINS }} \
+                --env-add TURNSTILE_SITE_KEY=${{ secrets.TURNSTILE_SITE_KEY }} \
+                --env-add TURNSTILE_SECRET_KEY=${{ secrets.TURNSTILE_SECRET_KEY }} \
                 school_grades_app
             else
               docker service create \
                 --with-registry-auth \
                 --name school_grades_app \
                 --network app_network \
+                --env REDIS_URL=redis://redis:6379/0 \
+                --env SECRET_KEY=${{ secrets.SECRET_KEY }} \
+                --env CORS_ORIGINS=${{ secrets.CORS_ORIGINS }} \
+                --env TURNSTILE_SITE_KEY=${{ secrets.TURNSTILE_SITE_KEY }} \
+                --env TURNSTILE_SECRET_KEY=${{ secrets.TURNSTILE_SECRET_KEY }} \
                 ghcr.io/${{ github.repository }}:sha-${{ github.sha }}
             fi
               
