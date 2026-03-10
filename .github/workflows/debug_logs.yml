@@ -1,0 +1,27 @@
+name: Debug Docker Swarm Logs
+on:
+  workflow_dispatch:
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands to debug
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            echo "--- Docker Services Status ---"
+            docker service ls
+
+            echo "--- Docker PS Status ---"
+            docker ps -a
+            
+            echo "--- App Service Logs ---"
+            docker service logs school_grades_app --tail 200
+
+            echo "--- Redis Service Logs ---"
+            docker service logs redis --tail 100
