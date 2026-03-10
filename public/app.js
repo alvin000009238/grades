@@ -6,6 +6,7 @@ let barChartInstance = null;
 const GlobalTurnstileManager = {
     siteKey: '',
     initPromise: null,
+    scriptPromise: null,
     lastError: '',
 
     async init(force = false) {
@@ -40,6 +41,26 @@ const GlobalTurnstileManager = {
         return this.lastError;
     },
 
+    async ensureScriptLoaded() {
+        if (typeof turnstile !== 'undefined') {
+            return;
+        }
+
+        if (!this.scriptPromise) {
+            this.scriptPromise = new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+                script.async = true;
+                script.defer = true;
+                script.onload = () => resolve();
+                script.onerror = () => reject(new Error('Failed to load Turnstile script'));
+                document.head.appendChild(script);
+            });
+        }
+
+        await this.scriptPromise;
+    },
+
     async verify(actionLabel = '此操作') {
         // 每次驗證前都嘗試重新抓一次設定，避免首次失敗後永久不可用
         await this.init(true);
@@ -48,26 +69,11 @@ const GlobalTurnstileManager = {
             return '';
         }
 
-        const waitForTurnstile = (timeoutMs = 5000) => new Promise((resolve, reject) => {
-            const startedAt = Date.now();
-            if (typeof turnstile !== 'undefined') return resolve();
-
-            const interval = setInterval(() => {
-                if (typeof turnstile !== 'undefined') {
-                    clearInterval(interval);
-                    resolve();
-                    return;
-                }
-
-                if (Date.now() - startedAt >= timeoutMs) {
-                    clearInterval(interval);
-                    reject(new Error('Turnstile script load timeout'));
-                }
-            }, 100);
-        });
-
         try {
-            await waitForTurnstile();
+            await Promise.race([
+                this.ensureScriptLoaded(),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Turnstile script load timeout')), 5000)),
+            ]);
         } catch (e) {
             console.warn('Turnstile script not available:', e);
             this.lastError = 'Turnstile 腳本載入逾時';
