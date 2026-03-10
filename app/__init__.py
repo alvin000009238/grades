@@ -28,17 +28,26 @@ def create_app():
     app.config['SESSION_COOKIE_SECURE'] = True
     app.config['SESSION_COOKIE_HTTPONLY'] = True
 
-    redis_url = os.environ.get('REDIS_URL', 'redis://redis:6379/0')
+    redis_url = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/0')
     redis_client = redis.from_url(redis_url, decode_responses=True)
-    app.config['REDIS_CLIENT'] = redis_client
-    app.config['SHARE_TTL'] = 7200
     
-    app.config['SESSION_TYPE'] = 'redis'
-    app.config['SESSION_REDIS'] = redis_client
-    app.config['SESSION_USE_SIGNER'] = True
-    app.config['SESSION_KEY_PREFIX'] = 'session:'
-    app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # 1 day
-    Session(app)
+    flask_env = os.environ.get('FLASK_ENV', '').lower()
+    app_env = os.environ.get('APP_ENV', '').lower()
+    is_dev = flask_env in ('development', 'testing') or app_env in ('development', 'testing')
+
+    try:
+        if is_dev:
+            redis_client.ping()
+        app.config['REDIS_CLIENT'] = redis_client
+        app.config['SESSION_TYPE'] = 'redis'
+        app.config['SESSION_REDIS'] = redis_client
+        app.config['SESSION_USE_SIGNER'] = True
+        app.config['SESSION_KEY_PREFIX'] = 'session:'
+        app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # 1 day
+        Session(app)
+    except redis.exceptions.ConnectionError:
+        app.config['REDIS_CLIENT'] = None
+        print("WARNING: Redis not available. Using default cookie session for development.")
 
     app.config['TURNSTILE_SITE_KEY'] = os.environ.get('TURNSTILE_SITE_KEY', '')
     app.config['TURNSTILE_SECRET_KEY'] = os.environ.get('TURNSTILE_SECRET_KEY', '')

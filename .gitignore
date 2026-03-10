@@ -61,3 +61,7 @@ shared_grades/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Node.js
+node_modules/
+public/dist/

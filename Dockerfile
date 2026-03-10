@@ -1,3 +1,12 @@
+FROM node:20-slim AS frontend-build
+
+WORKDIR /build
+COPY package.json ./
+RUN npm install
+COPY vite.config.js ./
+COPY frontend/ ./frontend/
+RUN npm run build
+
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -12,8 +21,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Create necessary directories
-RUN mkdir -p shared_grades
+# Copy Vite build output
+COPY --from=frontend-build /build/public/dist/ ./public/dist/
 
 # Expose port
 EXPOSE 5000
