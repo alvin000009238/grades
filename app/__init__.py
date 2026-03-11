@@ -33,11 +33,9 @@ def create_app():
     
     flask_env = os.environ.get('FLASK_ENV', '').lower()
     app_env = os.environ.get('APP_ENV', '').lower()
-    is_dev = flask_env in ('development', 'testing') or app_env in ('development', 'testing')
 
     try:
-        if is_dev:
-            redis_client.ping()
+        redis_client.ping()
         app.config['REDIS_CLIENT'] = redis_client
         app.config['SESSION_TYPE'] = 'redis'
         app.config['SESSION_REDIS'] = redis_client
@@ -47,6 +45,9 @@ def create_app():
         Session(app)
     except redis.exceptions.ConnectionError:
         app.config['REDIS_CLIENT'] = None
+        # 退回不使用 Redis session
+        app.config['SESSION_TYPE'] = 'null'
+        Session(app)
         print("WARNING: Redis not available. Using default cookie session for development.")
 
     app.config['TURNSTILE_SITE_KEY'] = os.environ.get('TURNSTILE_SITE_KEY', '')

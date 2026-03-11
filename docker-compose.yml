@@ -1,14 +1,17 @@
 services:
   app:
-    image: ghcr.io/${GHCR_IMAGE:-alvin000009238/school_grades}:latest
+    build: .
+    image: ghcr.io/${GHCR_IMAGE:-alvin000009238/grades}:latest
     environment:
       - PYTHONUNBUFFERED=1
       - SECRET_KEY=${SECRET_KEY}
       - CORS_ORIGINS=${CORS_ORIGINS}
-      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - REDIS_URL=redis://redis:6379/0
       - TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}
       - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
       - TZ=Asia/Taipei
+    ports:
+      - "5000:5000"
 
     depends_on:
       - redis
