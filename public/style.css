@@ -89,6 +89,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 html {
@@ -279,8 +280,9 @@ body {
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
+    transition: transform var(--duration) var(--ease), background-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
     box-shadow: none;
+    touch-action: manipulation;
 }
 
 .import-dropdown-btn:hover {
@@ -289,6 +291,7 @@ body {
 }
 
 .import-dropdown-btn:active {
+    transform: scale(0.96);
     background: var(--color-primary-muted);
 }
 
@@ -305,6 +308,7 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all var(--duration) var(--ease);
+    touch-action: manipulation;
 }
 
 .icon-btn:hover {
@@ -313,7 +317,7 @@ body {
 }
 
 .icon-btn:active {
-    transform: scale(0.98);
+    transform: scale(0.96);
 }
 
 .dropdown-icon,
@@ -372,11 +376,17 @@ body {
     width: 100%;
     text-align: left;
     cursor: pointer;
-    transition: background var(--duration) var(--ease);
+    transition: transform var(--duration) var(--ease), background var(--duration) var(--ease);
     color: var(--color-text-main);
+    touch-action: manipulation;
 }
 
 .dropdown-item:hover {
+    background: var(--color-fill);
+}
+
+.dropdown-item:active {
+    transform: scale(0.98);
     background: var(--color-fill);
 }
 
@@ -479,6 +489,12 @@ body {
     position: relative;
     outline: none;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition: transform var(--duration) var(--ease);
+}
+
+.tooltip-icon:active {
+    transform: scale(0.96);
 }
 
 .tooltip-icon::before {
@@ -547,7 +563,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color var(--duration) var(--ease), color var(--duration) var(--ease);
+    transition: transform var(--duration) var(--ease), background-color var(--duration) var(--ease), color var(--duration) var(--ease);
+    touch-action: manipulation;
 }
 
 .modal-close:hover {
@@ -556,6 +573,7 @@ body {
 }
 
 .modal-close:active {
+    transform: scale(0.92);
     background: var(--color-fill);
 }
 
@@ -617,9 +635,10 @@ body {
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color var(--duration) var(--ease), color var(--duration) var(--ease);
+    transition: transform var(--duration) var(--ease), background-color var(--duration) var(--ease), color var(--duration) var(--ease);
     border: none;
     white-space: nowrap;
+    touch-action: manipulation;
 }
 
 .modal-btn.cancel {
@@ -628,6 +647,11 @@ body {
 }
 
 .modal-btn.cancel:hover {
+    background: var(--color-fill);
+}
+
+.modal-btn.cancel:active {
+    transform: scale(0.96);
     background: var(--color-fill);
 }
 
@@ -641,6 +665,7 @@ body {
 }
 
 .modal-btn.confirm:active {
+    transform: scale(0.96);
     background: var(--color-primary-muted);
 }
 
@@ -768,11 +793,16 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color var(--duration) var(--ease);
+    transition: transform var(--duration) var(--ease), color var(--duration) var(--ease);
+    touch-action: manipulation;
 }
 
 .toggle-password-btn:hover {
     color: var(--color-primary);
+}
+
+.toggle-password-btn:active {
+    transform: translateY(-50%) scale(0.90);
 }
 
 /* Status message */
@@ -798,6 +828,13 @@ body {
     border: none;
     box-shadow: var(--shadow-soft);
     flex-wrap: wrap;
+    touch-action: manipulation;
+    transition: transform var(--duration) var(--ease), background-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
+}
+
+.student-card:active {
+    transform: scale(0.98);
+    background-color: var(--color-surface-hover);
 }
 
 .student-avatar {
@@ -957,14 +994,20 @@ body {
     padding: 20px 22px;
     border: none;
     box-shadow: var(--shadow-soft);
-    transition: background-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
+    transition: transform var(--duration) var(--ease), background-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
     position: relative;
     overflow: hidden;
+    touch-action: manipulation;
 }
 
 .score-card:hover {
     background: var(--color-surface-hover);
     box-shadow: var(--shadow-hover);
+}
+
+.score-card:active {
+    transform: scale(0.98);
+    background-color: var(--color-surface-hover);
 }
 
 .score-header {
@@ -1187,11 +1230,17 @@ body {
     border-radius: var(--radius-lg);
     border: 1px solid var(--color-border-subtle);
     overflow: hidden;
-    transition: all var(--duration) var(--ease);
+    transition: transform var(--duration) var(--ease), border-color var(--duration) var(--ease), background-color var(--duration) var(--ease);
+    touch-action: manipulation;
 }
 
 .chart-card:hover {
     border-color: var(--color-border);
+}
+
+.chart-card:active {
+    transform: scale(0.99);
+    background-color: var(--color-surface-hover);
 }
 
 .chart-header {
@@ -1376,11 +1425,17 @@ body {
     border-radius: var(--radius-lg);
     padding: 20px;
     border: 1px solid var(--color-border-subtle);
-    transition: all var(--duration) var(--ease);
+    transition: transform var(--duration) var(--ease), border-color var(--duration) var(--ease), background-color var(--duration) var(--ease);
+    touch-action: manipulation;
 }
 
 .distribution-card:hover {
     border-color: var(--color-border);
+}
+
+.distribution-card:active {
+    transform: scale(0.99);
+    background-color: var(--color-surface-hover);
 }
 
 .distribution-card h4 {
