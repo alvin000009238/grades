@@ -67,3 +67,7 @@ Thumbs.db
 # Node.js
 node_modules/
 public/dist/
+
+# bat
+*.bat
+*.ps1

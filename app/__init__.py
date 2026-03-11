@@ -70,4 +70,13 @@ def create_app():
     app.register_blueprint(share_bp)
     app.register_blueprint(system_bp)
 
+    @app.after_request
+    def add_cache_headers(response):
+        # response may not have mimetype attribute or it could be None
+        # using request.path to check the file extension is safer
+        from flask import request
+        if request.path.endswith('.woff2'):
+            response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+        return response
+
     return app
