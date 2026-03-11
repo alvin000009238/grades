@@ -27,6 +27,7 @@ def create_app():
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
     app.config['SESSION_COOKIE_SECURE'] = True
     app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_PATH'] = '/api'
 
     redis_url = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/0')
     redis_client = redis.from_url(redis_url)
@@ -72,11 +73,13 @@ def create_app():
 
     @app.after_request
     def add_cache_headers(response):
-        # response may not have mimetype attribute or it could be None
-        # using request.path to check the file extension is safer
         from flask import request
-        if request.path.endswith('.woff2'):
+        static_extensions = ('.woff2', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg', '.webmanifest')
+        
+        if request.path.startswith(('/fonts/', '/dist/', '/assets/')) or request.path.endswith(static_extensions):
             response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+            if 'Set-Cookie' in response.headers:
+                del response.headers['Set-Cookie']
         return response
 
     return app
