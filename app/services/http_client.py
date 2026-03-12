@@ -1,6 +1,8 @@
 import os
 import requests
 import logging
+import certifi
+import tempfile
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 
@@ -63,7 +65,22 @@ def get_http_session() -> TimeoutSession:
     
     cert_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "certs", "TWCA Secure SSL Certification Authority.crt")
     if os.path.exists(cert_path):
-        session.verify = cert_path
+        combined_path = os.path.join(tempfile.gettempdir(), "twca_combined_ca_bundle.pem")
+        try:
+            # Overwrite if missing or too small
+            if not os.path.exists(combined_path) or os.path.getsize(combined_path) < 100:
+                with open(certifi.where(), "r", encoding="utf-8") as f_ca:
+                    base_certs = f_ca.read()
+                with open(cert_path, "r", encoding="utf-8") as f_custom:
+                    custom_cert = f_custom.read()
+                with open(combined_path, "w", encoding="utf-8") as f_out:
+                    f_out.write(base_certs + "\n\n" + custom_cert + "\n")
+            session.verify = combined_path
+        except Exception as e:
+            logger.error(f"Failed to create combined CA bundle: {e}")
+            session.verify = certifi.where() # fallback
+    else:
+        session.verify = certifi.where()
     
     retry_strategy = LoggingRetry(
         total=total_retries,
