@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 from app.services.http_client import get_http_session
 
-# Disable insecure request warnings
+# Note: InsecureRequestWarning is not disabled here; the HTTP session enforces SSL verification.
 
 class GradeFetcher:
     BASE = "https://shcloud2.k12ea.gov.tw/CLHSTYC"
