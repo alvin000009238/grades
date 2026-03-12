@@ -61,6 +61,10 @@ def get_http_session() -> TimeoutSession:
 
     session = TimeoutSession(timeout=(connect_timeout, read_timeout))
     
+    cert_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "certs", "TWCA Secure SSL Certification Authority.crt")
+    if os.path.exists(cert_path):
+        session.verify = cert_path
+    
     retry_strategy = LoggingRetry(
         total=total_retries,
         backoff_factor=backoff_factor,
