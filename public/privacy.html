@@ -5,12 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>隱私權政策 - 成績分析平台</title>
-    <!-- SEO 基本標籤 -->
     <meta name="description" content="中大壢中成績分析平台的隱私權保護政策，詳細說明我們如何處理及保護您的學校帳號、成績資料等個人隱私資訊。">
     <meta name="robots" content="index, follow">
-    <!-- Open Graph 標籤 -->
-    <meta property="og:title" content="隱私權政策 - 成績分析平台">
-    <meta property="og:description" content="中大壢中成績分析平台的隱私權保護政策，詳細說明我們如何處理及保護您的學校帳號、成績資料等個人隱私資訊。">
+    <meta property="og:title" content="隱私權政策 - 中大壢中成績分析平台">
+    <meta property="og:description" content="了解本平台如何處理登入資料、成績資料、分享連結與安全驗證資訊。">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://score.clhs.dev/privacy.html">
     <link
@@ -20,51 +18,93 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <style>
         .privacy-container {
-            max-width: 800px;
-            margin: 40px auto;
+            max-width: 900px;
+            margin: 32px auto;
             background: var(--color-surface);
-            padding: 40px;
+            padding: 36px;
             border-radius: var(--radius-lg);
             border: 1px solid var(--color-border-subtle);
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--shadow-soft);
             color: var(--color-text-main);
-            line-height: 1.6;
+            line-height: 1.75;
             position: relative;
             z-index: 10;
         }
 
         .privacy-container h1 {
-            color: var(--color-text-strong);
-            margin-bottom: 24px;
+            margin-bottom: 8px;
             text-align: center;
+            color: var(--color-text-main);
+        }
+
+        .privacy-meta {
+            text-align: center;
+            color: var(--color-text-secondary);
+            margin-bottom: 24px;
+            font-size: 14px;
         }
 
         .privacy-container h2 {
             color: var(--color-primary);
-            margin-top: 32px;
-            margin-bottom: 16px;
-            font-size: 1.25rem;
+            margin-top: 28px;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
             font-weight: 700;
         }
 
         .privacy-container p {
-            margin-bottom: 16px;
-            color: var(--color-text-dim);
+            margin-bottom: 12px;
+            color: var(--color-text-secondary);
         }
 
         .privacy-container ul {
-            margin-bottom: 16px;
-            padding-left: 24px;
-            color: var(--color-text-dim);
+            margin: 0 0 12px 20px;
+            color: var(--color-text-secondary);
         }
 
         .privacy-container li {
             margin-bottom: 8px;
         }
 
+        .privacy-note {
+            background: var(--color-surface-elevated);
+            border: 1px solid var(--color-border-subtle);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            color: var(--color-text-main);
+            margin-top: 8px;
+        }
+
+        .back-home {
+            display: inline-block;
+            padding: 10px 24px;
+            background: var(--color-surface-elevated);
+            color: var(--color-text-main);
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--color-border-subtle);
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .back-home:hover {
+            background: var(--color-surface-hover);
+        }
+
+        .contact-link {
+            color: var(--color-primary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .contact-link:hover {
+            color: var(--color-primary-hover);
+            text-decoration: underline;
+        }
+
         @media (max-width: 768px) {
             .privacy-container {
-                margin: 20px;
+                margin: 16px;
                 padding: 24px;
             }
         }
@@ -72,55 +112,79 @@
 </head>
 
 <body>
-    <!-- 背景動畫元素 -->
     <div class="bg-orbs">
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
         <div class="orb orb-3"></div>
     </div>
 
-    <div class="privacy-container">
+    <main class="privacy-container">
         <h1>隱私權政策</h1>
-        <p>歡迎使用「成績分析平台」（以下簡稱本平台）。為了讓您能夠安心使用本平台的各項服務與資訊，特此向您說明本平台的隱私權保護政策，以保障您的權益，請您詳閱下列內容：</p>
+        <p class="privacy-meta">最後更新日期：2026-03-12</p>
 
-        <h2>一、隱私權保護政策的適用範圍</h2>
-        <p>隱私權保護政策內容，包括本平台如何處理在您使用網站服務時收集到的個人識別資料。隱私權保護政策不適用於本平台以外的相關連結網站，也不適用於非本平台所委託或參與管理的人員。</p>
+        <p>本頁說明「成績分析平台」（以下簡稱本平台）是如何蒐集、使用、保存與保護您在使用服務時提供或產生的資料。</p>
 
-        <h2>二、個人資料的蒐集、處理及利用方式</h2>
+        <h2>1. 適用範圍</h2>
+        <p>本說明適用於本平台網站與相關 API 服務，不適用於第三方網站或外部服務。</p>
+
+        <h2>2. 我們處理的資料類型</h2>
         <ul>
-            <li>當您使用本平台的「匯入成績」功能時，我們僅會在您的瀏覽器、本平台伺服器與學校成績系統之間進行連線與資料抓取。</li>
-            <li><strong>本平台伺服器不會永久儲存您的學校帳號與密碼。</strong> 您的登入憑證與學校系統 API Token 僅存放於後端具備加密簽章之暫時性 Session (採用 Redis 快取)
-                中，用於當次會話向學校系統進行身份驗證及獲取成績資料，並會在會話逾時或關閉後自動清除。</li>
-            <li>您所匯入或取得的成績資料，本平台會處理並呈現圖表與分析結果，這些資料僅保留在您當前的瀏覽器會話 (LocalStorage) 或本平台伺服器提供的暫時性分享連結中。</li>
-            <li>當您使用「分享功能」產生連結時，該成績資料將匿名儲存於伺服器最多兩小時，過期後將自動永久刪除。我們不會要求提供任何可識別您個人身份的資訊。</li>
+            <li>登入資料：您輸入的學校系統帳號與密碼，僅用於向學校系統發起登入請求。</li>
+            <li>驗證資料：Cloudflare Turnstile 驗證 token，用於機器人防護。</li>
+            <li>查詢結果：學校系統回傳的成績資料。</li>
+            <li>系統運作資料：必要的伺服器日誌與錯誤資訊，用於除錯與維運。</li>
         </ul>
 
-        <h2>三、資料之保護</h2>
+        <h2>3. 資料使用目的</h2>
         <ul>
-            <li>本平台採行適當之技術及組織安全措施，保護您的成績及個人相關資料免於未經授權之存取、揭露或修改。</li>
-            <li>本平台採用 HTTPS 加密通訊協定，確保您的登入資訊和成績資料在傳輸過程中受到加密保護。</li>
+            <li>完成登入、取得可查詢考次、查詢成績並顯示於儀表板。</li>
+            <li>在您主動要求時建立短期分享連結。</li>
+            <li>維持服務安全性、可用性與故障排查。</li>
         </ul>
 
-        <h2>四、第三方服務</h2>
-        <p>為了防範機器人惡意攻擊並保護平台服務品質，本平台使用了 Cloudflare Turnstile
-            作為人機驗證服務。當您進行登入或相關操作時，此服務可能會收集部分硬體及網路連線資訊以判斷是否為真實用戶。相關資料處理請參閱 Cloudflare 的隱私權政策。</p>
-
-        <h2>五、您的權利</h2>
+        <h2>4. 資料儲存位置與保留時間</h2>
         <ul>
-            <li>您可以隨時停止使用本平台服務，並清除您瀏覽器中的本平台 Cookie 與儲存資料（例如利用登出功能），這將移除您於本平台會話中的成績數據。</li>
-            <li>如果您曾建立暫時性的分享連結，該資料將在規定的時間內自動刪除，請注意該連結產生後無法手動提前撤回。</li>
+            <li>瀏覽器端：成績資料會儲存在您的瀏覽器 localStorage。</li>
+            <li>伺服器 Session：登入後必要狀態由 Redis Session 保存，有效期為 1 天。</li>
+            <li>分享資料：建立分享連結後，資料會寫入 Redis， 2 小時自動過期。</li>
+        </ul>
+        <p class="privacy-note">本平台不提供長期成績資料庫，不會建立永久的個人成績檔案。</p>
+
+        <h2>5. 第三方服務</h2>
+        <ul>
+            <li>學校系統 API：用於登入與成績查詢。</li>
+            <li>Cloudflare Turnstile：用於人機驗證與濫用防護。</li>
+        </ul>
+        <p>上述第三方服務可能依其政策處理必要技術資訊，請參閱其官方隱私政策。</p>
+
+        <h2>6. Cookie</h2>
+        <p>本平台使用 Session Cookie 維持登入狀態。</p>
+
+        <h2>7. 資料安全措施</h2>
+        <ul>
+            <li>使用 HTTPS/TLS 傳輸。</li>
+            <li>限制 API 請求大小與靜態檔案類型。</li>
+            <li>針對外部請求採用 timeout、retry 與憑證驗證策略。</li>
+            <li>分享連結採隨機 ID，並設定自動到期。</li>
         </ul>
 
-        <h2>六、隱私權保護政策之修正</h2>
-        <p>本平台之隱私權保護政策將因應需求或法規變更隨時進行修正，修正後的條款將刊登於網站上。若您於條款修改後繼續使用本平台服務，即表示您同意並接受修改後的隱私權政策。</p>
+        <h2>8. 您可採取的控制方式</h2>
+        <ul>
+            <li>可隨時登出以清除伺服器 Session。</li>
+            <li>可在瀏覽器清除本站資料以移除 localStorage 內容。</li>
+            <li>如不希望資料被他人檢視，請勿建立分享連結，或等待分享連結自動過期。</li>
+        </ul>
 
-        <div style="text-align: center; margin-top: 40px;">
-            <a href="/"
-                style="display: inline-block; padding: 10px 24px; background: var(--color-surface-elevated); color: var(--color-text-main); text-decoration: none; border-radius: var(--radius-md); border: 1px solid var(--color-border-subtle); transition: all 0.2s; cursor: pointer; font-weight: 500;">
-                回首頁
-            </a>
+        <h2>9. 說明更新</h2>
+        <p>本平台可能因功能或法規調整而更新本說明。更新後版本將公布於本頁，並以頁面上的「最後更新日期」為準。</p>
+
+        <h2>10. 聯絡方式</h2>
+        <p>若您對本說明有疑問，請透過 <a href="mailto:contact@clhs.dev" class="contact-link">contact@clhs.dev</a> 與我們聯繫。</p>
+
+        <div style="text-align: center; margin-top: 32px;">
+            <a href="/" class="back-home">返回首頁</a>
         </div>
-    </div>
+    </main>
 </body>
 
 </html>
