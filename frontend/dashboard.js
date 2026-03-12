@@ -157,6 +157,9 @@ function generateScoreCards(subjects) {
     const grid = document.getElementById('scoresGrid');
     grid.innerHTML = '';
 
+    // Create a DocumentFragment to batch DOM insertions and reduce reflows
+    const fragment = document.createDocumentFragment();
+
     subjects.forEach(subject => {
         const scoreValue = getNumericScore(subject.ScoreDisplay, subject.Score);
         const classAvgValue = getNumericScore(subject.ClassAVGScoreDisplay, subject.ClassAVGScore);
@@ -237,8 +240,11 @@ function generateScoreCards(subjects) {
                 </div>
             </div>
         `;
-        grid.appendChild(card);
+        fragment.appendChild(card);
     });
+
+    // Append all cards at once
+    grid.appendChild(fragment);
 }
 
 // 取得排名百分位 CSS class
@@ -274,6 +280,9 @@ function generateStandardsTable(subjects, standards) {
     const tbody = document.getElementById('standardsBody');
     tbody.innerHTML = '';
 
+    // Create a DocumentFragment to batch DOM insertions and reduce reflows
+    const fragment = document.createDocumentFragment();
+
     subjects.forEach((subject, index) => {
         const std = standards.find(s => cleanSubjectName(s.SubjectName) === subject.SubjectName) || standards[index];
         if (!std) return;
@@ -293,8 +302,11 @@ function generateStandardsTable(subjects, standards) {
             <td><span class="my-score ${level.class}">${score}</span></td>
             <td><span class="level-badge ${level.class}">${level.text}</span></td>
         `;
-        tbody.appendChild(row);
+        fragment.appendChild(row);
     });
+
+    // Append all rows at once
+    tbody.appendChild(fragment);
 }
 
 // 清理科目名稱（移除 <br/>）
@@ -315,6 +327,9 @@ function getScoreLevel(score, std) {
 function generateDistributionCards(subjects, standards) {
     const grid = document.getElementById('distributionGrid');
     grid.innerHTML = '';
+
+    // Create a DocumentFragment to batch DOM insertions and reduce reflows
+    const fragment = document.createDocumentFragment();
 
     subjects.forEach((subject, index) => {
         const std = standards.find(s => cleanSubjectName(s.SubjectName) === subject.SubjectName) || standards[index];
@@ -358,8 +373,11 @@ function generateDistributionCards(subjects, standards) {
         }).join('')}
             </div>
         `;
-        grid.appendChild(card);
+        fragment.appendChild(card);
     });
+
+    // Append all distribution cards at once
+    grid.appendChild(fragment);
 }
 
 function getMyScoreRange(score) {
