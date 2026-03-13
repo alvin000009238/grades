@@ -1,7 +1,8 @@
 import os
 import redis
+import uuid
 
-from flask import Flask
+from flask import Flask, g, request
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_session import Session
 
@@ -13,6 +14,11 @@ from fetcher import GradeFetcher
 def create_app():
     root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     app = Flask(__name__, static_folder='.', root_path=root_path)
+
+    @app.before_request
+    def assign_request_id():
+        g.request_id = request.headers.get('X-Request-Id', str(uuid.uuid4())[:8])
+
 
     secret_key = os.environ.get('SECRET_KEY')
     if not secret_key:

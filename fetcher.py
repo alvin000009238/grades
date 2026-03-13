@@ -1,6 +1,31 @@
+import logging
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
+from flask import g, has_request_context
 from app.services.http_client import get_http_session
+
+logger = logging.getLogger('SchoolGradesServer.Fetcher')
+
+def _mask_user_id(user_id: str) -> str:
+    if not user_id:
+        return "Unknown"
+    s = str(user_id)
+    if len(s) > 3:
+        return s[:3] + "***"
+    return "***"
+
+def _log(level: str, user_id: str, msg: str, req_id: str = None):
+    if not req_id and has_request_context() and 'request_id' in g:
+        req_id = g.request_id
+    
+    r_str = f"[{req_id}] " if req_id else ""
+    u_str = f"[User:{_mask_user_id(user_id)}] " if user_id else ""
+    
+    final_msg = f"{r_str}{u_str}{msg}"
+    if level == 'error':
+        logger.error(final_msg)
+    else:
+        logger.info(final_msg)
 
 # Note: InsecureRequestWarning is not disabled here; the HTTP session enforces SSL verification.
 
@@ -24,7 +49,7 @@ class GradeFetcher:
     def login_and_get_tokens(username, password):
         """Login via requests session, return (success, message, cookies_dict, student_no, token)."""
         try:
-            print(f"Attempting login for user: {username} (requests mode)")
+            _log('info', username, f"Attempting login for user: {username} (requests mode)")
             s = get_http_session()
 
             # 1) GET login page to obtain cookies + hidden token
@@ -66,7 +91,7 @@ class GradeFetcher:
                 msg = j.get("Result", {}).get("DisplayMsg") or j.get("Message") or "登入失敗"
                 return False, msg, None, None, None
 
-            print("Login OK, fetching grades page for API token...")
+            _log('info', username, "Login OK, fetching grades page for API token...")
 
             # 3) GET grades page to obtain the API-specific __RequestVerificationToken
             r2 = s.get(GradeFetcher.GRADES_PAGE)
@@ -83,11 +108,11 @@ class GradeFetcher:
                     pass
             student_no = username
 
-            print(f"Successfully obtained credentials for {student_no}")
+            _log('info', student_no, f"Successfully obtained credentials for {student_no}")
             return True, "登入成功", cookies_dict, student_no, api_token
 
         except Exception as e:
-            print(f"Login Exception: {e}")
+            _log('error', username, f"Login Exception: {e}")
             return False, f"登入錯誤: {str(e)}", None, None, None
 
     @staticmethod
@@ -109,7 +134,7 @@ class GradeFetcher:
         }
         
         try:
-            print(f"Requesting structure for {student_no}...")
+            _log('info', student_no, f"Requesting structure for {student_no}...")
             session = get_http_session()
             response = session.post(url, headers=headers, data=data, cookies=cookies)
             response.raise_for_status()
@@ -126,9 +151,11 @@ class GradeFetcher:
                     items.append((name, value))
             
             # Fetch all exams in parallel
+            current_req_id = g.request_id if has_request_context() and 'request_id' in g else None
+            
             def _fetch_one(name_value):
                 n, v = name_value
-                exams = GradeFetcher.get_exams_via_api(cookies, student_no, token, v)
+                exams = GradeFetcher.get_exams_via_api(cookies, student_no, token, v, req_id=current_req_id)
                 return n, v, exams
             
             with ThreadPoolExecutor(max_workers=len(items) or 1) as pool:
@@ -141,11 +168,11 @@ class GradeFetcher:
             return structure
             
         except Exception as e:
-            print(f"Error fetching structure: {e}")
+            _log('error', student_no, f"Error fetching structure: {e}")
             return {}
 
     @staticmethod
-    def get_exams_via_api(cookies, student_no, token, year_value):
+    def get_exams_via_api(cookies, student_no, token, year_value, req_id=None):
         """Helper to fetch exams for a year"""
         url = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/CommonData/GetGradeCanQueryExamNoListByStudentNo"
         
@@ -187,7 +214,7 @@ class GradeFetcher:
                      })
                 return exams
         except Exception as e:
-            print(f"Error fetching exams via API: {e}")
+            _log('error', student_no, f"Error fetching exams via API: {e}", req_id=req_id)
         return []
 
     @staticmethod
@@ -224,7 +251,7 @@ class GradeFetcher:
             "ExamNo": exam_value
         }
         
-        print(f"API Fetching grades: Year={year}, Term={term}, Exam={exam_value}")
+        _log('info', student_no, f"API Fetching grades: Year={year}, Term={term}, Exam={exam_value}")
         
         try:
             session = get_http_session()
@@ -232,5 +259,5 @@ class GradeFetcher:
             response.raise_for_status()
             return response.json()
         except Exception as e:
-            print(f"API Fetch Error: {e}")
+            _log('error', student_no, f"API Fetch Error: {e}")
             raise e
