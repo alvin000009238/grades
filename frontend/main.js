@@ -13,6 +13,23 @@ document.addEventListener('DOMContentLoaded', () => {
     loadGradesData();
     setupSyncFeature();
     setupShareFeature();
+    if (!window.location.pathname.startsWith('/share/')) {
+        const initOnboarding = () => {
+            import('./onboarding.js')
+                .then(({ setupOnboardingFeature }) => {
+                    setupOnboardingFeature();
+                })
+                .catch((error) => {
+                    console.warn('Failed to load onboarding module', error);
+                });
+        };
+
+        if (typeof window.requestIdleCallback === 'function') {
+            window.requestIdleCallback(initOnboarding, { timeout: 1200 });
+        } else {
+            setTimeout(initOnboarding, 0);
+        }
+    }
 
     // 注入 Commit Hash
     const commitHash = import.meta.env.VITE_COMMIT_HASH;
