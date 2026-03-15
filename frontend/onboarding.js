@@ -1,9 +1,10 @@
 import { setDemoModeEnabled } from './demo-mode.js';
 import { ONBOARDING_EVENTS } from './onboarding-events.js';
 import { loadGradesData } from './storage.js';
+import { resetCharts } from './charts.js';
 
 const ONBOARDING_COMPLETED_KEY = 'onboardingCompleted';
-const ONBOARDING_PROMPT_DISMISSED_KEY = 'onboardingPromptDismissed';
+export const ONBOARDING_SESSION_ENDED_EVENT = 'onboarding:session-ended';
 
 const TOUR_STEPS = [
     {
@@ -83,106 +84,12 @@ const TOUR_STEPS = [
 const FLOW_STEP_TOTAL = TOUR_STEPS.filter((step) => step.completion?.type !== 'finish').length;
 
 let tourState = null;
-let startPromptEl = null;
-let reopenTipEl = null;
 let preOnboardingGradesData = undefined;
 let repositionRafId = null;
 
-export function setupOnboardingFeature() {
+export function startOnboardingSession(trigger = 'manual') {
     if (window.location.pathname.startsWith('/share/')) return;
-
-    waitForDisclaimerClosed().then(() => {
-        const shownFirstPrompt = maybeShowFirstVisitPrompt();
-        if (!shownFirstPrompt) {
-            showReopenTip();
-        }
-    });
-}
-
-function maybeShowFirstVisitPrompt() {
-    if (localStorage.getItem(ONBOARDING_COMPLETED_KEY) === 'true') return false;
-    if (sessionStorage.getItem(ONBOARDING_PROMPT_DISMISSED_KEY) === 'true') return false;
-    if (tourState || startPromptEl) return false;
-    showStartPrompt();
-    return true;
-}
-
-function waitForDisclaimerClosed() {
-    return new Promise((resolve) => {
-        const check = () => {
-            const disclaimerModal = document.getElementById('disclaimerModal');
-            if (disclaimerModal?.classList.contains('active')) {
-                setTimeout(check, 250);
-                return;
-            }
-            resolve();
-        };
-        setTimeout(check, 300);
-    });
-}
-
-function showStartPrompt() {
-    startPromptEl = document.createElement('div');
-    startPromptEl.className = 'tour-start-overlay';
-    startPromptEl.innerHTML = `
-        <div class="tour-start-dialog">
-            <h3>首次使用教學</h3>
-            <p>要開始教學嗎？會用內建教學資料示範一次匯入與分享流程。</p>
-            <div class="tour-start-actions">
-                <button type="button" class="tour-btn" data-role="later">稍後再說</button>
-                <button type="button" class="tour-btn primary" data-role="start">開始教學</button>
-            </div>
-        </div>
-    `;
-
-    startPromptEl.querySelector('[data-role="later"]')?.addEventListener('click', () => {
-        sessionStorage.setItem(ONBOARDING_PROMPT_DISMISSED_KEY, 'true');
-        removeStartPrompt();
-        showReopenTip();
-    });
-
-    startPromptEl.querySelector('[data-role="start"]')?.addEventListener('click', () => {
-        removeStartPrompt();
-        startOnboarding('auto');
-    });
-
-    document.body.appendChild(startPromptEl);
-}
-
-function removeStartPrompt() {
-    if (startPromptEl) {
-        startPromptEl.remove();
-        startPromptEl = null;
-    }
-}
-
-function showReopenTip() {
-    if (tourState || startPromptEl || reopenTipEl) return;
-
-    reopenTipEl = document.createElement('div');
-    reopenTipEl.className = 'onboarding-reopen-tip';
-    reopenTipEl.innerHTML = `
-        <span class="onboarding-reopen-text">要重新跑一次使用教學嗎？</span>
-        <button type="button" class="onboarding-reopen-start" data-role="start">開始教學</button>
-        <button type="button" class="onboarding-reopen-close" data-role="close" aria-label="關閉提示">×</button>
-    `;
-
-    reopenTipEl.querySelector('[data-role="close"]')?.addEventListener('click', () => {
-        removeReopenTip();
-    });
-    reopenTipEl.querySelector('[data-role="start"]')?.addEventListener('click', () => {
-        removeReopenTip();
-        startOnboarding('manual');
-    });
-
-    document.body.appendChild(reopenTipEl);
-}
-
-function removeReopenTip() {
-    if (reopenTipEl) {
-        reopenTipEl.remove();
-        reopenTipEl = null;
-    }
+    startOnboarding(trigger);
 }
 
 function startOnboarding(trigger) {
@@ -190,8 +97,6 @@ function startOnboarding(trigger) {
         stopOnboarding('restart');
     }
 
-    removeStartPrompt();
-    removeReopenTip();
     if (preOnboardingGradesData === undefined) {
         preOnboardingGradesData = localStorage.getItem('gradesData');
     }
@@ -232,7 +137,6 @@ function startOnboarding(trigger) {
     tourState.cleanupGuards = attachInteractionGuards();
     tourState.cleanupPositioning = setupPositioningListeners();
     scheduleReposition();
-
     goToStep(0);
 }
 
@@ -255,15 +159,13 @@ function stopOnboarding(reason) {
 
     tourState.root.remove();
     tourState = null;
-
-    if (reason !== 'completed') {
-        sessionStorage.setItem(ONBOARDING_PROMPT_DISMISSED_KEY, 'true');
-    }
-
     setDemoModeEnabled(false);
+
     if (reason !== 'restart') {
         restorePreOnboardingState();
     }
+
+    window.dispatchEvent(new CustomEvent(ONBOARDING_SESSION_ENDED_EVENT, { detail: { reason } }));
 }
 
 async function goToStep(index) {
@@ -419,9 +321,8 @@ function renderOverviewStep() {
 
     const popoverWidth = tourState.popover.offsetWidth;
     const left = Math.max(12, window.innerWidth - popoverWidth - 12);
-    const top = 12;
     tourState.popover.style.left = `${Math.round(left)}px`;
-    tourState.popover.style.top = `${top}px`;
+    tourState.popover.style.top = '12px';
 }
 
 function repositionCurrentStep() {
@@ -443,15 +344,11 @@ function repositionCurrentStep() {
     tourState.highlight.style.top = `${Math.round(top)}px`;
     tourState.highlight.style.width = `${Math.round(width)}px`;
     tourState.highlight.style.height = `${Math.round(height)}px`;
-
     positionPopover(rect);
 }
 
 function setupPositioningListeners() {
-    const onViewportChanged = () => {
-        scheduleReposition();
-    };
-
+    const onViewportChanged = () => scheduleReposition();
     window.addEventListener('resize', onViewportChanged, { passive: true });
     window.addEventListener('scroll', onViewportChanged, { passive: true, capture: true });
     document.addEventListener('transitionend', onViewportChanged, true);
@@ -564,9 +461,7 @@ function ensureStepContext(step) {
 
     if (step.context === 'login') {
         if (!loginModal.classList.contains('active')) {
-            if (syncBtn) {
-                syncBtn.click();
-            }
+            if (syncBtn) syncBtn.click();
             setTimeout(() => showLogin(), 0);
         } else {
             showLogin();
@@ -619,12 +514,10 @@ function restorePreOnboardingState() {
     if (snapshot !== null && snapshot !== undefined) {
         localStorage.setItem('gradesData', snapshot);
         void loadGradesData();
-        showReopenTip();
         return;
     }
 
     resetDashboardToEmptyState();
-    showReopenTip();
 }
 
 function resetDashboardToEmptyState() {
@@ -658,13 +551,7 @@ function resetDashboardToEmptyState() {
     if (standardsBody) standardsBody.innerHTML = '';
     if (distributionGrid) distributionGrid.innerHTML = '';
 
-    ['radarChart', 'barChart'].forEach((canvasId) => {
-        const canvas = document.getElementById(canvasId);
-        const context = canvas?.getContext?.('2d');
-        if (canvas && context) {
-            context.clearRect(0, 0, canvas.width, canvas.height);
-        }
-    });
+    resetCharts();
 }
 
 function attachInteractionGuards() {
@@ -718,9 +605,7 @@ function waitForElement(selector, timeoutMs) {
 
         const findAndResolve = () => {
             const el = document.querySelector(selector);
-            if (el) {
-                finish(el);
-            }
+            if (el) finish(el);
         };
 
         const observer = new MutationObserver(findAndResolve);
