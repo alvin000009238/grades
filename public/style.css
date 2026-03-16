@@ -1956,7 +1956,7 @@ body.read-only-mode .header {
 .onboarding-reopen-disable {
     background: transparent;
     color: var(--color-text-main);
-    border-color: var(--color-border-strong);
+    border-color: var(--color-border);
 }
 
 .onboarding-reopen-start {
