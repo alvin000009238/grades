@@ -1,5 +1,6 @@
 const ONBOARDING_COMPLETED_KEY = 'onboardingCompleted';
 const ONBOARDING_PROMPT_DISMISSED_KEY = 'onboardingPromptDismissed';
+const ONBOARDING_REOPEN_TIP_DISABLED_KEY = 'onboardingReopenTipDisabled';
 const ONBOARDING_SESSION_ENDED_EVENT = 'onboarding:session-ended';
 
 let startPromptEl = null;
@@ -82,17 +83,23 @@ function removeStartPrompt() {
 }
 
 function showReopenTip() {
+    if (localStorage.getItem(ONBOARDING_REOPEN_TIP_DISABLED_KEY) === 'true') return;
     if (onboardingRunning || startPromptEl || reopenTipEl) return;
 
     reopenTipEl = document.createElement('div');
     reopenTipEl.className = 'onboarding-reopen-tip';
     reopenTipEl.innerHTML = `
         <span class="onboarding-reopen-text">要重新跑一次使用教學嗎？</span>
+        <button type="button" class="onboarding-reopen-disable" data-role="disable">不再提示</button>
         <button type="button" class="onboarding-reopen-start" data-role="start">開始教學</button>
         <button type="button" class="onboarding-reopen-close" data-role="close" aria-label="關閉提示">×</button>
     `;
 
     reopenTipEl.querySelector('[data-role="close"]')?.addEventListener('click', () => {
+        removeReopenTip();
+    });
+    reopenTipEl.querySelector('[data-role="disable"]')?.addEventListener('click', () => {
+        localStorage.setItem(ONBOARDING_REOPEN_TIP_DISABLED_KEY, 'true');
         removeReopenTip();
     });
     reopenTipEl.querySelector('[data-role="start"]')?.addEventListener('click', () => {

@@ -1915,6 +1915,7 @@ body.read-only-mode .header {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-wrap: wrap;
 }
 
 .onboarding-reopen-close {
@@ -1941,13 +1942,24 @@ body.read-only-mode .header {
     white-space: nowrap;
 }
 
+
+.onboarding-reopen-disable,
 .onboarding-reopen-start {
     border: 1px solid var(--color-primary);
-    background: var(--color-primary);
-    color: var(--md-sys-color-on-primary);
     border-radius: var(--radius-pill);
     font-size: 12px;
     padding: 5px 10px;
     line-height: 1.2;
     cursor: pointer;
+}
+
+.onboarding-reopen-disable {
+    background: transparent;
+    color: var(--color-text-main);
+    border-color: var(--color-border-strong);
+}
+
+.onboarding-reopen-start {
+    background: var(--color-primary);
+    color: var(--md-sys-color-on-primary);
 }
