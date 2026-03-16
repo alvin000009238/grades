@@ -101,7 +101,7 @@
                         <span class="material-symbols-outlined" style="font-size: 24px;">share</span>
                         分享成績單
                     </h3>
-                    <button class="modal-close" id="closeShareModal">&times;</button>
+                    <button class="modal-close" id="closeShareModal" aria-label="關閉視窗">&times;</button>
                 </div>
                 <div class="modal-body">
                     <div id="sharePreview"></div>
@@ -115,10 +115,10 @@
                 <div class="modal-header">
                     <h3 style="display: flex; align-items: center; gap: 8px;">
                         登入系統
-                        <span class="material-symbols-outlined tooltip-icon" tabindex="0"
+                        <span class="material-symbols-outlined tooltip-icon" tabindex="0" aria-label="提示說明" role="button"
                             data-tooltip="請使用欣河校園平台帳密登入">help</span>
                     </h3>
-                    <button class="modal-close" id="closeLoginModal">&times;</button>
+                    <button class="modal-close" id="closeLoginModal" aria-label="關閉視窗">&times;</button>
                 </div>
                 <div class="modal-body">
                     <form id="loginForm" method="post" action="javascript:void(0);">
@@ -132,7 +132,7 @@
                                 <input type="password" id="passwordInput" name="password"
                                     autocomplete="current-password" placeholder=" " data-tour="login-password">
                                 <label>密碼</label>
-                                <button type="button" id="togglePasswordBtn" class="toggle-password-btn" tabindex="-1">
+                                <button type="button" id="togglePasswordBtn" class="toggle-password-btn" aria-label="顯示密碼" title="顯示密碼">
                                     <span class="material-symbols-outlined eye-icon">visibility</span>
                                     <span class="material-symbols-outlined eye-off-icon"
                                         style="display: none;">visibility_off</span>
@@ -164,7 +164,7 @@
             <div class="modal-content sm">
                 <div class="modal-header">
                     <h3>選擇考試</h3>
-                    <button class="modal-close" id="closeSelectModal">&times;</button>
+                    <button class="modal-close" id="closeSelectModal" aria-label="關閉視窗">&times;</button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">

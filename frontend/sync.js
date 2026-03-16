@@ -368,9 +368,13 @@ export function setupSyncFeature() {
             if (type === 'text') {
                 eyeIcon.style.display = 'none';
                 eyeOffIcon.style.display = 'block';
+                togglePasswordBtn.setAttribute('aria-label', '隱藏密碼');
+                togglePasswordBtn.setAttribute('title', '隱藏密碼');
             } else {
                 eyeIcon.style.display = 'block';
                 eyeOffIcon.style.display = 'none';
+                togglePasswordBtn.setAttribute('aria-label', '顯示密碼');
+                togglePasswordBtn.setAttribute('title', '顯示密碼');
             }
         });
     }
