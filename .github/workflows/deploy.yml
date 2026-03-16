@@ -53,6 +53,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           provenance: false
+          build-args: |
+            VITE_COMMIT_HASH=${{ github.sha }}
 
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@master

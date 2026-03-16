@@ -5,6 +5,7 @@
 import { requestTurnstileVerification } from './turnstile.js';
 import { getStoredGrades } from './storage.js';
 import { initDashboard } from './dashboard.js';
+import { emitOnboardingEvent, ONBOARDING_EVENTS } from './onboarding-events.js';
 
 export function setupShareFeature() {
     const shareBtn = document.getElementById('shareBtn');
@@ -37,7 +38,7 @@ export function setupShareFeature() {
                         複製連結
                     </button>
                 </div>
-                <button id="createLinkBtn" class="import-dropdown-btn" style="width: 100%; justify-content: center;">
+                <button id="createLinkBtn" data-tour="create-share-link" class="import-dropdown-btn" style="width: 100%; justify-content: center;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
@@ -95,6 +96,7 @@ export function setupShareFeature() {
                     createLinkBtn.style.display = 'none';
                     shareStatus.textContent = '連結建立成功！';
                     shareStatus.className = 'status-msg success';
+                    emitOnboardingEvent(ONBOARDING_EVENTS.SHARE_LINK_CREATED, { link });
                 } else {
                     throw new Error(data.error || '建立失敗');
                 }
@@ -123,6 +125,7 @@ export function setupShareFeature() {
     shareBtn.addEventListener('click', () => {
         shareModal.classList.add('active');
         setupModalContent();
+        emitOnboardingEvent(ONBOARDING_EVENTS.SHARE_MODAL_OPEN);
     });
 
     // Close Modal

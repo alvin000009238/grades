@@ -5,6 +5,10 @@ COPY package.json ./
 RUN npm install
 COPY vite.config.js ./
 COPY frontend/ ./frontend/
+
+ARG VITE_COMMIT_HASH
+ENV VITE_COMMIT_HASH=$VITE_COMMIT_HASH
+
 RUN npm run build
 
 FROM python:3.11-slim

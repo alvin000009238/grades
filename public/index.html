@@ -35,7 +35,6 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <link rel="stylesheet" href="/style.css">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -76,14 +75,14 @@
                         <span class="time-value" id="updateTime">--</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <button class="import-dropdown-btn" id="shareBtn"
+                        <button class="import-dropdown-btn" id="shareBtn" data-tour="share-btn"
                             style="background: var(--color-surface-elevated); color: var(--color-text-main); border: 1px solid var(--color-border-subtle);">
                             <span class="dropdown-icon">
                                 <span class="material-symbols-outlined" style="font-size: 18px;">share</span>
                             </span>
                             <span>分享</span>
                         </button>
-                        <button class="import-dropdown-btn" id="syncBtn">
+                        <button class="import-dropdown-btn" id="syncBtn" data-tour="import-btn">
                             <span class="dropdown-icon">
                                 <span class="material-symbols-outlined" style="font-size: 18px;">cloud_sync</span>
                             </span>
@@ -125,13 +124,13 @@
                     <form id="loginForm" method="post" action="javascript:void(0);">
                         <div class="form-group">
                             <input type="text" id="usernameInput" name="username" autocomplete="username"
-                                placeholder=" ">
+                                placeholder=" " data-tour="login-username">
                             <label>帳號</label>
                         </div>
                         <div class="form-group">
                             <div class="password-group">
                                 <input type="password" id="passwordInput" name="password"
-                                    autocomplete="current-password" placeholder=" ">
+                                    autocomplete="current-password" placeholder=" " data-tour="login-password">
                                 <label>密碼</label>
                                 <button type="button" id="togglePasswordBtn" class="toggle-password-btn" aria-label="顯示密碼" title="顯示密碼">
                                     <span class="material-symbols-outlined eye-icon">visibility</span>
@@ -140,6 +139,10 @@
                                 </button>
                             </div>
                         </div>
+                        <button type="button" class="modal-btn reload demo-fill-login-btn" id="demoFillLoginBtn"
+                            data-tour="demo-fill-login" style="display: none; width: 100%; justify-content: center;">
+                            一鍵填入教學帳密
+                        </button>
                         <div id="loginStatus" class="status-msg"></div>
                         <p class="privacy-notice"
                             style="text-align: center; margin-top: 16px; margin-bottom: 0; font-size: 13px; color: var(--color-text-dim);">
@@ -150,7 +153,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="modal-btn cancel" id="cancelLogin">取消</button>
-                    <button type="submit" class="modal-btn confirm" id="confirmLogin" form="loginForm">登入</button>
+                    <button type="submit" class="modal-btn confirm" id="confirmLogin" form="loginForm"
+                        data-tour="login-submit">登入</button>
                 </div>
             </div>
         </div>
@@ -164,14 +168,14 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <select id="yearSelect">
+                        <select id="yearSelect" data-tour="year-select">
                             <option value="">載入中...</option>
                         </select>
                         <label>學年度</label>
                     </div>
                     <div class="form-group">
-                        <select id="examSelect">
-                            <option value="">請先選擇學年度</option>
+                        <select id="examSelect" data-tour="exam-select">
+                            <option value="">請選擇考試</option>
                         </select>
                         <label>考試名稱</label>
                     </div>
@@ -183,7 +187,7 @@
                     </div>
                     <div class="footer-right-group" style="display: flex; gap: 12px;">
                         <button class="modal-btn cancel" id="cancelSelect">取消</button>
-                        <button class="modal-btn confirm" id="confirmFetch">查詢</button>
+                        <button class="modal-btn confirm" id="confirmFetch" data-tour="fetch-btn">查詢</button>
                     </div>
                 </div>
             </div>
@@ -393,6 +397,7 @@
                     </svg>
                     GitHub
                 </a>
+                <span id="commit-badge-container"></span>
             </p>
         </footer>
     </div>
