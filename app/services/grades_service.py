@@ -4,7 +4,7 @@ def get_structure(fetcher, cookies, student_no, token):
 
 
 def filter_grades_data(data):
-    if not data or 'Result' not in data:
+    if not isinstance(data, dict) or 'Result' not in data or not isinstance(data['Result'], dict):
         return data
 
     result = data['Result']
@@ -20,7 +20,7 @@ def filter_grades_data(data):
         'Show類組排名人數': result.get('Show類組排名人數'),
     }
 
-    if 'ExamItem' in result and result['ExamItem']:
+    if 'ExamItem' in result and isinstance(result['ExamItem'], dict):
         exam = result['ExamItem']
         filtered_result['ExamItem'] = {
             'ExamName': exam.get('ExamName'),
@@ -30,7 +30,7 @@ def filter_grades_data(data):
             '類組排名Count': exam.get('類組排名Count')
         }
 
-    if 'SubjectExamInfoList' in result:
+    if 'SubjectExamInfoList' in result and isinstance(result['SubjectExamInfoList'], list):
         filtered_result['SubjectExamInfoList'] = [
             {
                 'SubjectName': subject.get('SubjectName'),
@@ -47,7 +47,7 @@ def filter_grades_data(data):
             for subject in result['SubjectExamInfoList']
         ]
 
-    if '成績五標List' in result:
+    if '成績五標List' in result and isinstance(result['成績五標List'], list):
         filtered_result['成績五標List'] = [
             {
                 'SubjectName': std.get('SubjectName'),
