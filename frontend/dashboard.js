@@ -283,8 +283,20 @@ function generateStandardsTable(subjects, standards) {
     // Create a DocumentFragment to batch DOM insertions and reduce reflows
     const fragment = document.createDocumentFragment();
 
+    // Precompute a map for O(1) lookup
+    const standardsMap = new Map();
+    standards.forEach((s, i) => {
+        if (s && s.SubjectName) {
+            const key = cleanSubjectName(s.SubjectName);
+            // .find() returned the first match, only set if not present
+            if (!standardsMap.has(key)) {
+                standardsMap.set(key, s);
+            }
+        }
+    });
+
     subjects.forEach((subject, index) => {
-        const std = standards.find(s => cleanSubjectName(s.SubjectName) === subject.SubjectName) || standards[index];
+        const std = standardsMap.get(cleanSubjectName(subject.SubjectName)) || standards[index];
         if (!std) return;
 
         const score = getNumericScore(subject.ScoreDisplay, subject.Score);
@@ -331,8 +343,20 @@ function generateDistributionCards(subjects, standards) {
     // Create a DocumentFragment to batch DOM insertions and reduce reflows
     const fragment = document.createDocumentFragment();
 
+    // Precompute a map for O(1) lookup
+    const standardsMap = new Map();
+    standards.forEach((s, i) => {
+        if (s && s.SubjectName) {
+            const key = cleanSubjectName(s.SubjectName);
+            // .find() returned the first match, only set if not present
+            if (!standardsMap.has(key)) {
+                standardsMap.set(key, s);
+            }
+        }
+    });
+
     subjects.forEach((subject, index) => {
-        const std = standards.find(s => cleanSubjectName(s.SubjectName) === subject.SubjectName) || standards[index];
+        const std = standardsMap.get(cleanSubjectName(subject.SubjectName)) || standards[index];
         if (!std) return;
 
         const total = std["大於90Count"] + std["大於80Count"] + std["大於70Count"] +
