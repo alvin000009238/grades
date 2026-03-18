@@ -30,7 +30,7 @@ def fetch_grades_route():
         return jsonify({'success': True, 'message': '成績已更新', 'data': data})
     except Exception as exc:
         current_app.config['LOGGER'].error(f'Error fetching grades (API): {exc}', exc_info=True)
-        return jsonify({'success': False, 'error': str(exc)}), 500
+        return jsonify({'success': False, 'error': '取得成績時發生異常，請稍後再試'}), 500
 
 
 @bp.route('/api/structure', methods=['GET'])
@@ -58,7 +58,7 @@ def get_structure_route():
         return jsonify({'structure': structure})
     except Exception as exc:
         current_app.config['LOGGER'].error(f'Error getting structure (API): {exc}', exc_info=True)
-        return jsonify({'error': str(exc)}), 500
+        return jsonify({'error': '取得成績結構時發生異常，請稍後再試'}), 500
 
 
 
