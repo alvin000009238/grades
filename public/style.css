@@ -660,6 +660,21 @@ body {
     color: var(--md-sys-color-on-primary);
 }
 
+/* ── Accessibility ─────────────────────── */
+:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
 .modal-btn.confirm:hover {
     background: var(--color-primary-hover);
 }
