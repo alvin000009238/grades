@@ -283,8 +283,15 @@ function generateStandardsTable(subjects, standards) {
     // Create a DocumentFragment to batch DOM insertions and reduce reflows
     const fragment = document.createDocumentFragment();
 
+    // ⚡ Bolt: Replace O(n²) Array.find() inside loop with O(n) Map lookup
+    const standardsMap = new Map();
+    standards.forEach(s => {
+        const key = cleanSubjectName(s.SubjectName);
+        if (!standardsMap.has(key)) standardsMap.set(key, s);
+    });
+
     subjects.forEach((subject, index) => {
-        const std = standards.find(s => cleanSubjectName(s.SubjectName) === subject.SubjectName) || standards[index];
+        const std = standardsMap.get(subject.SubjectName) || standards[index];
         if (!std) return;
 
         const score = getNumericScore(subject.ScoreDisplay, subject.Score);
@@ -331,8 +338,15 @@ function generateDistributionCards(subjects, standards) {
     // Create a DocumentFragment to batch DOM insertions and reduce reflows
     const fragment = document.createDocumentFragment();
 
+    // ⚡ Bolt: Replace O(n²) Array.find() inside loop with O(n) Map lookup
+    const standardsMap = new Map();
+    standards.forEach(s => {
+        const key = cleanSubjectName(s.SubjectName);
+        if (!standardsMap.has(key)) standardsMap.set(key, s);
+    });
+
     subjects.forEach((subject, index) => {
-        const std = standards.find(s => cleanSubjectName(s.SubjectName) === subject.SubjectName) || standards[index];
+        const std = standardsMap.get(subject.SubjectName) || standards[index];
         if (!std) return;
 
         const total = std["大於90Count"] + std["大於80Count"] + std["大於70Count"] +
