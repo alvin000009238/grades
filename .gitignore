@@ -42,6 +42,7 @@ shared_grades/
 !requirements.txt
 !.env.example
 !package.json
+!package-lock.json
 !manifest.json
 *.md
 !README.md
