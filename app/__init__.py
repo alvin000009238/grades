@@ -45,7 +45,7 @@ def create_app():
         app.config['REDIS_CLIENT'] = redis_client
         app.config['SESSION_TYPE'] = 'redis'
         app.config['SESSION_REDIS'] = redis_client
-        app.config['SESSION_USE_SIGNER'] = False
+        app.config['SESSION_USE_SIGNER'] = True
         app.config['SESSION_KEY_PREFIX'] = 'session:'
         app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # 1 day
         Session(app)
