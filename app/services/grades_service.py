@@ -4,8 +4,8 @@ def get_structure(fetcher, cookies, student_no, token):
 
 
 SUBJECT_KEYS = ('SubjectName', 'ScoreDisplay', 'Score', 'ClassAVGScoreDisplay', 'ClassAVGScore', 'ClassRank', 'ClassRankCount', 'YearRank', 'YearRankCount', 'YearTermDisplay')
-STD_KEYS = ('SubjectName', '頂標', '前標', '均標', '後標', '底標', '標準差')
-COUNT_KEYS = ('大於90Count', '大於80Count', '大於70Count', '大於60Count', '大於50Count', '大於40Count', '大於30Count', '大於20Count', '大於10Count', '大於0Count')
+STD_KEYS = {'SubjectName', '頂標', '前標', '均標', '後標', '底標', '標準差'}
+COUNT_KEYS = {'大於90Count', '大於80Count', '大於70Count', '大於60Count', '大於50Count', '大於40Count', '大於30Count', '大於20Count', '大於10Count', '大於0Count'}
 
 
 def filter_grades_data(data):
