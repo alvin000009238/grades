@@ -43,7 +43,7 @@ def filter_grades_data(data):
 
     if '成績五標List' in result:
         filtered_result['成績五標List'] = [
-            {**{k: std.get(k) for k in STD_KEYS}, **{k: std.get(k, 0) for k in COUNT_KEYS}}
+            {k: std.get(k, 0) if k in COUNT_KEYS else std.get(k) for k in STD_KEYS | COUNT_KEYS}
             for std in result['成績五標List']
         ]
 
