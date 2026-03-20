@@ -124,13 +124,13 @@
                     <form id="loginForm" method="post" action="javascript:void(0);">
                         <div class="form-group">
                             <input type="text" id="usernameInput" name="username" autocomplete="username"
-                                placeholder=" " data-tour="login-username">
+                                placeholder=" " data-tour="login-username" required>
                             <label for="usernameInput">帳號</label>
                         </div>
                         <div class="form-group">
                             <div class="password-group">
                                 <input type="password" id="passwordInput" name="password"
-                                    autocomplete="current-password" placeholder=" " data-tour="login-password">
+                                    autocomplete="current-password" placeholder=" " data-tour="login-password" required>
                                 <label for="passwordInput">密碼</label>
                                 <button type="button" id="togglePasswordBtn" class="toggle-password-btn" aria-label="顯示密碼" title="顯示密碼">
                                     <span class="material-symbols-outlined eye-icon">visibility</span>
@@ -143,7 +143,7 @@
                             data-tour="demo-fill-login" style="display: none; width: 100%; justify-content: center;">
                             一鍵填入教學帳密
                         </button>
-                        <div id="loginStatus" class="status-msg"></div>
+                        <div id="loginStatus" class="status-msg" aria-live="polite" aria-atomic="true"></div>
                         <p class="privacy-notice"
                             style="text-align: center; margin-top: 16px; margin-bottom: 0; font-size: 13px; color: var(--color-text-dim);">
                             若您繼續，即代表您已閱讀並同意本網站的<a href="/privacy.html" target="_blank"
@@ -179,7 +179,7 @@
                         </select>
                         <label for="examSelect">考試名稱</label>
                     </div>
-                    <div id="fetchStatus" class="status-msg"></div>
+                    <div id="fetchStatus" class="status-msg" aria-live="polite" aria-atomic="true"></div>
                 </div>
                 <div class="modal-footer">
                     <div class="footer-left-group" style="margin-right: auto; display: flex; gap: 12px;">
