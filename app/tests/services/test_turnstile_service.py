@@ -63,7 +63,7 @@ class TestTurnstileService(unittest.TestCase):
         self.assertEqual(msg, '驗證服務異常，請稍後再試')
         self.app.config['LOGGER'].error.assert_called_once()
         args, kwargs = self.app.config['LOGGER'].error.call_args
-        self.assertTrue('Turnstile verification error: Network Error' in args[0])
+        self.assertIn('Turnstile verification error: Network Error', args[0])
         self.assertTrue(kwargs.get('exc_info'))
 
 if __name__ == '__main__':
