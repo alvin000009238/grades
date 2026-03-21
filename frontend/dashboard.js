@@ -38,30 +38,31 @@ function getSubjectWeight(subjectName) {
 export function initDashboard(gradesData) {
     const result = gradesData.Result;
     const standards = Array.isArray(result["成績五標List"]) ? result["成績五標List"] : [];
+    const subjects = result.SubjectExamInfoList || [];
 
-    // 更新學生資訊
-    updateStudentInfo(result);
+    // Phase 1: 優先渲染基本文字資訊與統計，即時反饋給使用者
+    requestAnimationFrame(() => {
+        updateStudentInfo(result);
+        updateExamInfo(result);
+        updateRankInfo(result);
+        updateStatistics(subjects);
 
-    // 更新考試資訊
-    updateExamInfo(result);
+        // Phase 2: 處理成績卡片的 DOM 生成
+        requestAnimationFrame(() => {
+            generateScoreCards(subjects);
 
-    // 更新排名資訊
-    updateRankInfo(result);
+            // Phase 3: 處理五標表格與圖表加載 (可能涉及較多運算與外部腳本)
+            requestAnimationFrame(() => {
+                generateStandardsTable(subjects, standards);
+                generateCharts(subjects);
 
-    // 計算統計資料
-    updateStatistics(result.SubjectExamInfoList);
-
-    // 生成成績卡片
-    generateScoreCards(result.SubjectExamInfoList);
-
-    // 生成圖表
-    generateCharts(result.SubjectExamInfoList);
-
-    // 生成五標表格
-    generateStandardsTable(result.SubjectExamInfoList, standards);
-
-    // 生成分佈圖
-    generateDistributionCards(result.SubjectExamInfoList, standards);
+                // Phase 4: 最後生成可能在畫面最下方的分佈圖
+                requestAnimationFrame(() => {
+                    generateDistributionCards(subjects, standards);
+                });
+            });
+        });
+    });
 }
 
 // 更新排名資訊

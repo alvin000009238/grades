@@ -1963,3 +1963,11 @@ body.read-only-mode .header {
     background: var(--color-primary);
     color: var(--md-sys-color-on-primary);
 }
+
+/* ── Performance Optimization (content-visibility) ── */
+.charts-section,
+.standards-section,
+.distribution-section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 600px;
+}
