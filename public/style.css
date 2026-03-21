@@ -1963,3 +1963,9 @@ body.read-only-mode .header {
     background: var(--color-primary);
     color: var(--md-sys-color-on-primary);
 }
+
+/* Accessibility */
+:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
