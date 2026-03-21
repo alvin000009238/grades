@@ -72,3 +72,6 @@ public/dist/
 # bat
 *.bat
 *.ps1
+
+# Flask
+flask_session/
