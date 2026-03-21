@@ -51,10 +51,11 @@ def create_app():
         Session(app)
     except redis.exceptions.ConnectionError:
         app.config['REDIS_CLIENT'] = None
-        # 退回不使用 Redis session
-        app.config['SESSION_TYPE'] = 'null'
+        # 退回使用 filesystem session
+        app.config['SESSION_TYPE'] = 'filesystem'
+        app.config['SESSION_FILE_DIR'] = os.path.join(root_path, 'flask_session')
         Session(app)
-        print("WARNING: Redis not available. Using default cookie session for development.")
+        print("WARNING: Redis not available. Using filesystem session for development.")
 
     app.config['TURNSTILE_SITE_KEY'] = os.environ.get('TURNSTILE_SITE_KEY', '')
     app.config['TURNSTILE_SECRET_KEY'] = os.environ.get('TURNSTILE_SECRET_KEY', '')

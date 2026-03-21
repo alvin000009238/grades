@@ -38,6 +38,7 @@ venv.bak/
 grades_raw.json
 shared_grades/
 .flask_session/
+flask_session/
 *.json
 !requirements.txt
 !.env.example
