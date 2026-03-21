@@ -39,26 +39,28 @@ export function initDashboard(gradesData) {
     const result = gradesData.Result;
     const standards = Array.isArray(result["成績五標List"]) ? result["成績五標List"] : [];
     const subjects = result.SubjectExamInfoList || [];
+    const preparedSubjects = prepareSubjects(subjects);
+    const standardsLookup = createStandardsLookup(standards);
 
     // Phase 1: 優先渲染基本文字資訊與統計，即時反饋給使用者
     requestAnimationFrame(() => {
         updateStudentInfo(result);
         updateExamInfo(result);
         updateRankInfo(result);
-        updateStatistics(subjects);
+        updateStatistics(preparedSubjects);
 
         // Phase 2: 處理成績卡片的 DOM 生成
         requestAnimationFrame(() => {
-            generateScoreCards(subjects);
+            generateScoreCards(preparedSubjects);
 
             // Phase 3: 處理五標表格與圖表加載 (可能涉及較多運算與外部腳本)
             requestAnimationFrame(() => {
-                generateStandardsTable(subjects, standards);
-                generateCharts(subjects);
+                generateStandardsTable(preparedSubjects, standards, standardsLookup);
+                generateCharts(preparedSubjects);
 
-                // Phase 4: 最後生成可能在畫面最下方的分佈圖
-                requestAnimationFrame(() => {
-                    generateDistributionCards(subjects, standards);
+                // Phase 4: 最後生成可能在畫面最下方的分佈圖，改在閒置時間執行避免阻塞首屏
+                scheduleLowPriorityRender(() => {
+                    generateDistributionCards(preparedSubjects, standards, standardsLookup);
                 });
             });
         });
@@ -132,7 +134,7 @@ function updateStatistics(subjects) {
         return;
     }
 
-    const scores = subjects.map(subject => getNumericScore(subject.ScoreDisplay, subject.Score));
+    const scores = subjects.map(subject => subject.scoreValue);
     const highest = Math.max(...scores);
 
     // 計算加權平均
@@ -140,7 +142,7 @@ function updateStatistics(subjects) {
     let totalWeight = 0;
 
     subjects.forEach(subject => {
-        const score = getNumericScore(subject.ScoreDisplay, subject.Score);
+        const score = subject.scoreValue;
         const weight = getSubjectWeight(subject.SubjectName);
         totalWeightedScore += score * weight;
         totalWeight += weight;
@@ -162,9 +164,9 @@ function generateScoreCards(subjects) {
     const fragment = document.createDocumentFragment();
 
     subjects.forEach(subject => {
-        const scoreValue = getNumericScore(subject.ScoreDisplay, subject.Score);
-        const classAvgValue = getNumericScore(subject.ClassAVGScoreDisplay, subject.ClassAVGScore);
-        const diff = scoreValue - classAvgValue;
+        const scoreValue = subject.scoreValue;
+        const classAvgValue = subject.classAvgValue;
+        const diff = subject.diffValue;
         const scoreClass = getScoreClass(scoreValue);
         const diffClass = diff >= 0 ? 'positive' : 'negative';
         const diffIcon = diff >= 0 ? '↑' : '↓';
@@ -277,7 +279,7 @@ export function shortenName(name) {
 }
 
 // 生成五標表格
-function generateStandardsTable(subjects, standards) {
+function generateStandardsTable(subjects, standards, standardsLookup) {
     const tbody = document.getElementById('standardsBody');
     tbody.innerHTML = '';
 
@@ -285,10 +287,10 @@ function generateStandardsTable(subjects, standards) {
     const fragment = document.createDocumentFragment();
 
     subjects.forEach((subject, index) => {
-        const std = standards.find(s => cleanSubjectName(s.SubjectName) === subject.SubjectName) || standards[index];
+        const std = standardsLookup.get(subject.SubjectName) || standards[index];
         if (!std) return;
 
-        const score = getNumericScore(subject.ScoreDisplay, subject.Score);
+        const score = subject.scoreValue;
         const level = getScoreLevel(score, std);
 
         const row = document.createElement('tr');
@@ -325,7 +327,7 @@ function getScoreLevel(score, std) {
 }
 
 // 生成分佈圖
-function generateDistributionCards(subjects, standards) {
+function generateDistributionCards(subjects, standards, standardsLookup) {
     const grid = document.getElementById('distributionGrid');
     grid.innerHTML = '';
 
@@ -333,7 +335,7 @@ function generateDistributionCards(subjects, standards) {
     const fragment = document.createDocumentFragment();
 
     subjects.forEach((subject, index) => {
-        const std = standards.find(s => cleanSubjectName(s.SubjectName) === subject.SubjectName) || standards[index];
+        const std = standardsLookup.get(subject.SubjectName) || standards[index];
         if (!std) return;
 
         const total = std["大於90Count"] + std["大於80Count"] + std["大於70Count"] +
@@ -350,7 +352,7 @@ function generateDistributionCards(subjects, standards) {
         ];
 
         // 找出我的成績在哪個區間
-        const myRange = getMyScoreRange(getNumericScore(subject.ScoreDisplay, subject.Score));
+        const myRange = getMyScoreRange(subject.scoreValue);
 
         const card = document.createElement('div');
         card.className = 'distribution-card';
@@ -388,6 +390,35 @@ function getMyScoreRange(score) {
     if (score >= 60) return '60-69';
     if (score >= 50) return '50-59';
     return '0-49';
+}
+
+function prepareSubjects(subjects) {
+    return subjects.map(subject => {
+        const scoreValue = getNumericScore(subject.ScoreDisplay, subject.Score);
+        const classAvgValue = getNumericScore(subject.ClassAVGScoreDisplay, subject.ClassAVGScore);
+        return {
+            ...subject,
+            scoreValue,
+            classAvgValue,
+            diffValue: scoreValue - classAvgValue
+        };
+    });
+}
+
+function createStandardsLookup(standards) {
+    const lookup = new Map();
+    standards.forEach(std => {
+        lookup.set(cleanSubjectName(std.SubjectName), std);
+    });
+    return lookup;
+}
+
+function scheduleLowPriorityRender(renderFn) {
+    if (typeof window.requestIdleCallback === 'function') {
+        window.requestIdleCallback(renderFn, { timeout: 1000 });
+        return;
+    }
+    setTimeout(renderFn, 0);
 }
 
 export function getNumericScore(displayValue, fallbackValue) {

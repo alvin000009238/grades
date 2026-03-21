@@ -13,9 +13,11 @@ let chartJsLoadPromise = null;
 let latestRenderToken = 0;
 
 export function generateCharts(subjects) {
+    if (!Array.isArray(subjects) || subjects.length === 0) return;
+
     const labels = subjects.map((subject) => shortenName(subject.SubjectName));
-    const myScores = subjects.map((subject) => getNumericScore(subject.ScoreDisplay, subject.Score));
-    const avgScores = subjects.map((subject) => getNumericScore(subject.ClassAVGScoreDisplay, subject.ClassAVGScore));
+    const myScores = subjects.map((subject) => subject.scoreValue ?? getNumericScore(subject.ScoreDisplay, subject.Score));
+    const avgScores = subjects.map((subject) => subject.classAvgValue ?? getNumericScore(subject.ClassAVGScoreDisplay, subject.ClassAVGScore));
     const renderToken = ++latestRenderToken;
 
     ensureChartJsLoaded()
@@ -174,7 +176,7 @@ function updateRadarChart(ChartCtor, labels, myScores, avgScores) {
     radarChartInstance.data.labels = labels;
     radarChartInstance.data.datasets[0].data = myScores;
     radarChartInstance.data.datasets[1].data = avgScores;
-    radarChartInstance.update();
+    radarChartInstance.update('none');
 }
 
 function updateBarChart(ChartCtor, labels, myScores, avgScores) {
@@ -249,7 +251,7 @@ function updateBarChart(ChartCtor, labels, myScores, avgScores) {
     barChartInstance.data.labels = labels;
     barChartInstance.data.datasets[0].data = myScores;
     barChartInstance.data.datasets[1].data = avgScores;
-    barChartInstance.update();
+    barChartInstance.update('none');
 }
 
 function clearCanvas(canvasId) {
