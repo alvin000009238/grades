@@ -86,6 +86,9 @@ def get_http_session() -> TimeoutSession:
 
     session = TimeoutSession(timeout=(connect_timeout, read_timeout))
     
+    global _CACHED_CERT_PATH
+    if not os.path.exists(_CACHED_CERT_PATH):
+        _CACHED_CERT_PATH = _setup_cached_cert_path()
     session.verify = _CACHED_CERT_PATH
     
     retry_strategy = LoggingRetry(
