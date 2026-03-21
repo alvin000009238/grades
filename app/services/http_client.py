@@ -36,6 +36,34 @@ class TimeoutSession(requests.Session):
             kwargs['timeout'] = self.default_timeout
         return super().request(method, url, **kwargs)
 
+_cached_ca_bundle_path = None
+
+def _get_ca_bundle_path():
+    global _cached_ca_bundle_path
+    if _cached_ca_bundle_path is not None:
+        return _cached_ca_bundle_path
+
+    cert_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "certs", "TWCA Secure SSL Certification Authority.crt")
+    if os.path.exists(cert_path):
+        combined_path = os.path.join(tempfile.gettempdir(), "twca_combined_ca_bundle.pem")
+        try:
+            # Overwrite if missing or too small
+            if not os.path.exists(combined_path) or os.path.getsize(combined_path) < 100:
+                with open(certifi.where(), "r", encoding="utf-8") as f_ca:
+                    base_certs = f_ca.read()
+                with open(cert_path, "r", encoding="utf-8") as f_custom:
+                    custom_cert = f_custom.read()
+                with open(combined_path, "w", encoding="utf-8") as f_out:
+                    f_out.write(base_certs + "\n\n" + custom_cert + "\n")
+            _cached_ca_bundle_path = combined_path
+        except Exception as e:
+            logger.error(f"Failed to create combined CA bundle: {e}")
+            _cached_ca_bundle_path = certifi.where()  # fallback
+    else:
+        _cached_ca_bundle_path = certifi.where()
+    
+    return _cached_ca_bundle_path
+
 def get_http_session() -> TimeoutSession:
     """
     Returns a requests.Session customized with default timeouts and automatic retries.
@@ -63,24 +91,7 @@ def get_http_session() -> TimeoutSession:
 
     session = TimeoutSession(timeout=(connect_timeout, read_timeout))
     
-    cert_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "certs", "TWCA Secure SSL Certification Authority.crt")
-    if os.path.exists(cert_path):
-        combined_path = os.path.join(tempfile.gettempdir(), "twca_combined_ca_bundle.pem")
-        try:
-            # Overwrite if missing or too small
-            if not os.path.exists(combined_path) or os.path.getsize(combined_path) < 100:
-                with open(certifi.where(), "r", encoding="utf-8") as f_ca:
-                    base_certs = f_ca.read()
-                with open(cert_path, "r", encoding="utf-8") as f_custom:
-                    custom_cert = f_custom.read()
-                with open(combined_path, "w", encoding="utf-8") as f_out:
-                    f_out.write(base_certs + "\n\n" + custom_cert + "\n")
-            session.verify = combined_path
-        except Exception as e:
-            logger.error(f"Failed to create combined CA bundle: {e}")
-            session.verify = certifi.where() # fallback
-    else:
-        session.verify = certifi.where()
+    session.verify = _get_ca_bundle_path()
     
     retry_strategy = LoggingRetry(
         total=total_retries,
