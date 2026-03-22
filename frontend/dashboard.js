@@ -12,20 +12,33 @@ const SUBJECT_WEIGHTS = {
     '數學': 4,
 };
 
+const SUBJECT_WEIGHTS_KEYS = Object.keys(SUBJECT_WEIGHTS);
+const weightCache = new Map();
+
 // 取得科目權重
 function getSubjectWeight(subjectName) {
+    if (weightCache.has(subjectName)) {
+        return weightCache.get(subjectName);
+    }
+
+    let weight = 2; // 預設權重為 2
+
     // 先嘗試完全匹配
     if (SUBJECT_WEIGHTS[subjectName] !== undefined) {
-        return SUBJECT_WEIGHTS[subjectName];
-    }
-    // 嘗試部分匹配（例如 "選修化學-物質與能量" 匹配 "選修化學"）
-    for (const key of Object.keys(SUBJECT_WEIGHTS)) {
-        if (subjectName.includes(key) || key.includes(subjectName)) {
-            return SUBJECT_WEIGHTS[key];
+        weight = SUBJECT_WEIGHTS[subjectName];
+    } else {
+        // 嘗試部分匹配（例如 "選修化學-物質與能量" 匹配 "選修化學"）
+        for (let i = 0; i < SUBJECT_WEIGHTS_KEYS.length; i++) {
+            const key = SUBJECT_WEIGHTS_KEYS[i];
+            if (subjectName.includes(key) || key.includes(subjectName)) {
+                weight = SUBJECT_WEIGHTS[key];
+                break;
+            }
         }
     }
-    // 預設權重為 2
-    return 2;
+
+    weightCache.set(subjectName, weight);
+    return weight;
 }
 
 export function initDashboard(gradesData) {
@@ -264,17 +277,18 @@ function getScoreClass(score) {
     return 'low';
 }
 
+const SHORT_NAMES = {
+    '英語文': '英文',
+    '公民與社會': '公民',
+    '選修化學-物質與能量': '化學',
+    '選修物理-力學一': '物理',
+    '選修化學': '化學',
+    '選修物理': '物理'
+};
+
 // 縮短科目名稱
 export function shortenName(name) {
-    const shortNames = {
-        '英語文': '英文',
-        '公民與社會': '公民',
-        '選修化學-物質與能量': '化學',
-        '選修物理-力學一': '物理',
-        '選修化學': '化學',
-        '選修物理': '物理'
-    };
-    return shortNames[name] || name;
+    return SHORT_NAMES[name] || name;
 }
 
 // 生成五標表格
