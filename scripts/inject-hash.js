@@ -18,26 +18,27 @@ try {
     
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
     
-    // 2. Find the entry file path
-    const entryData = manifest['main.js'] || manifest['frontend/main.js'];
-    if (!entryData || !entryData.file) {
-        console.error('main.js entry not found in manifest.json!');
-        process.exit(1);
-    }
-    
-    const hashedFilename = entryData.file;
-    console.log(`[Hash Injector] Found main JS with hash: ${hashedFilename}`);
-    
-    // 3. Update index.html
     let html = fs.readFileSync(htmlPath, 'utf-8');
     
-    // Replace <script type="module" src="/dist/main.js"></script> 
-    // or <script type="module" src="/dist/main-*.js"></script>
-    const scriptRegex = /<script\s+type="module"\s+src="\/dist\/main(-[a-zA-Z0-9]+)?\.js"><\/script>/g;
-    html = html.replace(scriptRegex, `<script type="module" src="/dist/${hashedFilename}"></script>`);
+    // Iterate over manifest keys to find entry points and inject their new names
+    Object.keys(manifest).forEach(key => {
+        const entryData = manifest[key];
+        if (entryData && (entryData.isEntry || entryData.isDynamicEntry) && entryData.file) {
+            // chunk name could be 'main.js' or 'frontend/main.js'
+            const baseName = key.split('/').pop().replace(/\.js$/, '');
+            
+            console.log(`[Hash Injector] Found Entry JS for ${baseName}: ${entryData.file}`);
+            
+            // Replaces both original `<script src="/dist/main.js">` 
+            // and already-hashed `<script src="/dist/main-ASD.js">`
+            // The regex dynamically builds pattern to boundary-check baseName
+            const scriptRegex = new RegExp(`<script\\s+type="module"\\s+src="\\/dist\\/${baseName}(-[a-zA-Z0-9_-]+)?\\.js"><\\/script>`, 'g');
+            html = html.replace(scriptRegex, `<script type="module" src="/dist/${entryData.file}"></script>`);
+        }
+    });
     
     fs.writeFileSync(htmlPath, html, 'utf-8');
-    console.log(`[Hash Injector] Successfully updated public/index.html to use /dist/${hashedFilename}`);
+    console.log(`[Hash Injector] Successfully updated public/index.html`);
     
 } catch (error) {
     console.error('[Hash Injector] Error:', error);
