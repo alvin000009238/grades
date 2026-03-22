@@ -5,6 +5,7 @@
 import { getNumericScore, shortenName } from './dashboard.js';
 
 const CHART_JS_URL = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js';
+const CHART_JS_INTEGRITY = 'sha384-vsrfeLOOY6KuIYKDlmVH5UiBmgIdB1oEf7p01YgWHuqmOHfZr374+odEv96n9tNC';
 const CHART_SCRIPT_SELECTOR = 'script[data-chartjs-loader="true"]';
 
 let radarChartInstance = null;
@@ -72,6 +73,8 @@ function ensureChartJsLoaded() {
 
         const script = document.createElement('script');
         script.src = CHART_JS_URL;
+        script.integrity = CHART_JS_INTEGRITY;
+        script.crossOrigin = 'anonymous';
         script.async = true;
         script.defer = true;
         script.dataset.chartjsLoader = 'true';

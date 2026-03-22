@@ -1,7 +1,6 @@
 from flask import Blueprint, current_app, jsonify, request, session
 
 from app.services.auth_service import is_logged_in, login_and_build_session_payload
-from app.services.grades_service import get_structure
 from app.services.rate_limiter import is_rate_limited
 from app.services.turnstile_service import verify_turnstile_token
 import logging
@@ -65,19 +64,6 @@ def login():
 
     session.update(payload)
     logger.info('Login successful')
-
-    try:
-        logger.info('Fetching structure via API...')
-        structure = get_structure(
-            fetcher,
-            session['api_cookies'],
-            session['student_no'],
-            session['api_token'],
-        )
-        session['structure'] = structure
-        logger.info(f'Structure cached: {len(structure)} semesters')
-    except Exception as exc:
-        logger.error(f'Failed to fetch structure: {exc}')
 
     return jsonify({'success': True, 'message': message})
 
