@@ -1971,3 +1971,12 @@ body.read-only-mode .header {
     content-visibility: auto;
     contain-intrinsic-size: auto 600px;
 }
+
+/* ── Inline SVG Icon Colors ── */
+.inline-svg-icon {
+    fill: #ffffff !important;
+}
+
+#syncBtn .inline-svg-icon {
+    fill: var(--md-sys-color-on-primary) !important;
+}
