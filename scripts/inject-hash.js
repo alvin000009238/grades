@@ -34,6 +34,12 @@ try {
             // The regex dynamically builds pattern to boundary-check baseName
             const scriptRegex = new RegExp(`<script\\s+type="module"\\s+src="\\/dist\\/${baseName}(-[a-zA-Z0-9_-]+)?\\.js"><\\/script>`, 'g');
             html = html.replace(scriptRegex, `<script type="module" src="/dist/${entryData.file}"></script>`);
+
+            if (entryData.css && entryData.css.length > 0) {
+                const cssFile = entryData.css[0];
+                const cssRegex = /<link[^>]+id="vite-css"[^>]*>/g;
+                html = html.replace(cssRegex, `<link rel="stylesheet" href="/dist/${cssFile}" id="vite-css">`);
+            }
         }
     });
     
