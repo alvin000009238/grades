@@ -12,7 +12,7 @@ ALLOWED_STATIC_EXT = {
 
 @bp.route('/')
 def index():
-    current_app.config['LOGGER'].info('Accessing index page')
+    current_app.config['LOGGER'].debug('Accessing index page')
     return send_from_directory('public', 'index.html')
 
 
@@ -25,7 +25,10 @@ def static_files(filename):
     if any(part.startswith('.') for part in filename.split('/')):
         return jsonify({'error': 'Forbidden'}), 403
 
-    return send_from_directory('public', filename)
+    response = send_from_directory('public', filename)
+    if ext in ('.js', '.css', '.woff', '.woff2', '.ttf', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico'):
+        response.cache_control.max_age = 86400
+    return response
 
 
 @bp.route('/health')
