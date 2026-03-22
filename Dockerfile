@@ -24,7 +24,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY . .
+COPY app/ ./app/
+COPY certs/ ./certs/
+COPY fetcher.py server.py ./
+COPY public/ ./public/
 
 # Copy Vite build output
 COPY --from=frontend-build /build/public/dist/ ./public/dist/
@@ -34,4 +37,4 @@ COPY --from=frontend-build /build/public/index.html ./public/index.html
 EXPOSE 5000
 
 # Use gunicorn for production
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--timeout", "120", "--workers", "5", "--threads", "4", "server:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--timeout", "120", "--workers", "2", "--threads", "4", "server:app"]
