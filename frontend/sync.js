@@ -7,6 +7,7 @@ import { validateGradesData, storeGradesData } from './storage.js';
 import { initDashboard } from './dashboard.js';
 import { getDemoCredentials, getDemoResultData, getDemoStructure, isDemoModeEnabled } from './demo-mode.js';
 import { emitOnboardingEvent, ONBOARDING_EVENTS } from './onboarding-events.js';
+import { showConfirm, showAlert } from './dialog.js';
 
 export function setupSyncFeature() {
     const syncBtn = document.getElementById('syncBtn');
@@ -108,12 +109,12 @@ export function setupSyncFeature() {
     // Logout Logic
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
-            if (!confirm('確定要登出嗎？')) return;
+            if (!await showConfirm('確認登出', '確定要登出嗎？')) return;
             try {
                 await fetch(`${API_BASE}/logout`, { method: 'POST' });
                 location.reload();
             } catch (e) {
-                alert('登出失敗');
+                await showAlert('錯誤', '登出失敗');
             }
         });
     }

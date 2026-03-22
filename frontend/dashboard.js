@@ -9,14 +9,7 @@ import { generateCharts } from './charts.js';
 const SUBJECT_WEIGHTS = {
     '國語文': 4,
     '英語文': 4,
-    '數學A': 4,
-    '歷史': 2,
-    '地理': 2,
-    '公民與社會': 2,
-    '選修化學': 2,
-    '選修化學-物質與能量': 2,
-    '選修物理': 2,
-    '選修物理-力學一': 2
+    '數學': 4,
 };
 
 // 取得科目權重
@@ -199,7 +192,7 @@ function generateScoreCards(subjects) {
                 <div class="score-row">
                     <span class="score-label">與班平均差距</span>
                     <span class="diff-indicator ${diffClass}">
-                        ${diffIcon} ${Math.abs(diff).toFixed(2)}
+                        ${diffIcon} ${escapeHTML(Math.abs(diff).toFixed(2))}
                     </span>
                 </div>
                 ${hasClassRank || hasYearRank ? `
@@ -216,9 +209,9 @@ function generateScoreCards(subjects) {
                         </div>
                         <span class="rank-label">班排</span>
                         <span class="rank-value">
-                            <span class="rank-number">${classRank}</span>${classRankCount > 0 ? `<span class="rank-total">/${classRankCount}</span>` : ''}
+                            <span class="rank-number">${escapeHTML(classRank)}</span>${classRankCount > 0 ? `<span class="rank-total">/${escapeHTML(classRankCount)}</span>` : ''}
                         </span>
-                        ${classRankCount > 0 ? `<span class="rank-percentile ${getRankPercentileClass(classRankPercentile)}">PR${classRankPercentile}</span>` : ''}
+                        ${classRankCount > 0 ? `<span class="rank-percentile ${getRankPercentileClass(classRankPercentile)}">PR${escapeHTML(classRankPercentile)}</span>` : ''}
                     </div>
                     ` : ''}
                     ${hasYearRank ? `
@@ -232,7 +225,7 @@ function generateScoreCards(subjects) {
                         </div>
                         <span class="rank-label">校排</span>
                         <span class="rank-value">
-                            <span class="rank-number">${yearRank}</span>${yearRankCount > 0 ? `<span class="rank-total">/${yearRankCount}</span>` : ''}
+                            <span class="rank-number">${escapeHTML(yearRank)}</span>${yearRankCount > 0 ? `<span class="rank-total">/${escapeHTML(yearRankCount)}</span>` : ''}
                         </span>
                     </div>
                     ` : ''}
@@ -248,7 +241,7 @@ function generateScoreCards(subjects) {
 
     // Append all cards at once
     grid.appendChild(fragment);
-    
+
     // 配合 CSP: 'unsafe-inline' 去除後無法使用 style="..." 的問題
     grid.querySelectorAll('.progress-fill').forEach(el => {
         const w = el.getAttribute('data-width');
@@ -302,14 +295,14 @@ function generateStandardsTable(subjects, standards, standardsLookup) {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${escapeHTML(shortenName(subject.SubjectName))}</td>
-            <td class="top-mark">${std["頂標"].toFixed(2)}</td>
-            <td class="front-mark">${std["前標"].toFixed(2)}</td>
-            <td class="avg-mark">${std["均標"].toFixed(2)}</td>
-            <td class="back-mark">${std["後標"].toFixed(2)}</td>
-            <td class="bottom-mark">${std["底標"].toFixed(2)}</td>
-            <td>${std["標準差"].toFixed(2)}</td>
-            <td><span class="my-score ${level.class}">${score}</span></td>
-            <td><span class="level-badge ${level.class}">${level.text}</span></td>
+            <td class="top-mark">${escapeHTML(std["頂標"].toFixed(2))}</td>
+            <td class="front-mark">${escapeHTML(std["前標"].toFixed(2))}</td>
+            <td class="avg-mark">${escapeHTML(std["均標"].toFixed(2))}</td>
+            <td class="back-mark">${escapeHTML(std["後標"].toFixed(2))}</td>
+            <td class="bottom-mark">${escapeHTML(std["底標"].toFixed(2))}</td>
+            <td>${escapeHTML(std["標準差"].toFixed(2))}</td>
+            <td><span class="my-score ${level.class}">${escapeHTML(score)}</span></td>
+            <td><span class="level-badge ${level.class}">${escapeHTML(level.text)}</span></td>
         `;
         fragment.appendChild(row);
     });
@@ -371,10 +364,10 @@ function generateDistributionCards(subjects, standards, standardsLookup) {
             const barClass = r.count === 0 ? '' : r.class;
             return `
                         <div class="dist-row">
-                            <span class="dist-label">${r.label}</span>
+                            <span class="dist-label">${escapeHTML(r.label)}</span>
                             <div class="dist-bar-container">
                                 <div class="dist-bar ${barClass}" data-width="${percentage === 0 ? 0 : Math.max(percentage, 5)}"></div>
-                                <span class="dist-count">${r.count}人</span>
+                                <span class="dist-count">${escapeHTML(r.count)}人</span>
                                 ${isMine ? '<span class="my-score-marker">我</span>' : ''}
                             </div>
                         </div>

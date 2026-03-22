@@ -33,7 +33,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap"></noscript>
         <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
-    <link rel="stylesheet" href="/dist/main-B836wp4e.css" id="vite-css">
+    <link rel="stylesheet" href="/dist/main-BitnWYKi.css" id="vite-css">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 
@@ -227,6 +227,39 @@
             </div>
         </div>
 
+        <!-- 提示視窗 (Alert) -->
+        <div class="modal-overlay" id="alertDialog">
+            <div class="modal-content sm">
+                <div class="modal-header">
+                    <h3 id="alertTitle">提示</h3>
+                    <button class="modal-close" id="closeAlertDialog" aria-label="關閉視窗">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="alertMessage" class="mt-12"></p>
+                </div>
+                <div class="modal-footer flex-end">
+                    <button class="modal-btn confirm" id="confirmAlertDialog">確定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 確認視窗 (Confirm) -->
+        <div class="modal-overlay" id="confirmDialog">
+            <div class="modal-content sm">
+                <div class="modal-header">
+                    <h3 id="confirmTitle">確認</h3>
+                    <button class="modal-close" id="closeConfirmDialog" aria-label="關閉視窗">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmMessage" class="mt-12"></p>
+                </div>
+                <div class="modal-footer flex-end">
+                    <button class="modal-btn cancel" id="cancelConfirmDialog">取消</button>
+                    <button class="modal-btn confirm" id="acceptConfirmDialog">確定</button>
+                </div>
+            </div>
+        </div>
+
         <!-- 學生資訊卡片 -->
         <section class="student-card">
             <div class="student-avatar">
@@ -394,7 +427,7 @@
         </footer>
     </div>
 
-    <script type="module" src="/dist/main-52V92fNV.js"></script>
+    <script type="module" src="/dist/main-5kdkZz_u.js"></script>
 </body>
 
 </html>

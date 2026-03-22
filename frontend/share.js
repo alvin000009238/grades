@@ -6,6 +6,7 @@ import { requestTurnstileVerification } from './turnstile.js';
 import { getStoredGrades } from './storage.js';
 import { initDashboard } from './dashboard.js';
 import { emitOnboardingEvent, ONBOARDING_EVENTS } from './onboarding-events.js';
+import { showAlert } from './dialog.js';
 
 export function setupShareFeature() {
     const shareBtn = document.getElementById('shareBtn');
@@ -154,7 +155,7 @@ export async function checkSharedLink() {
         try {
             const res = await fetch(`/api/share/${shareId}`);
             if (res.status === 404) {
-                alert('此分享連結已過期或不存在。');
+                await showAlert('錯誤', '此分享連結已過期或不存在。');
                 window.location.href = '/';
                 return;
             }
@@ -178,7 +179,7 @@ export async function checkSharedLink() {
             }
         } catch (error) {
             console.error(error);
-            alert('載入分享資料失敗: ' + error.message);
+            await showAlert('錯誤', '載入分享資料失敗: ' + error.message);
             window.location.href = '/';
         }
         return true; // Handled shared link

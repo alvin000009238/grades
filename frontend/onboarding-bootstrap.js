@@ -1,7 +1,7 @@
-const ONBOARDING_COMPLETED_KEY = 'onboardingCompleted';
+import { ONBOARDING_COMPLETED_KEY, ONBOARDING_SESSION_ENDED_EVENT } from './onboarding-events.js';
+
 const ONBOARDING_PROMPT_DISMISSED_KEY = 'onboardingPromptDismissed';
 const ONBOARDING_REOPEN_TIP_DISABLED_KEY = 'onboardingReopenTipDisabled';
-const ONBOARDING_SESSION_ENDED_EVENT = 'onboarding:session-ended';
 
 let startPromptEl = null;
 let reopenTipEl = null;
