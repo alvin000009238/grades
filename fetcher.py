@@ -173,7 +173,7 @@ class GradeFetcher:
                 exams = GradeFetcher.get_exams_via_api(cookies, student_no, token, v, req_id=current_req_id, session=session)
                 return n, v, exams
             
-            with ThreadPoolExecutor(max_workers=len(items) or 1) as pool:
+            with ThreadPoolExecutor(max_workers=min(len(items) or 1, 10)) as pool:
                 for name, value, exams in pool.map(_fetch_one, items):
                     structure[name] = {
                         "year_value": value,
