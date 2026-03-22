@@ -5,7 +5,8 @@ COPY package.json package-lock.json ./
 RUN npm ci
 COPY vite.config.js ./
 COPY frontend/ ./frontend/
-
+COPY scripts/ ./scripts/
+COPY public/ ./public/
 ARG VITE_COMMIT_HASH
 ENV VITE_COMMIT_HASH=$VITE_COMMIT_HASH
 
