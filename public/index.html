@@ -28,19 +28,18 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://challenges.cloudflare.com; script-src-elem 'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://cdn.jsdelivr.net https://cloudflareinsights.com; frame-src https://challenges.cloudflare.com; img-src 'self' data:;">
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://challenges.cloudflare.com; script-src-elem 'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://challenges.cloudflare.com; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://cdn.jsdelivr.net https://cloudflareinsights.com; frame-src https://challenges.cloudflare.com; img-src 'self' data:;">
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap"></noscript>
         <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
-    <link rel="stylesheet" href="/dist/main-DyaHnPHz.css" id="vite-css">
+    <link rel="stylesheet" href="/dist/main-B836wp4e.css" id="vite-css">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 
 <body>
     <!-- 確保搜尋引擎能讀取到頁面詳細介紹的隱藏文字 -->
-    <div
-        style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;">
+    <div class="seo-hidden">
         <h2>中大壢中成績分析平台</h2>
         <p>提供學生安全、快速的平台查詢段考、模擬考與平時考成績。透過視覺化圖表比較個人分數與班級平均，提供五標標準分析、落點預測及排名分佈，有效幫助學生掌握學習進度並規劃未來讀書計畫。</p>
     </div>
@@ -58,7 +57,7 @@
             <div class="header-content">
                 <div class="logo">
                     <div class="logo-icon">
-                        <svg class="inline-svg-icon" style="font-size: 24px;" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M640-160v-280h160v280H640Zm-240 0v-640h160v640H400Zm-240 0v-440h160v440H160Z"/></svg>
+                        <svg class="inline-svg-icon icon-24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M640-160v-280h160v280H640Zm-240 0v-640h160v640H400Zm-240 0v-440h160v440H160Z"/></svg>
                     </div>
                     <div class="logo-text">
                         <h1>成績分析平台</h1>
@@ -71,17 +70,16 @@
                         <span class="time-label">資料更新時間</span>
                         <span class="time-value" id="updateTime">--</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <button class="import-dropdown-btn" id="shareBtn" data-tour="share-btn"
-                            style="background: var(--color-surface-elevated); color: var(--color-text-main); border: 1px solid var(--color-border-subtle);">
+                    <div class="flex-center-gap-8">
+                        <button class="import-dropdown-btn share-btn-style" id="shareBtn" data-tour="share-btn">
                             <span class="dropdown-icon">
-                                <svg class="inline-svg-icon" style="font-size: 18px;" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M720-80q-50 0-85-35t-35-85q0-7 1-14.5t3-13.5L322-392q-17 15-38 23.5t-44 8.5q-50 0-85-35t-35-85q0-50 35-85t85-35q23 0 44 8.5t38 23.5l282-164q-2-6-3-13.5t-1-14.5q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35q-23 0-44-8.5T638-672L356-508q2 6 3 13.5t1 14.5q0 7-1 14.5t-3 13.5l282 164q17-15 38-23.5t44-8.5q50 0 85 35t35 85q0 50-35 85t-85 35Zm0-640q17 0 28.5-11.5T760-760q0-17-11.5-28.5T720-800q-17 0-28.5 11.5T680-760q0 17 11.5 28.5T720-720ZM240-440q17 0 28.5-11.5T280-480q0-17-11.5-28.5T240-520q-17 0-28.5 11.5T200-480q0 17 11.5 28.5T240-440Zm480 280q17 0 28.5-11.5T760-200q0-17-11.5-28.5T720-240q-17 0-28.5 11.5T680-200q0 17 11.5 28.5T720-160Zm0-600ZM240-480Zm480 280Z"/></svg>
+                                <svg class="inline-svg-icon icon-18" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M720-80q-50 0-85-35t-35-85q0-7 1-14.5t3-13.5L322-392q-17 15-38 23.5t-44 8.5q-50 0-85-35t-35-85q0-50 35-85t85-35q23 0 44 8.5t38 23.5l282-164q-2-6-3-13.5t-1-14.5q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35q-23 0-44-8.5T638-672L356-508q2 6 3 13.5t1 14.5q0 7-1 14.5t-3 13.5l282 164q17-15 38-23.5t44-8.5q50 0 85 35t35 85q0 50-35 85t-85 35Zm0-640q17 0 28.5-11.5T760-760q0-17-11.5-28.5T720-800q-17 0-28.5 11.5T680-760q0 17 11.5 28.5T720-720ZM240-440q17 0 28.5-11.5T280-480q0-17-11.5-28.5T240-520q-17 0-28.5 11.5T200-480q0 17 11.5 28.5T240-440Zm480 280q17 0 28.5-11.5T760-200q0-17-11.5-28.5T720-240q-17 0-28.5 11.5T680-200q0 17 11.5 28.5T720-160Zm0-600ZM240-480Zm480 280Z"/></svg>
                             </span>
                             <span>分享</span>
                         </button>
                         <button class="import-dropdown-btn" id="syncBtn" data-tour="import-btn">
                             <span class="dropdown-icon">
-                                <svg class="inline-svg-icon" style="font-size: 18px;" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M160-160v-80h109q-51-44-80-106t-29-134q0-112 68-197.5T400-790v84q-70 25-115 86.5T240-480q0 54 21.5 99.5T320-302v-98h80v240H160Zm440 0q-50 0-85-35t-35-85q0-48 33-82.5t81-36.5q17-36 50.5-58.5T720-480q53 0 91.5 34.5T858-360q42 0 72 29t30 70q0 42-29 71.5T860-160H600Zm116-360q-7-41-27-76t-49-62v98h-80v-240h240v80H691q43 38 70.5 89T797-520h-81ZM600-240h260q8 0 14-6t6-14q0-8-6-14t-14-6h-70v-50q0-29-20.5-49.5T720-400q-29 0-49.5 20.5T650-330v10h-50q-17 0-28.5 11.5T560-280q0 17 11.5 28.5T600-240Zm120-80Z"/></svg>
+                                <svg class="inline-svg-icon icon-18" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M160-160v-80h109q-51-44-80-106t-29-134q0-112 68-197.5T400-790v84q-70 25-115 86.5T240-480q0 54 21.5 99.5T320-302v-98h80v240H160Zm440 0q-50 0-85-35t-35-85q0-48 33-82.5t81-36.5q17-36 50.5-58.5T720-480q53 0 91.5 34.5T858-360q42 0 72 29t30 70q0 42-29 71.5T860-160H600Zm116-360q-7-41-27-76t-49-62v98h-80v-240h240v80H691q43 38 70.5 89T797-520h-81ZM600-240h260q8 0 14-6t6-14q0-8-6-14t-14-6h-70v-50q0-29-20.5-49.5T720-400q-29 0-49.5 20.5T650-330v10h-50q-17 0-28.5 11.5T560-280q0 17 11.5 28.5T600-240Zm120-80Z"/></svg>
                             </span>
                             <span>匯入成績</span>
                         </button>
@@ -95,7 +93,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3>
-                        <svg class="inline-svg-icon" style="font-size: 24px;" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M720-80q-50 0-85-35t-35-85q0-7 1-14.5t3-13.5L322-392q-17 15-38 23.5t-44 8.5q-50 0-85-35t-35-85q0-50 35-85t85-35q23 0 44 8.5t38 23.5l282-164q-2-6-3-13.5t-1-14.5q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35q-23 0-44-8.5T638-672L356-508q2 6 3 13.5t1 14.5q0 7-1 14.5t-3 13.5l282 164q17-15 38-23.5t44-8.5q50 0 85 35t35 85q0 50-35 85t-85 35Zm0-640q17 0 28.5-11.5T760-760q0-17-11.5-28.5T720-800q-17 0-28.5 11.5T680-760q0 17 11.5 28.5T720-720ZM240-440q17 0 28.5-11.5T280-480q0-17-11.5-28.5T240-520q-17 0-28.5 11.5T200-480q0 17 11.5 28.5T240-440Zm480 280q17 0 28.5-11.5T760-200q0-17-11.5-28.5T720-240q-17 0-28.5 11.5T680-200q0 17 11.5 28.5T720-160Zm0-600ZM240-480Zm480 280Z"/></svg>
+                        <svg class="inline-svg-icon icon-24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M720-80q-50 0-85-35t-35-85q0-7 1-14.5t3-13.5L322-392q-17 15-38 23.5t-44 8.5q-50 0-85-35t-35-85q0-50 35-85t85-35q23 0 44 8.5t38 23.5l282-164q-2-6-3-13.5t-1-14.5q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35q-23 0-44-8.5T638-672L356-508q2 6 3 13.5t1 14.5q0 7-1 14.5t-3 13.5l282 164q17-15 38-23.5t44-8.5q50 0 85 35t35 85q0 50-35 85t-85 35Zm0-640q17 0 28.5-11.5T760-760q0-17-11.5-28.5T720-800q-17 0-28.5 11.5T680-760q0 17 11.5 28.5T720-720ZM240-440q17 0 28.5-11.5T280-480q0-17-11.5-28.5T240-520q-17 0-28.5 11.5T200-480q0 17 11.5 28.5T240-440Zm480 280q17 0 28.5-11.5T760-200q0-17-11.5-28.5T720-240q-17 0-28.5 11.5T680-200q0 17 11.5 28.5T720-160Zm0-600ZM240-480Zm480 280Z"/></svg>
                         分享成績單
                     </h3>
                     <button class="modal-close" id="closeShareModal" aria-label="關閉視窗">&times;</button>
@@ -110,9 +108,9 @@
         <div class="modal-overlay" id="loginModal">
             <div class="modal-content sm">
                 <div class="modal-header">
-                    <h3 style="display: flex; align-items: center; gap: 8px;">
+                    <h3 class="flex-center-gap-8">
                         登入系統
-                        <span class="tooltip-icon" tabindex="0" aria-label="提示說明" role="button" data-tooltip="請使用欣河校園平台帳密登入" style="display: inline-flex; align-items: center; justify-content: center;">
+                        <span class="tooltip-icon inline-flex-center" tabindex="0" aria-label="提示說明" role="button" data-tooltip="請使用欣河校園平台帳密登入">
                             <svg class="inline-svg-icon" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M478-240q21 0 35.5-14.5T528-290q0-21-14.5-35.5T478-340q-21 0-35.5 14.5T428-290q0 21 14.5 35.5T478-240Zm-36-154h74q0-33 7.5-52t42.5-52q26-26 41-49.5t15-56.5q0-56-41-86t-97-30q-57 0-92.5 30T342-618l66 26q5-18 22.5-39t53.5-21q32 0 48 17.5t16 38.5q0 20-12 37.5T506-526q-44 39-54 59t-10 73Zm38 314q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
                         </span>
                     </h3>
@@ -132,19 +130,18 @@
                                 <label for="passwordInput">密碼</label>
                                 <button type="button" id="togglePasswordBtn" class="toggle-password-btn" aria-label="顯示密碼" title="顯示密碼">
                                     <svg class="inline-svg-icon eye-icon" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/></svg>
-                                    <svg class="inline-svg-icon eye-off-icon" style="display: none;" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z"/></svg>
+                                    <svg class="inline-svg-icon eye-off-icon hidden" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z"/></svg>
                                 </button>
                             </div>
                         </div>
-                        <button type="button" class="modal-btn reload demo-fill-login-btn" id="demoFillLoginBtn"
-                            data-tour="demo-fill-login" style="display: none; width: 100%; justify-content: center;">
+                        <button type="button" class="modal-btn reload demo-fill-login-btn hidden-full-center" id="demoFillLoginBtn"
+                            data-tour="demo-fill-login">
                             一鍵填入教學帳密
                         </button>
                         <div id="loginStatus" class="status-msg"></div>
-                        <p class="privacy-notice"
-                            style="text-align: center; margin-top: 16px; margin-bottom: 0; font-size: 13px; color: var(--color-text-dim);">
+                        <p class="privacy-notice privacy-notice-text">
                             若您繼續，即代表您已閱讀並同意本網站的<a href="/privacy.html" target="_blank"
-                                style="color: var(--color-primary); text-decoration: none;">隱私權政策</a>
+                                class="link-primary">隱私權政策</a>
                         </p>
                     </form>
                 </div>
@@ -179,10 +176,10 @@
                     <div id="fetchStatus" class="status-msg"></div>
                 </div>
                 <div class="modal-footer">
-                    <div class="footer-left-group" style="margin-right: auto; display: flex; gap: 12px;">
+                    <div class="footer-left-group footer-left-group-style">
                         <button class="modal-btn danger" id="logoutBtn">登出</button>
                     </div>
-                    <div class="footer-right-group" style="display: flex; gap: 12px;">
+                    <div class="footer-right-group flex-gap-12">
                         <button class="modal-btn cancel" id="cancelSelect">取消</button>
                         <button class="modal-btn confirm" id="confirmFetch" data-tour="fetch-btn">查詢</button>
                     </div>
@@ -194,19 +191,19 @@
         <div class="modal-overlay" id="disclaimerModal">
             <div class="modal-content sm">
                 <div class="modal-header">
-                    <h3 style="color: var(--color-warning);">
-                        <svg class="inline-svg-icon " style="color: var(--color-warning); font-size: 24px;" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="m40-120 440-760 440 760H40Zm138-80h604L480-720 178-200Zm302-40q17 0 28.5-11.5T520-280q0-17-11.5-28.5T480-320q-17 0-28.5 11.5T440-280q0 17 11.5 28.5T480-240Zm-40-120h80v-200h-80v200Zm40-100Z"/></svg>
+                    <h3 class="text-warning">
+                        <svg class="inline-svg-icon icon-warning-24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="m40-120 440-760 440 760H40Zm138-80h604L480-720 178-200Zm302-40q17 0 28.5-11.5T520-280q0-17-11.5-28.5T480-320q-17 0-28.5 11.5T440-280q0 17 11.5 28.5T480-240Zm-40-120h80v-200h-80v200Zm40-100Z"/></svg>
                         免責聲明
                     </h3>
                 </div>
-                <div class="modal-body" style="line-height: 1.6; color: var(--color-text-secondary); font-size: 15px;">
+                <div class="modal-body disclaimer-text">
                     <p>歡迎使用中大壢中成績分析平台！</p>
-                    <p style="margin-top: 12px;">
+                    <p class="mt-12">
                         請注意，本網站為<strong>非官方</strong>開發之第三方服務，我們與壢中及欣河智慧校園平台無任何直接關聯。</p>
-                    <p style="margin-top: 12px;">
+                    <p class="mt-12">
                         您的帳號密碼僅會用於直接向原系統請求成績資料，本站<strong>絕不</strong>記錄或收集您的登入憑證或其他個人隱私資訊。</p>
                 </div>
-                <div class="modal-footer" style="display: flex; justify-content: flex-end;">
+                <div class="modal-footer flex-end">
                     <button class="modal-btn confirm" id="confirmDisclaimer">我了解了</button>
                 </div>
             </div>
@@ -218,13 +215,13 @@
                 <div class="modal-header">
                     <h3>安全驗證</h3>
                 </div>
-                <div class="modal-body" style="text-align: center; padding: 24px 16px;">
-                    <p style="color: var(--color-text-secondary); margin-bottom: 20px; font-size: 15px;">
+                <div class="modal-body turnstile-body">
+                    <p class="turnstile-text">
                         請先完成人機驗證，再繼續操作
                     </p>
-                    <div id="turnstileWidgetContainer" style="display: flex; justify-content: center;"></div>
+                    <div id="turnstileWidgetContainer" class="flex-center"></div>
                 </div>
-                <div class="modal-footer" style="display: flex; justify-content: center;">
+                <div class="modal-footer flex-center">
                     <button class="modal-btn cancel" id="cancelTurnstile">取消</button>
                 </div>
             </div>
@@ -241,19 +238,19 @@
                 <div class="student-details">
                     <div class="detail-item">
                         <span class="detail-icon">
-                            <svg class="inline-svg-icon" style="font-size: 18px;" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M80-120v-720h400v160h400v560H80Zm80-80h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm160 480h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm160 480h320v-400H480v80h80v80h-80v80h80v80h-80v80Zm160-240v-80h80v80h-80Zm0 160v-80h80v80h-80Z"/></svg>
+                            <svg class="inline-svg-icon icon-18" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M80-120v-720h400v160h400v560H80Zm80-80h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm160 480h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm160 480h320v-400H480v80h80v80h-80v80h80v80h-80v80Zm160-240v-80h80v80h-80Zm0 160v-80h80v80h-80Z"/></svg>
                         </span>
                         <span class="detail-text" id="studentClass">--</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon">
-                            <svg class="inline-svg-icon" style="font-size: 18px;" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M160-120v-240h640v240h-80v-160H240v160h-80Zm20-280q-25 0-42.5-17.5T120-460q0-25 17.5-42.5T180-520q25 0 42.5 17.5T240-460q0 25-17.5 42.5T180-400Zm100 0v-360q0-33 23.5-56.5T360-840h240q33 0 56.5 23.5T680-760v360H280Zm500 0q-25 0-42.5-17.5T720-460q0-25 17.5-42.5T780-520q25 0 42.5 17.5T840-460q0 25-17.5 42.5T780-400Zm-420-80h240v-280H360v280Zm0 0h240-240Z"/></svg>
+                            <svg class="inline-svg-icon icon-18" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M160-120v-240h640v240h-80v-160H240v160h-80Zm20-280q-25 0-42.5-17.5T120-460q0-25 17.5-42.5T180-520q25 0 42.5 17.5T240-460q0 25-17.5 42.5T180-400Zm100 0v-360q0-33 23.5-56.5T360-840h240q33 0 56.5 23.5T680-760v360H280Zm500 0q-25 0-42.5-17.5T720-460q0-25 17.5-42.5T780-520q25 0 42.5 17.5T840-460q0 25-17.5 42.5T780-400Zm-420-80h240v-280H360v280Zm0 0h240-240Z"/></svg>
                         </span>
                         <span class="detail-text">座號 <span id="studentSeat">--</span></span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-icon">
-                            <svg class="inline-svg-icon" style="font-size: 18px;" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="m240-160 40-160H120l20-80h160l40-160H180l20-80h160l40-160h80l-40 160h160l40-160h80l-40 160h160l-20 80H660l-40 160h160l-20 80H600l-40 160h-80l40-160H360l-40 160h-80Zm140-240h160l40-160H420l-40 160Z"/></svg>
+                            <svg class="inline-svg-icon icon-18" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="m240-160 40-160H120l20-80h160l40-160H180l20-80h160l40-160h80l-40 160h160l40-160h80l-40 160h160l-20 80H660l-40 160h160l-20 80H600l-40 160h-80l40-160H360l-40 160h-80Zm140-240h160l40-160H420l-40 160Z"/></svg>
                         </span>
                         <span class="detail-text">學號 <span id="studentNo">--</span></span>
                     </div>
@@ -272,11 +269,11 @@
                     <span class="stat-value" id="highestScore">--</span>
                     <span class="stat-label">最高分</span>
                 </div>
-                <div class="stat-box" id="classRankBox" style="display: none;">
+                <div class="stat-box hidden" id="classRankBox">
                     <span class="stat-value" id="classRank">--</span>
                     <span class="stat-label">班級排名</span>
                 </div>
-                <div class="stat-box" id="categoryRankBox" style="display: none;">
+                <div class="stat-box hidden" id="categoryRankBox">
                     <span class="stat-value" id="categoryRank">--</span>
                     <span class="stat-label">類組排名</span>
                 </div>
@@ -310,7 +307,7 @@
                         </h3>
                     </div>
                     <div class="chart-body">
-                        <canvas id="radarChart"></canvas>
+                        <canvas id="radarChart" aria-label="成績雷達圖" role="img"></canvas>
                     </div>
                 </div>
 
@@ -325,7 +322,7 @@
                         </h3>
                     </div>
                     <div class="chart-body">
-                        <canvas id="barChart"></canvas>
+                        <canvas id="barChart" aria-label="成績對比分析" role="img"></canvas>
                     </div>
                 </div>
             </div>
@@ -376,18 +373,17 @@
 
         <!-- 頁尾 -->
         <footer class="footer">
-            <p
-                style="margin-bottom: 12px; font-size: 13px; color: var(--color-text-secondary); display: flex; align-items: center; justify-content: center; gap: 6px;">
-                <svg class="inline-svg-icon" style="font-size: 16px;" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+            <p class="footer-info">
+                <svg class="inline-svg-icon icon-16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 -960 960 960" width="1em"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
                 本平台僅提供成績視覺化分析，實際成績仍以官方系統為準。
             </p>
             <p>© 2026 中大壢中成績分析 - 數據來源：欣河智慧校園平台</p>
-            <p style="margin-top: 8px; font-size: 13px; display: flex; align-items: center; justify-content: center;">
+            <p class="footer-links">
                 <a href="mailto:contact@clhs.dev"
-                    style="color: var(--color-text-dim); text-decoration: none; transition: color 0.2s ease;">contact@clhs.dev</a>
-                <span style="color: var(--color-border-subtle); margin: 0 10px;">|</span>
+                    class="footer-link">contact@clhs.dev</a>
+                <span class="footer-divider">|</span>
                 <a href="https://github.com/alvin000009238/grades" target="_blank" rel="noopener noreferrer"
-                    style="color: var(--color-text-dim); text-decoration: none; transition: color 0.2s ease; display: inline-flex; align-items: center; gap: 4px;">
+                    class="footer-github-link">
                     <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
                         <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
                     </svg>
@@ -398,7 +394,7 @@
         </footer>
     </div>
 
-    <script type="module" src="/dist/main-DO2oc7VN.js"></script>
+    <script type="module" src="/dist/main-92QcBdgg.js"></script>
 </body>
 
 </html>

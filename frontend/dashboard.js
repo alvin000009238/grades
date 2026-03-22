@@ -239,7 +239,7 @@ function generateScoreCards(subjects) {
                 </div>
                 ` : ''}
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${scoreValue}%"></div>
+                    <div class="progress-fill" data-width="${scoreValue}"></div>
                 </div>
             </div>
         `;
@@ -248,6 +248,12 @@ function generateScoreCards(subjects) {
 
     // Append all cards at once
     grid.appendChild(fragment);
+    
+    // 配合 CSP: 'unsafe-inline' 去除後無法使用 style="..." 的問題
+    grid.querySelectorAll('.progress-fill').forEach(el => {
+        const w = el.getAttribute('data-width');
+        if (w !== null) el.style.width = w + '%';
+    });
 }
 
 // 取得排名百分位 CSS class
@@ -367,7 +373,7 @@ function generateDistributionCards(subjects, standards, standardsLookup) {
                         <div class="dist-row">
                             <span class="dist-label">${r.label}</span>
                             <div class="dist-bar-container">
-                                <div class="dist-bar ${barClass}" style="width: ${percentage === 0 ? 0 : Math.max(percentage, 5)}%"></div>
+                                <div class="dist-bar ${barClass}" data-width="${percentage === 0 ? 0 : Math.max(percentage, 5)}"></div>
                                 <span class="dist-count">${r.count}人</span>
                                 ${isMine ? '<span class="my-score-marker">我</span>' : ''}
                             </div>
@@ -381,6 +387,12 @@ function generateDistributionCards(subjects, standards, standardsLookup) {
 
     // Append all distribution cards at once
     grid.appendChild(fragment);
+
+    // 配合 CSP: 'unsafe-inline' 去除後無法使用 style="..." 的問題
+    grid.querySelectorAll('.dist-bar').forEach(el => {
+        const w = el.getAttribute('data-width');
+        if (w !== null) el.style.width = w + '%';
+    });
 }
 
 function getMyScoreRange(score) {
