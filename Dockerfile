@@ -28,6 +28,7 @@ COPY . .
 
 # Copy Vite build output
 COPY --from=frontend-build /build/public/dist/ ./public/dist/
+COPY --from=frontend-build /build/public/index.html ./public/index.html
 
 # Expose port
 EXPOSE 5000
