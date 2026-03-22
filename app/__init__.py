@@ -53,7 +53,7 @@ def create_app():
     except redis.exceptions.ConnectionError:
         app.config['REDIS_CLIENT'] = None
         # 退回不使用 Redis session
-        app.config['SESSION_TYPE'] = 'null'
+        app.config['SESSION_TYPE'] = 'filesystem'
         Session(app)
         print("WARNING: Redis not available. Using default cookie session for development.")
 
