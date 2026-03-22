@@ -59,7 +59,7 @@ def create_app():
 
     app.config['SHARE_TTL'] = int(os.environ.get('SHARE_TTL', 7200))
 
-    app.config['GRADE_FETCHER'] = GradeFetcher
+    app.config['GRADE_FETCHER'] = GradeFetcher()
 
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
