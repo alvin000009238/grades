@@ -1,10 +1,8 @@
 import { setDemoModeEnabled } from './demo-mode.js';
-import { ONBOARDING_EVENTS } from './onboarding-events.js';
+import { ONBOARDING_EVENTS, ONBOARDING_COMPLETED_KEY, ONBOARDING_SESSION_ENDED_EVENT } from './onboarding-events.js';
 import { loadGradesData } from './storage.js';
 import { resetCharts } from './charts.js';
 
-const ONBOARDING_COMPLETED_KEY = 'onboardingCompleted';
-export const ONBOARDING_SESSION_ENDED_EVENT = 'onboarding:session-ended';
 
 const TOUR_STEPS = [
     {

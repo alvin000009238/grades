@@ -6,6 +6,7 @@ import { requestTurnstileVerification } from './turnstile.js';
 import { getStoredGrades } from './storage.js';
 import { initDashboard } from './dashboard.js';
 import { emitOnboardingEvent, ONBOARDING_EVENTS } from './onboarding-events.js';
+import { showAlert } from './dialog.js';
 
 export function setupShareFeature() {
     const shareBtn = document.getElementById('shareBtn');
@@ -18,17 +19,17 @@ export function setupShareFeature() {
     // Reset Modal Content for Link Sharing
     const setupModalContent = () => {
         sharePreview.innerHTML = `
-            <div style="text-align: center; padding: 8px 0;">
-                <p style="color: var(--color-text-secondary); margin-bottom: 20px; font-size: 13px; line-height: 1.6;">
+            <div class="share-modal-container">
+                <p class="share-modal-text">
                     建立一個唯讀的分享連結，讓他人查看此成績單。<br>
-                    連結將於 <strong style="color: var(--color-warning);">2 小時後</strong> 自動失效。
+                    連結將於 <strong class="text-warning">2 小時後</strong> 自動失效。
                 </p>
-                <div id="linkContainer" style="display: none; margin-bottom: 16px;">
-                    <div class="form-group" style="margin-bottom: 12px;">
+                <div id="linkContainer" class="share-link-container hidden">
+                    <div class="form-group mb-12">
                         <input type="text" id="shareLinkInput" readonly
-                            style="text-align: center; font-size: 13px; color: var(--color-primary); border-color: var(--color-primary); background: var(--color-primary-muted);">
+                            class="share-input-readonly">
                     </div>
-                    <button id="copyLinkBtn" class="import-dropdown-btn" style="width: 100%; justify-content: center;">
+                    <button id="copyLinkBtn" class="import-dropdown-btn w-full-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                             stroke-linejoin="round">
@@ -38,7 +39,7 @@ export function setupShareFeature() {
                         複製連結
                     </button>
                 </div>
-                <button id="createLinkBtn" data-tour="create-share-link" class="import-dropdown-btn" style="width: 100%; justify-content: center;">
+                <button id="createLinkBtn" data-tour="create-share-link" class="import-dropdown-btn w-full-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
@@ -47,7 +48,7 @@ export function setupShareFeature() {
                     </svg>
                     建立分享連結
                 </button>
-                <div id="shareStatus" class="status-msg" style="margin-top: 12px;"></div>
+                <div id="shareStatus" class="status-msg mt-12"></div>
             </div>
         `;
 
@@ -154,7 +155,7 @@ export async function checkSharedLink() {
         try {
             const res = await fetch(`/api/share/${shareId}`);
             if (res.status === 404) {
-                alert('此分享連結已過期或不存在。');
+                await showAlert('錯誤', '此分享連結已過期或不存在。');
                 window.location.href = '/';
                 return;
             }
@@ -167,7 +168,7 @@ export async function checkSharedLink() {
                 const header = document.querySelector('.header-content');
                 const indicator = document.createElement('div');
                 indicator.className = 'share-indicator';
-                indicator.innerHTML = '<span style="color: var(--color-warning); font-weight: bold; padding: 4px 8px; border: 1px solid var(--color-warning); border-radius: 4px; font-size: 12px;">僅供檢視 (唯讀)</span>';
+                indicator.innerHTML = '<span class="readonly-badge">僅供檢視 (唯讀)</span>';
                 // Insert before data-time-box
                 const timeBox = document.querySelector('.data-time-box');
                 header.insertBefore(indicator, timeBox);
@@ -178,7 +179,7 @@ export async function checkSharedLink() {
             }
         } catch (error) {
             console.error(error);
-            alert('載入分享資料失敗: ' + error.message);
+            await showAlert('錯誤', '載入分享資料失敗: ' + error.message);
             window.location.href = '/';
         }
         return true; // Handled shared link

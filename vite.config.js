@@ -6,12 +6,13 @@ export default defineConfig({
     build: {
         outDir: resolve(__dirname, 'public/dist'),
         emptyOutDir: true,
+        manifest: true,
         rollupOptions: {
             input: resolve(__dirname, 'frontend/main.js'),
             output: {
-                entryFileNames: 'main.js',
-                chunkFileNames: '[name].js',
-                assetFileNames: '[name][extname]',
+                entryFileNames: 'main-[hash].js',
+                chunkFileNames: '[name]-[hash].js',
+                assetFileNames: '[name]-[hash][extname]',
             },
         },
     },

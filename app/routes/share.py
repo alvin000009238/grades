@@ -4,9 +4,13 @@ from app.services.share_service import (
     generate_share_id,
     is_valid_share_id,
     read_shared_data,
+    validate_share_payload,
     write_shared_data,
 )
 from app.services.turnstile_service import verify_turnstile_token
+import logging
+
+logger = logging.getLogger('SchoolGradesServer.Share')
 
 bp = Blueprint('share', __name__)
 
@@ -23,11 +27,16 @@ def create_share_link():
         if not ts_ok:
             return jsonify({'error': ts_err}), 403
 
+        # Payload 大小與結構校驗
+        valid, err, cleaned = validate_share_payload(data)
+        if not valid:
+            return jsonify({'error': err}), 400
+
         share_id = generate_share_id()
-        write_shared_data(current_app.config['REDIS_CLIENT'], share_id, data, current_app.config['SHARE_TTL'])
+        write_shared_data(current_app.config['REDIS_CLIENT'], share_id, cleaned, current_app.config['SHARE_TTL'])
         return jsonify({'success': True, 'id': share_id})
     except Exception as exc:
-        current_app.config['LOGGER'].error(f'Error creating share: {exc}', exc_info = True)
+        logger.error(f'Error creating share: {exc}', exc_info = True)
         return jsonify({'error': str(exc)}), 500
 
 
@@ -43,10 +52,14 @@ def get_shared_grades(share_id):
 
         return jsonify({'success': True, 'data': data})
     except Exception as exc:
-        current_app.config['LOGGER'].error(f'Error reading share: {exc}', exc_info = True)
+        logger.error(f'Error reading share: {exc}', exc_info = True)
         return jsonify({'error': str(exc)}), 500
 
 
 @bp.route('/share/<share_id>')
 def view_shared_page(share_id):
-    return send_from_directory('public', 'index.html')
+    response = send_from_directory('public', 'index.html')
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response

@@ -3,6 +3,7 @@ import secrets
 import string
 
 CHARS = string.ascii_letters + string.digits + '-_.~'
+SHARE_MAX_PAYLOAD_BYTES = 512_000  # 500 KB
 
 
 def generate_share_id(length=15):
@@ -11,6 +12,38 @@ def generate_share_id(length=15):
 
 def is_valid_share_id(share_id):
     return all(c in CHARS for c in share_id)
+
+
+def validate_share_payload(data, max_bytes=SHARE_MAX_PAYLOAD_BYTES):
+    """校驗分享 payload 的大小與結構。
+
+    Args:
+        data: 解析後的 JSON dict。
+        max_bytes: 序列化後允許的最大位元組數。
+
+    Returns:
+        tuple: (is_valid, error_message, cleaned_data)
+    """
+    if not isinstance(data, dict):
+        return False, 'Payload 必須為 JSON 物件', None
+
+    # 剝離非必要欄位
+    cleaned = {k: v for k, v in data.items() if k != 'turnstile_token'}
+
+    # 大小檢查
+    serialized = json.dumps(cleaned, ensure_ascii=False)
+    if len(serialized.encode('utf-8')) > max_bytes:
+        return False, f'Payload 超過大小限制（{max_bytes // 1000}KB）', None
+
+    # 結構校驗
+    result = cleaned.get('Result')
+    if not isinstance(result, dict):
+        return False, '缺少 Result 資料', None
+
+    if not isinstance(result.get('SubjectExamInfoList'), list):
+        return False, '缺少 SubjectExamInfoList 成績清單', None
+
+    return True, None, cleaned
 
 
 def write_shared_data(redis_client, share_id, data, ttl=7200):

@@ -2,7 +2,7 @@ name: Deploy to VPS
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -25,8 +25,17 @@ jobs:
 
       - name: Basic Syntax Check
         run: |
-          python3 -m py_compile server.py
-          python3 -m py_compile fetcher.py
+          python3 -m compileall app fetcher.py server.py
+
+      - name: Set Environment Variables based on Branch
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "TAG_PREFIX=sha-" >> $GITHUB_ENV
+            echo "LATEST_TAG=latest" >> $GITHUB_ENV
+          else
+            echo "TAG_PREFIX=dev-sha-" >> $GITHUB_ENV
+            echo "LATEST_TAG=dev-latest" >> $GITHUB_ENV
+          fi
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -44,8 +53,8 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=latest
-            type=sha,format=long
+            type=raw,value=${{ env.LATEST_TAG }}
+            type=sha,format=long,prefix=${{ env.TAG_PREFIX }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -68,41 +77,58 @@ jobs:
           CORS_ORIGINS: ${{ secrets.CORS_ORIGINS }}
           TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
           TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+          TUNNEL_TOKEN_PROD: ${{ secrets.TUNNEL_TOKEN }}
+          TUNNEL_TOKEN_DEV: ${{ secrets.TUNNEL_TOKEN_DEV }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
-          envs: GHCR_PAT,SECRET_KEY,CORS_ORIGINS,TURNSTILE_SITE_KEY,TURNSTILE_SECRET_KEY
+          envs: GHCR_PAT,SECRET_KEY,CORS_ORIGINS,TURNSTILE_SITE_KEY,TURNSTILE_SECRET_KEY,TUNNEL_TOKEN_PROD,TUNNEL_TOKEN_DEV
           script: |
+            # Determine target environment settings
+            if [ "${{ github.ref_name }}" = "main" ]; then
+              APP_SERVICE_NAME="school_grades_app"
+              TUNNEL_SERVICE_NAME="school_grades_tunnel"
+              CURRENT_TUNNEL_TOKEN="$TUNNEL_TOKEN_PROD"
+              IMAGE_TAG_PREFIX="sha-"
+            else
+              APP_SERVICE_NAME="app_dev"
+              TUNNEL_SERVICE_NAME="school_grades_tunnel_dev"
+              CURRENT_TUNNEL_TOKEN="$TUNNEL_TOKEN_DEV"
+              IMAGE_TAG_PREFIX="dev-sha-"
+            fi
+            
             # 登入 GHCR
             echo "$GHCR_PAT" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
             # 確保 overlay 網路存在
             docker network create -d overlay app_network || true
             
+            TARGET_IMAGE="ghcr.io/${{ github.repository }}:${IMAGE_TAG_PREFIX}${{ github.sha }}"
+            
             # 使用明確 SHA tag 更新應用程式服務 (避免 latest 不觸發更新的問題)
-            if docker service inspect school_grades_app > /dev/null 2>&1; then
+            if docker service inspect $APP_SERVICE_NAME > /dev/null 2>&1; then
               docker service update \
                 --with-registry-auth \
-                --image ghcr.io/${{ github.repository }}:sha-${{ github.sha }} \
+                --image "$TARGET_IMAGE" \
                 --env-add REDIS_URL=redis://redis:6379/0 \
                 --env-add SECRET_KEY="$SECRET_KEY" \
                 --env-add CORS_ORIGINS="$CORS_ORIGINS" \
                 --env-add TURNSTILE_SITE_KEY="$TURNSTILE_SITE_KEY" \
                 --env-add TURNSTILE_SECRET_KEY="$TURNSTILE_SECRET_KEY" \
-                school_grades_app
+                $APP_SERVICE_NAME
             else
               docker service create \
                 --with-registry-auth \
-                --name school_grades_app \
+                --name $APP_SERVICE_NAME \
                 --network app_network \
                 --env REDIS_URL=redis://redis:6379/0 \
                 --env SECRET_KEY="$SECRET_KEY" \
                 --env CORS_ORIGINS="$CORS_ORIGINS" \
                 --env TURNSTILE_SITE_KEY="$TURNSTILE_SITE_KEY" \
                 --env TURNSTILE_SECRET_KEY="$TURNSTILE_SECRET_KEY" \
-                ghcr.io/${{ github.repository }}:sha-${{ github.sha }}
+                "$TARGET_IMAGE"
             fi
               
             # 確保 Redis 服務啟動並加入網路
@@ -118,9 +144,19 @@ jobs:
             fi
             
             # 確保 Tunnel 也加入此網路 (如果您原本有啟動 tunnel)
-            if docker service inspect school_grades_tunnel > /dev/null 2>&1; then
-              docker service update --network-add app_network school_grades_tunnel > /dev/null 2>&1 || true
+            if [ -n "$CURRENT_TUNNEL_TOKEN" ]; then
+              if docker service inspect $TUNNEL_SERVICE_NAME > /dev/null 2>&1; then
+                docker service update \
+                  --env-add TUNNEL_TOKEN="$CURRENT_TUNNEL_TOKEN" \
+                  --network-add app_network $TUNNEL_SERVICE_NAME > /dev/null 2>&1 || true
+              else
+                docker service create \
+                  --name $TUNNEL_SERVICE_NAME \
+                  --network app_network \
+                  --env TUNNEL_TOKEN="$CURRENT_TUNNEL_TOKEN" \
+                  cloudflare/cloudflared:latest tunnel run
+              fi
             fi
             
             # 等待更新完成並檢查狀態
-            docker service ps school_grades_app --no-trunc --format "{{.CurrentState}}" | head -1
+            docker service ps $APP_SERVICE_NAME --no-trunc --format "{{.CurrentState}}" | head -1

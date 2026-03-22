@@ -6,7 +6,7 @@ import tempfile
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('SchoolGradesServer.HttpClient')
 
 class LoggingRetry(Retry):
     def increment(self, method=None, url=None, response=None, error=None, _pool=None, _stacktrace=None):

@@ -11,3 +11,6 @@ export const ONBOARDING_EVENTS = {
 export function emitOnboardingEvent(type, detail = {}) {
     window.dispatchEvent(new CustomEvent(type, { detail }));
 }
+
+export const ONBOARDING_COMPLETED_KEY = 'onboardingCompleted';
+export const ONBOARDING_SESSION_ENDED_EVENT = 'onboarding:session-ended';

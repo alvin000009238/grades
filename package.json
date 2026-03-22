@@ -4,10 +4,13 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build",
-        "preview": "vite preview"
+        "build": "vite build && node scripts/inject-hash.js",
+        "preview": "vite preview",
+        "test": "vitest run --environment jsdom --root ."
     },
     "devDependencies": {
-        "vite": "^6.0.0"
+        "jsdom": "29.0.1",
+        "vite": "6.0.0",
+        "vitest": "4.1.0"
     }
 }

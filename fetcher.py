@@ -2,7 +2,6 @@ import logging
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 from flask import g, has_request_context
-from app.services.http_client import get_http_session
 
 logger = logging.getLogger('SchoolGradesServer.Fetcher')
 
@@ -13,6 +12,17 @@ def _mask_user_id(user_id: str) -> str:
     if len(s) > 3:
         return s[:3] + "***"
     return "***"
+
+def _parse_year_term(year_value, default_year="114", default_term="1"):
+    try:
+        s = str(year_value)
+        if "_" in s:
+            return s.split("_", 1)
+        if len(s) >= 4:
+            return s[:-1], s[-1]
+    except Exception:
+        pass
+    return default_year, default_term
 
 def _log(level: str, user_id: str, msg: str, req_id: str = None):
     if not req_id and has_request_context() and 'request_id' in g:
@@ -36,8 +46,15 @@ class GradeFetcher:
     GRADES_PAGE = f"{BASE}/ICampus/StudentInfo/Index?page=%E6%88%90%E7%B8%BE%E6%9F%A5%E8%A9%A2"
     API_BASE = f"{BASE}/ICampus"
 
-    @staticmethod
-    def _get_hidden_token(html: str) -> str:
+    def __init__(self, session_factory=None):
+        if session_factory is None:
+            # Delay import to avoid circular dependency if any, or just use the injected one
+            from app.services.http_client import get_http_session
+            self.session_factory = get_http_session
+        else:
+            self.session_factory = session_factory
+
+    def _get_hidden_token(self, html: str) -> str:
         """Extract __RequestVerificationToken from HTML."""
         soup = BeautifulSoup(html, "html.parser")
         el = soup.select_one('input[name="__RequestVerificationToken"]')
@@ -45,17 +62,16 @@ class GradeFetcher:
             raise RuntimeError("找不到 __RequestVerificationToken hidden input")
         return el["value"]
 
-    @staticmethod
-    def login_and_get_tokens(username, password):
+    def login_and_get_tokens(self, username, password):
         """Login via requests session, return (success, message, cookies_dict, student_no, token)."""
         try:
-            _log('info', username, f"Attempting login for user: {username} (requests mode)")
-            s = get_http_session()
+            _log('info', username, "Attempting login (requests mode)")
+            s = self.session_factory()
 
             # 1) GET login page to obtain cookies + hidden token
-            r = s.get(GradeFetcher.LOGIN_PAGE)
+            r = s.get(self.LOGIN_PAGE)
             r.raise_for_status()
-            login_token = GradeFetcher._get_hidden_token(r.text)
+            login_token = self._get_hidden_token(r.text)
 
             # 2) POST login
             headers = {
@@ -78,7 +94,7 @@ class GradeFetcher:
                 "__RequestVerificationToken": login_token,
             }
 
-            resp = s.post(GradeFetcher.DO_CHECK, data=data, headers=headers)
+            resp = s.post(self.DO_CHECK, data=data, headers=headers)
             resp.raise_for_status()
 
             try:
@@ -94,9 +110,9 @@ class GradeFetcher:
             _log('info', username, "Login OK, fetching grades page for API token...")
 
             # 3) GET grades page to obtain the API-specific __RequestVerificationToken
-            r2 = s.get(GradeFetcher.GRADES_PAGE)
+            r2 = s.get(self.GRADES_PAGE)
             r2.raise_for_status()
-            api_token = GradeFetcher._get_hidden_token(r2.text)
+            api_token = self._get_hidden_token(r2.text)
 
             # 4) Extract cookies as dict (filter out malformed cookies like 'no-cache')
             cookies_dict = {}
@@ -115,8 +131,7 @@ class GradeFetcher:
             _log('error', username, f"Login Exception: {e}")
             return False, f"登入錯誤: {str(e)}", None, None, None
 
-    @staticmethod
-    def get_structure_via_api(cookies, student_no, token):
+    def get_structure_via_api(self, cookies, student_no, token, session=None):
         """Fetch structure using requests"""
         url = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/CommonData/GetGradeCanQueryYearTermListByStudentNo"
         headers = {
@@ -133,9 +148,13 @@ class GradeFetcher:
             "__RequestVerificationToken": token
         }
         
+        own_session = False
+        if session is None:
+            session = self.session_factory()
+            own_session = True
+
         try:
             _log('info', student_no, f"Requesting structure for {student_no}...")
-            session = get_http_session()
             response = session.post(url, headers=headers, data=data, cookies=cookies)
             response.raise_for_status()
             
@@ -155,10 +174,10 @@ class GradeFetcher:
             
             def _fetch_one(name_value):
                 n, v = name_value
-                exams = GradeFetcher.get_exams_via_api(cookies, student_no, token, v, req_id=current_req_id)
+                exams = self.get_exams_via_api(cookies, student_no, token, v, req_id=current_req_id, session=session)
                 return n, v, exams
             
-            with ThreadPoolExecutor(max_workers=len(items) or 1) as pool:
+            with ThreadPoolExecutor(max_workers=min(len(items) or 1, 10)) as pool:
                 for name, value, exams in pool.map(_fetch_one, items):
                     structure[name] = {
                         "year_value": value,
@@ -170,24 +189,15 @@ class GradeFetcher:
         except Exception as e:
             _log('error', student_no, f"Error fetching structure: {e}")
             return {}
+        finally:
+            if own_session:
+                session.close()
 
-    @staticmethod
-    def get_exams_via_api(cookies, student_no, token, year_value, req_id=None):
+    def get_exams_via_api(self, cookies, student_no, token, year_value, req_id=None, session=None):
         """Helper to fetch exams for a year"""
         url = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/CommonData/GetGradeCanQueryExamNoListByStudentNo"
         
-        try:
-            if "_" in str(year_value):
-                year, term = str(year_value).split("_")
-            elif len(str(year_value)) >= 4:
-                year = year_value[:-1]
-                term = year_value[-1]
-            else:
-                year = "114"
-                term = "1"
-        except Exception:
-            year = "114"
-            term = "1"
+        year, term = _parse_year_term(year_value, default_year="114", default_term="1")
 
         headers = {
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
@@ -202,8 +212,12 @@ class GradeFetcher:
             "term": term,
             "__RequestVerificationToken": token
         }
+        own_session = False
+        if session is None:
+            session = self.session_factory()
+            own_session = True
+
         try:
-            session = get_http_session()
             resp = session.post(url, headers=headers, data=data, cookies=cookies)
             if resp.status_code == 200:
                 exams = []
@@ -215,10 +229,13 @@ class GradeFetcher:
                 return exams
         except Exception as e:
             _log('error', student_no, f"Error fetching exams via API: {e}", req_id=req_id)
+        finally:
+            if own_session:
+                session.close()
+                
         return []
 
-    @staticmethod
-    def fetch_grades_via_api(cookies, student_no, token, year_value, exam_value):
+    def fetch_grades_via_api(self, cookies, student_no, token, year_value, exam_value, session=None):
         """Fetch grades using requests"""
         url = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/TutorShGrade/GetScoreForStudentExamContent"
         headers = {
@@ -229,18 +246,7 @@ class GradeFetcher:
             "Referer": "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/StudentInfo/Index?page=%E6%88%90%E7%B8%BE%E6%9F%A5%E8%A9%A2"
         }
         
-        try:
-            if "_" in str(year_value):
-                year, term = str(year_value).split("_")
-            elif len(str(year_value)) >= 4:
-                year = year_value[:-1]
-                term = year_value[-1]
-            else:
-                 year = "114"
-                 term = "2"
-        except Exception:
-            year = "114"
-            term = "2"
+        year, term = _parse_year_term(year_value, default_year="114", default_term="2")
 
         data = {
             "StudentNo": student_no,
@@ -253,11 +259,18 @@ class GradeFetcher:
         
         _log('info', student_no, f"API Fetching grades: Year={year}, Term={term}, Exam={exam_value}")
         
+        own_session = False
+        if session is None:
+            session = self.session_factory()
+            own_session = True
+
         try:
-            session = get_http_session()
             response = session.post(url, headers=headers, data=data, cookies=cookies)
             response.raise_for_status()
             return response.json()
         except Exception as e:
             _log('error', student_no, f"API Fetch Error: {e}")
             raise e
+        finally:
+            if own_session:
+                session.close()

@@ -1,6 +1,9 @@
 from flask import Blueprint, current_app, jsonify, request, session
 
 from app.services.grades_service import fetch_grades, get_structure
+import logging
+
+logger = logging.getLogger('SchoolGradesServer.Grades')
 
 bp = Blueprint('grades', __name__)
 
@@ -29,7 +32,7 @@ def fetch_grades_route():
         )
         return jsonify({'success': True, 'message': '成績已更新', 'data': data})
     except Exception as exc:
-        current_app.config['LOGGER'].error(f'Error fetching grades (API): {exc}', exc_info=True)
+        logger.error(f'Error fetching grades (API): {exc}', exc_info=True)
         return jsonify({'success': False, 'error': str(exc)}), 500
 
 
@@ -57,7 +60,7 @@ def get_structure_route():
         session['structure'] = structure
         return jsonify({'structure': structure})
     except Exception as exc:
-        current_app.config['LOGGER'].error(f'Error getting structure (API): {exc}', exc_info=True)
+        logger.error(f'Error getting structure (API): {exc}', exc_info=True)
         return jsonify({'error': str(exc)}), 500
 
 

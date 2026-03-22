@@ -1,6 +1,9 @@
 import os
 
 from flask import Blueprint, current_app, jsonify, send_from_directory
+import logging
+
+logger = logging.getLogger('SchoolGradesServer.System')
 
 bp = Blueprint('system', __name__)
 
@@ -12,8 +15,12 @@ ALLOWED_STATIC_EXT = {
 
 @bp.route('/')
 def index():
-    current_app.config['LOGGER'].info('Accessing index page')
-    return send_from_directory('public', 'index.html')
+    logger.debug('Accessing index page')
+    response = send_from_directory('public', 'index.html')
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 
 @bp.route('/<path:filename>')
@@ -25,7 +32,10 @@ def static_files(filename):
     if any(part.startswith('.') for part in filename.split('/')):
         return jsonify({'error': 'Forbidden'}), 403
 
-    return send_from_directory('public', filename)
+    response = send_from_directory('public', filename)
+    if ext in ('.js', '.css', '.woff', '.woff2', '.ttf', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico'):
+        response.cache_control.max_age = 86400
+    return response
 
 
 @bp.route('/health')

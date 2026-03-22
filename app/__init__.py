@@ -1,6 +1,9 @@
 import os
 import redis
 import uuid
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from flask import Flask, g, request
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -26,6 +29,7 @@ def create_app():
         app_env = os.environ.get('APP_ENV', '').lower()
         if flask_env in ('development', 'testing') or app_env in ('development', 'testing'):
             secret_key = os.urandom(24).hex()
+            print("WARNING: SECRET_KEY not set – using random key. All sessions will be lost on restart.")
         else:
             raise RuntimeError("SECRET_KEY environment variable must be set in production.")
     app.secret_key = secret_key
@@ -36,16 +40,13 @@ def create_app():
 
     redis_url = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/0')
     redis_client = redis.from_url(redis_url)
-    
-    flask_env = os.environ.get('FLASK_ENV', '').lower()
-    app_env = os.environ.get('APP_ENV', '').lower()
 
     try:
         redis_client.ping()
         app.config['REDIS_CLIENT'] = redis_client
         app.config['SESSION_TYPE'] = 'redis'
         app.config['SESSION_REDIS'] = redis_client
-        app.config['SESSION_USE_SIGNER'] = True
+        app.config['SESSION_USE_SIGNER'] = False
         app.config['SESSION_KEY_PREFIX'] = 'session:'
         app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # 1 day
         Session(app)
@@ -61,7 +62,7 @@ def create_app():
 
     app.config['SHARE_TTL'] = int(os.environ.get('SHARE_TTL', 7200))
 
-    app.config['GRADE_FETCHER'] = GradeFetcher
+    app.config['GRADE_FETCHER'] = GradeFetcher()
 
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 

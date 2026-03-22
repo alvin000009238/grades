@@ -9,14 +9,7 @@ import { generateCharts } from './charts.js';
 const SUBJECT_WEIGHTS = {
     '國語文': 4,
     '英語文': 4,
-    '數學A': 4,
-    '歷史': 2,
-    '地理': 2,
-    '公民與社會': 2,
-    '選修化學': 2,
-    '選修化學-物質與能量': 2,
-    '選修物理': 2,
-    '選修物理-力學一': 2
+    '數學': 4,
 };
 
 // 取得科目權重
@@ -38,30 +31,33 @@ function getSubjectWeight(subjectName) {
 export function initDashboard(gradesData) {
     const result = gradesData.Result;
     const standards = Array.isArray(result["成績五標List"]) ? result["成績五標List"] : [];
+    const subjects = result.SubjectExamInfoList || [];
+    const preparedSubjects = prepareSubjects(subjects);
+    const standardsLookup = createStandardsLookup(standards);
 
-    // 更新學生資訊
-    updateStudentInfo(result);
+    // Phase 1: 優先渲染基本文字資訊與統計，即時反饋給使用者
+    requestAnimationFrame(() => {
+        updateStudentInfo(result);
+        updateExamInfo(result);
+        updateRankInfo(result);
+        updateStatistics(preparedSubjects);
 
-    // 更新考試資訊
-    updateExamInfo(result);
+        // Phase 2: 處理成績卡片的 DOM 生成
+        requestAnimationFrame(() => {
+            generateScoreCards(preparedSubjects);
 
-    // 更新排名資訊
-    updateRankInfo(result);
+            // Phase 3: 處理五標表格與圖表加載 (可能涉及較多運算與外部腳本)
+            requestAnimationFrame(() => {
+                generateStandardsTable(preparedSubjects, standards, standardsLookup);
+                generateCharts(preparedSubjects);
 
-    // 計算統計資料
-    updateStatistics(result.SubjectExamInfoList);
-
-    // 生成成績卡片
-    generateScoreCards(result.SubjectExamInfoList);
-
-    // 生成圖表
-    generateCharts(result.SubjectExamInfoList);
-
-    // 生成五標表格
-    generateStandardsTable(result.SubjectExamInfoList, standards);
-
-    // 生成分佈圖
-    generateDistributionCards(result.SubjectExamInfoList, standards);
+                // Phase 4: 最後生成可能在畫面最下方的分佈圖，改在閒置時間執行避免阻塞首屏
+                scheduleLowPriorityRender(() => {
+                    generateDistributionCards(preparedSubjects, standards, standardsLookup);
+                });
+            });
+        });
+    });
 }
 
 // 更新排名資訊
@@ -131,7 +127,7 @@ function updateStatistics(subjects) {
         return;
     }
 
-    const scores = subjects.map(subject => getNumericScore(subject.ScoreDisplay, subject.Score));
+    const scores = subjects.map(subject => subject.scoreValue);
     const highest = Math.max(...scores);
 
     // 計算加權平均
@@ -139,7 +135,7 @@ function updateStatistics(subjects) {
     let totalWeight = 0;
 
     subjects.forEach(subject => {
-        const score = getNumericScore(subject.ScoreDisplay, subject.Score);
+        const score = subject.scoreValue;
         const weight = getSubjectWeight(subject.SubjectName);
         totalWeightedScore += score * weight;
         totalWeight += weight;
@@ -161,9 +157,9 @@ function generateScoreCards(subjects) {
     const fragment = document.createDocumentFragment();
 
     subjects.forEach(subject => {
-        const scoreValue = getNumericScore(subject.ScoreDisplay, subject.Score);
-        const classAvgValue = getNumericScore(subject.ClassAVGScoreDisplay, subject.ClassAVGScore);
-        const diff = scoreValue - classAvgValue;
+        const scoreValue = subject.scoreValue;
+        const classAvgValue = subject.classAvgValue;
+        const diff = subject.diffValue;
         const scoreClass = getScoreClass(scoreValue);
         const diffClass = diff >= 0 ? 'positive' : 'negative';
         const diffIcon = diff >= 0 ? '↑' : '↓';
@@ -196,7 +192,7 @@ function generateScoreCards(subjects) {
                 <div class="score-row">
                     <span class="score-label">與班平均差距</span>
                     <span class="diff-indicator ${diffClass}">
-                        ${diffIcon} ${Math.abs(diff).toFixed(2)}
+                        ${diffIcon} ${escapeHTML(Math.abs(diff).toFixed(2))}
                     </span>
                 </div>
                 ${hasClassRank || hasYearRank ? `
@@ -213,9 +209,9 @@ function generateScoreCards(subjects) {
                         </div>
                         <span class="rank-label">班排</span>
                         <span class="rank-value">
-                            <span class="rank-number">${classRank}</span>${classRankCount > 0 ? `<span class="rank-total">/${classRankCount}</span>` : ''}
+                            <span class="rank-number">${escapeHTML(classRank)}</span>${classRankCount > 0 ? `<span class="rank-total">/${escapeHTML(classRankCount)}</span>` : ''}
                         </span>
-                        ${classRankCount > 0 ? `<span class="rank-percentile ${getRankPercentileClass(classRankPercentile)}">PR${classRankPercentile}</span>` : ''}
+                        ${classRankCount > 0 ? `<span class="rank-percentile ${getRankPercentileClass(classRankPercentile)}">PR${escapeHTML(classRankPercentile)}</span>` : ''}
                     </div>
                     ` : ''}
                     ${hasYearRank ? `
@@ -229,14 +225,14 @@ function generateScoreCards(subjects) {
                         </div>
                         <span class="rank-label">校排</span>
                         <span class="rank-value">
-                            <span class="rank-number">${yearRank}</span>${yearRankCount > 0 ? `<span class="rank-total">/${yearRankCount}</span>` : ''}
+                            <span class="rank-number">${escapeHTML(yearRank)}</span>${yearRankCount > 0 ? `<span class="rank-total">/${escapeHTML(yearRankCount)}</span>` : ''}
                         </span>
                     </div>
                     ` : ''}
                 </div>
                 ` : ''}
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${scoreValue}%"></div>
+                    <div class="progress-fill" data-width="${scoreValue}"></div>
                 </div>
             </div>
         `;
@@ -245,6 +241,12 @@ function generateScoreCards(subjects) {
 
     // Append all cards at once
     grid.appendChild(fragment);
+
+    // 配合 CSP: 'unsafe-inline' 去除後無法使用 style="..." 的問題
+    grid.querySelectorAll('.progress-fill').forEach(el => {
+        const w = el.getAttribute('data-width');
+        if (w !== null) el.style.width = w + '%';
+    });
 }
 
 // 取得排名百分位 CSS class
@@ -276,7 +278,7 @@ export function shortenName(name) {
 }
 
 // 生成五標表格
-function generateStandardsTable(subjects, standards) {
+function generateStandardsTable(subjects, standards, standardsLookup) {
     const tbody = document.getElementById('standardsBody');
     tbody.innerHTML = '';
 
@@ -284,23 +286,23 @@ function generateStandardsTable(subjects, standards) {
     const fragment = document.createDocumentFragment();
 
     subjects.forEach((subject, index) => {
-        const std = standards.find(s => cleanSubjectName(s.SubjectName) === subject.SubjectName) || standards[index];
+        const std = standardsLookup.get(subject.SubjectName) || standards[index];
         if (!std) return;
 
-        const score = getNumericScore(subject.ScoreDisplay, subject.Score);
+        const score = subject.scoreValue;
         const level = getScoreLevel(score, std);
 
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${escapeHTML(shortenName(subject.SubjectName))}</td>
-            <td class="top-mark">${std["頂標"].toFixed(2)}</td>
-            <td class="front-mark">${std["前標"].toFixed(2)}</td>
-            <td class="avg-mark">${std["均標"].toFixed(2)}</td>
-            <td class="back-mark">${std["後標"].toFixed(2)}</td>
-            <td class="bottom-mark">${std["底標"].toFixed(2)}</td>
-            <td>${std["標準差"].toFixed(2)}</td>
-            <td><span class="my-score ${level.class}">${score}</span></td>
-            <td><span class="level-badge ${level.class}">${level.text}</span></td>
+            <td class="top-mark">${escapeHTML(std["頂標"].toFixed(2))}</td>
+            <td class="front-mark">${escapeHTML(std["前標"].toFixed(2))}</td>
+            <td class="avg-mark">${escapeHTML(std["均標"].toFixed(2))}</td>
+            <td class="back-mark">${escapeHTML(std["後標"].toFixed(2))}</td>
+            <td class="bottom-mark">${escapeHTML(std["底標"].toFixed(2))}</td>
+            <td>${escapeHTML(std["標準差"].toFixed(2))}</td>
+            <td><span class="my-score ${level.class}">${escapeHTML(score)}</span></td>
+            <td><span class="level-badge ${level.class}">${escapeHTML(level.text)}</span></td>
         `;
         fragment.appendChild(row);
     });
@@ -324,7 +326,7 @@ function getScoreLevel(score, std) {
 }
 
 // 生成分佈圖
-function generateDistributionCards(subjects, standards) {
+function generateDistributionCards(subjects, standards, standardsLookup) {
     const grid = document.getElementById('distributionGrid');
     grid.innerHTML = '';
 
@@ -332,7 +334,7 @@ function generateDistributionCards(subjects, standards) {
     const fragment = document.createDocumentFragment();
 
     subjects.forEach((subject, index) => {
-        const std = standards.find(s => cleanSubjectName(s.SubjectName) === subject.SubjectName) || standards[index];
+        const std = standardsLookup.get(subject.SubjectName) || standards[index];
         if (!std) return;
 
         const total = std["大於90Count"] + std["大於80Count"] + std["大於70Count"] +
@@ -349,7 +351,7 @@ function generateDistributionCards(subjects, standards) {
         ];
 
         // 找出我的成績在哪個區間
-        const myRange = getMyScoreRange(getNumericScore(subject.ScoreDisplay, subject.Score));
+        const myRange = getMyScoreRange(subject.scoreValue);
 
         const card = document.createElement('div');
         card.className = 'distribution-card';
@@ -362,10 +364,10 @@ function generateDistributionCards(subjects, standards) {
             const barClass = r.count === 0 ? '' : r.class;
             return `
                         <div class="dist-row">
-                            <span class="dist-label">${r.label}</span>
+                            <span class="dist-label">${escapeHTML(r.label)}</span>
                             <div class="dist-bar-container">
-                                <div class="dist-bar ${barClass}" style="width: ${percentage === 0 ? 0 : Math.max(percentage, 5)}%"></div>
-                                <span class="dist-count">${r.count}人</span>
+                                <div class="dist-bar ${barClass}" data-width="${percentage === 0 ? 0 : Math.max(percentage, 5)}"></div>
+                                <span class="dist-count">${escapeHTML(r.count)}人</span>
                                 ${isMine ? '<span class="my-score-marker">我</span>' : ''}
                             </div>
                         </div>
@@ -378,6 +380,12 @@ function generateDistributionCards(subjects, standards) {
 
     // Append all distribution cards at once
     grid.appendChild(fragment);
+
+    // 配合 CSP: 'unsafe-inline' 去除後無法使用 style="..." 的問題
+    grid.querySelectorAll('.dist-bar').forEach(el => {
+        const w = el.getAttribute('data-width');
+        if (w !== null) el.style.width = w + '%';
+    });
 }
 
 function getMyScoreRange(score) {
@@ -387,6 +395,35 @@ function getMyScoreRange(score) {
     if (score >= 60) return '60-69';
     if (score >= 50) return '50-59';
     return '0-49';
+}
+
+function prepareSubjects(subjects) {
+    return subjects.map(subject => {
+        const scoreValue = getNumericScore(subject.ScoreDisplay, subject.Score);
+        const classAvgValue = getNumericScore(subject.ClassAVGScoreDisplay, subject.ClassAVGScore);
+        return {
+            ...subject,
+            scoreValue,
+            classAvgValue,
+            diffValue: scoreValue - classAvgValue
+        };
+    });
+}
+
+function createStandardsLookup(standards) {
+    const lookup = new Map();
+    standards.forEach(std => {
+        lookup.set(cleanSubjectName(std.SubjectName), std);
+    });
+    return lookup;
+}
+
+function scheduleLowPriorityRender(renderFn) {
+    if (typeof window.requestIdleCallback === 'function') {
+        window.requestIdleCallback(renderFn, { timeout: 1000 });
+        return;
+    }
+    setTimeout(renderFn, 0);
 }
 
 export function getNumericScore(displayValue, fallbackValue) {

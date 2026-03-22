@@ -2,6 +2,7 @@
 // 應用程式入口
 // ========================================
 
+import './style.css';
 import { loadTurnstileConfig } from './turnstile.js';
 import { checkDisclaimer, loadGradesData } from './storage.js';
 import { setupSyncFeature } from './sync.js';
@@ -23,9 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('commit-badge-container');
         if (container) {
             container.innerHTML = `
-                <span style="color: var(--color-border-subtle); margin: 0 10px;">|</span>
+                <span class="footer-divider">|</span>
                 <a href="https://github.com/alvin000009238/grades/commit/${commitHash}" target="_blank" rel="noopener noreferrer"
-                    style="color: var(--color-text-dim); text-decoration: none; transition: color 0.2s ease; font-family: monospace;">
+                    class="footer-link mono">
                     ${shortHash}
                 </a>
             `;
