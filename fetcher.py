@@ -116,7 +116,7 @@ class GradeFetcher:
             return False, f"登入錯誤: {str(e)}", None, None, None
 
     @staticmethod
-    def get_structure_via_api(cookies, student_no, token):
+    def get_structure_via_api(cookies, student_no, token, session=None):
         """Fetch structure using requests"""
         url = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/CommonData/GetGradeCanQueryYearTermListByStudentNo"
         headers = {
@@ -133,9 +133,13 @@ class GradeFetcher:
             "__RequestVerificationToken": token
         }
         
+        own_session = False
+        if session is None:
+            session = get_http_session()
+            own_session = True
+
         try:
             _log('info', student_no, f"Requesting structure for {student_no}...")
-            session = get_http_session()
             response = session.post(url, headers=headers, data=data, cookies=cookies)
             response.raise_for_status()
             
@@ -155,7 +159,7 @@ class GradeFetcher:
             
             def _fetch_one(name_value):
                 n, v = name_value
-                exams = GradeFetcher.get_exams_via_api(cookies, student_no, token, v, req_id=current_req_id)
+                exams = GradeFetcher.get_exams_via_api(cookies, student_no, token, v, req_id=current_req_id, session=session)
                 return n, v, exams
             
             with ThreadPoolExecutor(max_workers=len(items) or 1) as pool:
@@ -170,9 +174,12 @@ class GradeFetcher:
         except Exception as e:
             _log('error', student_no, f"Error fetching structure: {e}")
             return {}
+        finally:
+            if own_session:
+                session.close()
 
     @staticmethod
-    def get_exams_via_api(cookies, student_no, token, year_value, req_id=None):
+    def get_exams_via_api(cookies, student_no, token, year_value, req_id=None, session=None):
         """Helper to fetch exams for a year"""
         url = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/CommonData/GetGradeCanQueryExamNoListByStudentNo"
         
@@ -202,8 +209,12 @@ class GradeFetcher:
             "term": term,
             "__RequestVerificationToken": token
         }
-        try:
+        own_session = False
+        if session is None:
             session = get_http_session()
+            own_session = True
+
+        try:
             resp = session.post(url, headers=headers, data=data, cookies=cookies)
             if resp.status_code == 200:
                 exams = []
@@ -215,10 +226,14 @@ class GradeFetcher:
                 return exams
         except Exception as e:
             _log('error', student_no, f"Error fetching exams via API: {e}", req_id=req_id)
+        finally:
+            if own_session:
+                session.close()
+                
         return []
 
     @staticmethod
-    def fetch_grades_via_api(cookies, student_no, token, year_value, exam_value):
+    def fetch_grades_via_api(cookies, student_no, token, year_value, exam_value, session=None):
         """Fetch grades using requests"""
         url = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/TutorShGrade/GetScoreForStudentExamContent"
         headers = {
@@ -253,11 +268,18 @@ class GradeFetcher:
         
         _log('info', student_no, f"API Fetching grades: Year={year}, Term={term}, Exam={exam_value}")
         
-        try:
+        own_session = False
+        if session is None:
             session = get_http_session()
+            own_session = True
+
+        try:
             response = session.post(url, headers=headers, data=data, cookies=cookies)
             response.raise_for_status()
             return response.json()
         except Exception as e:
             _log('error', student_no, f"API Fetch Error: {e}")
             raise e
+        finally:
+            if own_session:
+                session.close()
