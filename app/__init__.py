@@ -1,6 +1,9 @@
 import os
 import redis
 import uuid
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from flask import Flask, g, request
 from werkzeug.middleware.proxy_fix import ProxyFix

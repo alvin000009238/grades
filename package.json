@@ -9,8 +9,8 @@
         "test": "vitest run --environment jsdom --root ."
     },
     "devDependencies": {
-        "jsdom": "^29.0.1",
-        "vite": "^6.0.0",
-        "vitest": "^4.1.0"
+        "jsdom": "29.0.1",
+        "vite": "6.0.0",
+        "vitest": "4.1.0"
     }
 }
