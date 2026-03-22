@@ -1,6 +1,6 @@
 # 專案架構文件
 
-最後更新時間：2026-03-12  
+最後更新時間：2026-03-22  
 
 ## 1. 專案定位與系統邊界
 
@@ -67,20 +67,36 @@ flowchart LR
 │       └── http_client.py         # timeout/retry/cert 管理
 ├── frontend/                      # 前端原始碼（ES Modules）
 │   ├── main.js
+│   ├── style.css                  # 全域樣式（由 Vite 打包）
 │   ├── storage.js
 │   ├── sync.js
 │   ├── share.js
 │   ├── dashboard.js
 │   ├── charts.js
-│   └── turnstile.js
+│   ├── turnstile.js
+│   ├── dialog.js                  # Modal 對話框元件
+│   ├── onboarding.js              # 新手導覽主邏輯
+│   ├── onboarding-bootstrap.js    # 新手導覽啟動器
+│   ├── onboarding-events.js       # 新手導覽事件常數
+│   ├── demo-data.js               # 示範資料
+│   └── demo-mode.js               # 示範模式
 ├── public/                        # 靜態資源與 Vite build 輸出
 │   ├── index.html
-│   ├── style.css
 │   ├── privacy.html
-│   └── dist/main.js
+│   ├── favicon.ico
+│   ├── robots.txt
+│   ├── sitemap.xml
+│   └── dist/                      # Vite 產出（帶 hash 檔名）
+├── scripts/                       # 建置輔助腳本
+│   ├── inject-hash.js             # 注入 commit hash
+│   └── inline_icons.py            # 內嵌 SVG 圖示
+├── tests/                         # 自動化測試
 ├── Dockerfile
 ├── docker-compose.yml
-└── .github/workflows/deploy.yml
+└── .github/workflows/
+    ├── deploy.yml                 # 正式環境部署
+    ├── pr-ci.yml                  # PR 自動檢查
+    └── debug_logs.yml             # 除錯日誌
 ```
 
 ---
@@ -126,6 +142,7 @@ flowchart LR
 | `share_service.py` | 產生 share id、Redis 寫入與讀取 |
 | `turnstile_service.py` | 呼叫 Cloudflare siteverify 驗證 token |
 | `http_client.py` | 建立統一 requests session（timeout/retry/cert） |
+| `rate_limiter.py` | API 請求頻率限制 |
 
 ### 4.4 外部系統整合（`fetcher.py`）
 
@@ -156,6 +173,7 @@ flowchart LR
   - `loadGradesData()`
   - `setupSyncFeature()`
   - `setupShareFeature()`
+  - `setupOnboardingBootstrap()`
 
 ### 5.2 前端模組責任
 
@@ -167,11 +185,18 @@ flowchart LR
 | `dashboard.js` | DOM 渲染（個資、統計、卡片、標準表、分佈） |
 | `charts.js` | Chart.js 雷達圖與長條圖 |
 | `turnstile.js` | site key 載入與 Turnstile widget 互動 |
+| `dialog.js` | 統一 Modal 對話框（取代 alert/confirm） |
+| `onboarding.js` | 新手導覽步驟與互動邏輯 |
+| `onboarding-bootstrap.js` | 新手導覽啟動與狀態管理 |
+| `onboarding-events.js` | 導覽事件常數定義 |
+| `demo-data.js` | 示範用成績資料 |
+| `demo-mode.js` | 示範模式切換 |
 
 ### 5.3 前端狀態儲存
 
 - `localStorage.hasSeenDisclaimer`：免責聲明已讀狀態
 - `localStorage.gradesData`：最近一次成績 JSON（前端渲染來源）
+- `localStorage.hasSeenOnboarding`：新手導覽已讀狀態
 
 ---
 
@@ -243,8 +268,8 @@ sequenceDiagram
 ### 7.1 前端建置
 
 - `vite.config.js`：`root=frontend`，entry `frontend/main.js`
-- build 輸出：`public/dist/main.js`
-- `public/index.html` 直接載入 `/dist/main.js`
+- build 輸出：`public/dist/`（帶 hash 檔名，如 `main-DMfxMjXw.js`）
+- `public/index.html` 直接載入 `/dist/main-[hash].js`
 
 ### 7.2 Docker（多階段）
 
@@ -261,12 +286,9 @@ sequenceDiagram
 
 ### 7.4 CI/CD
 
-`.github/workflows/deploy.yml`：
-
-1. push `main` 觸發
-2. 基本 `py_compile` 檢查
-3. Build + Push image 到 GHCR
-4. SSH 到 VPS，更新 Docker Swarm service（`school_grades_app` + `redis`）
+- `.github/workflows/deploy.yml`：push `main` 觸發，`py_compile` 檢查、Build + Push image 到 GHCR、SSH 到 VPS 更新 Docker Swarm service
+- `.github/workflows/pr-ci.yml`：PR 觸發，執行語法檢查與測試
+- `.github/workflows/debug_logs.yml`：除錯用日誌收集
 
 
 
