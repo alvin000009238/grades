@@ -24,11 +24,11 @@ export function setupShareFeature() {
                     連結將於 <strong class="text-warning">2 小時後</strong> 自動失效。
                 </p>
                 <div id="linkContainer" class="share-link-container hidden">
-                    <div class="form-group" class="mb-12">
+                    <div class="form-group mb-12">
                         <input type="text" id="shareLinkInput" readonly
                             class="share-input-readonly">
                     </div>
-                    <button id="copyLinkBtn" class="import-dropdown-btn" class="w-full-center">
+                    <button id="copyLinkBtn" class="import-dropdown-btn w-full-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                             stroke-linejoin="round">
@@ -38,7 +38,7 @@ export function setupShareFeature() {
                         複製連結
                     </button>
                 </div>
-                <button id="createLinkBtn" data-tour="create-share-link" class="import-dropdown-btn" class="w-full-center">
+                <button id="createLinkBtn" data-tour="create-share-link" class="import-dropdown-btn w-full-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
@@ -47,7 +47,7 @@ export function setupShareFeature() {
                     </svg>
                     建立分享連結
                 </button>
-                <div id="shareStatus" class="status-msg" class="mt-12"></div>
+                <div id="shareStatus" class="status-msg mt-12"></div>
             </div>
         `;
 
