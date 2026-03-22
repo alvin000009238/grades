@@ -1,6 +1,6 @@
-import requests as http_requests
-
 from flask import current_app
+
+from app.services.http_client import get_http_session
 
 VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
 
@@ -23,10 +23,10 @@ def verify_turnstile_token(token):
         return False, '缺少人機驗證 token'
 
     try:
-        resp = http_requests.post(
+        session = get_http_session()
+        resp = session.post(
             VERIFY_URL,
             data={'secret': secret_key, 'response': token},
-            timeout=10,
         )
         result = resp.json()
 
