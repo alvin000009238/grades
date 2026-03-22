@@ -14,6 +14,17 @@ def _mask_user_id(user_id: str) -> str:
         return s[:3] + "***"
     return "***"
 
+def _parse_year_term(year_value, default_year="114", default_term="1"):
+    try:
+        s = str(year_value)
+        if "_" in s:
+            return s.split("_", 1)
+        if len(s) >= 4:
+            return s[:-1], s[-1]
+    except Exception:
+        pass
+    return default_year, default_term
+
 def _log(level: str, user_id: str, msg: str, req_id: str = None):
     if not req_id and has_request_context() and 'request_id' in g:
         req_id = g.request_id
@@ -183,18 +194,7 @@ class GradeFetcher:
         """Helper to fetch exams for a year"""
         url = "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/CommonData/GetGradeCanQueryExamNoListByStudentNo"
         
-        try:
-            if "_" in str(year_value):
-                year, term = str(year_value).split("_")
-            elif len(str(year_value)) >= 4:
-                year = year_value[:-1]
-                term = year_value[-1]
-            else:
-                year = "114"
-                term = "1"
-        except Exception:
-            year = "114"
-            term = "1"
+        year, term = _parse_year_term(year_value, default_year="114", default_term="1")
 
         headers = {
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
@@ -244,18 +244,7 @@ class GradeFetcher:
             "Referer": "https://shcloud2.k12ea.gov.tw/CLHSTYC/ICampus/StudentInfo/Index?page=%E6%88%90%E7%B8%BE%E6%9F%A5%E8%A9%A2"
         }
         
-        try:
-            if "_" in str(year_value):
-                year, term = str(year_value).split("_")
-            elif len(str(year_value)) >= 4:
-                year = year_value[:-1]
-                term = year_value[-1]
-            else:
-                 year = "114"
-                 term = "2"
-        except Exception:
-            year = "114"
-            term = "2"
+        year, term = _parse_year_term(year_value, default_year="114", default_term="2")
 
         data = {
             "StudentNo": student_no,
