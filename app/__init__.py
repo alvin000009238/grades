@@ -26,6 +26,7 @@ def create_app():
         app_env = os.environ.get('APP_ENV', '').lower()
         if flask_env in ('development', 'testing') or app_env in ('development', 'testing'):
             secret_key = os.urandom(24).hex()
+            print("WARNING: SECRET_KEY not set – using random key. All sessions will be lost on restart.")
         else:
             raise RuntimeError("SECRET_KEY environment variable must be set in production.")
     app.secret_key = secret_key
@@ -36,9 +37,6 @@ def create_app():
 
     redis_url = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/0')
     redis_client = redis.from_url(redis_url)
-    
-    flask_env = os.environ.get('FLASK_ENV', '').lower()
-    app_env = os.environ.get('APP_ENV', '').lower()
 
     try:
         redis_client.ping()
