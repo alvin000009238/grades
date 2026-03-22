@@ -13,7 +13,11 @@ ALLOWED_STATIC_EXT = {
 @bp.route('/')
 def index():
     current_app.config['LOGGER'].debug('Accessing index page')
-    return send_from_directory('public', 'index.html')
+    response = send_from_directory('public', 'index.html')
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 
 @bp.route('/<path:filename>')

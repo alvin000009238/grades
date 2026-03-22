@@ -55,4 +55,8 @@ def get_shared_grades(share_id):
 
 @bp.route('/share/<share_id>')
 def view_shared_page(share_id):
-    return send_from_directory('public', 'index.html')
+    response = send_from_directory('public', 'index.html')
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
