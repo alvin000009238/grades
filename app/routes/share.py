@@ -8,6 +8,9 @@ from app.services.share_service import (
     write_shared_data,
 )
 from app.services.turnstile_service import verify_turnstile_token
+import logging
+
+logger = logging.getLogger('SchoolGradesServer.Share')
 
 bp = Blueprint('share', __name__)
 
@@ -33,7 +36,7 @@ def create_share_link():
         write_shared_data(current_app.config['REDIS_CLIENT'], share_id, cleaned, current_app.config['SHARE_TTL'])
         return jsonify({'success': True, 'id': share_id})
     except Exception as exc:
-        current_app.config['LOGGER'].error(f'Error creating share: {exc}', exc_info = True)
+        logger.error(f'Error creating share: {exc}', exc_info = True)
         return jsonify({'error': str(exc)}), 500
 
 
@@ -49,7 +52,7 @@ def get_shared_grades(share_id):
 
         return jsonify({'success': True, 'data': data})
     except Exception as exc:
-        current_app.config['LOGGER'].error(f'Error reading share: {exc}', exc_info = True)
+        logger.error(f'Error reading share: {exc}', exc_info = True)
         return jsonify({'error': str(exc)}), 500
 
 

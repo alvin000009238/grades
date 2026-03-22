@@ -4,6 +4,9 @@ from app.services.auth_service import is_logged_in, login_and_build_session_payl
 from app.services.grades_service import get_structure
 from app.services.rate_limiter import is_rate_limited
 from app.services.turnstile_service import verify_turnstile_token
+import logging
+
+logger = logging.getLogger('SchoolGradesServer.Auth')
 
 LOGIN_RATE_LIMIT_MAX = 5       # 每視窗最大嘗試次數
 LOGIN_RATE_LIMIT_WINDOW = 60   # 視窗長度（秒）
@@ -23,9 +26,9 @@ def login():
     data = request.json or {}
     username = data.get('username')
     password = data.get('password')
-    logger = current_app.config['LOGGER']
 
-    logger.info(f'Login attempt for user: {username}')
+    masked_username = (username[:3] + "***") if username and len(username) > 3 else "***"
+    logger.info(f'Login attempt for user: {masked_username}')
 
     # 速率限制檢查（在 Turnstile 之前）
     redis_client = current_app.config.get('REDIS_CLIENT')
@@ -61,7 +64,7 @@ def login():
         return jsonify({'success': False, 'message': message}), 401
 
     session.update(payload)
-    logger.info(f'Login successful for user: {username}')
+    logger.info('Login successful')
 
     try:
         logger.info('Fetching structure via API...')

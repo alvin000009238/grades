@@ -65,7 +65,7 @@ class GradeFetcher:
     def login_and_get_tokens(self, username, password):
         """Login via requests session, return (success, message, cookies_dict, student_no, token)."""
         try:
-            _log('info', username, f"Attempting login for user: {username} (requests mode)")
+            _log('info', username, "Attempting login (requests mode)")
             s = self.session_factory()
 
             # 1) GET login page to obtain cookies + hidden token

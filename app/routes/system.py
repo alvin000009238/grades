@@ -1,6 +1,9 @@
 import os
 
 from flask import Blueprint, current_app, jsonify, send_from_directory
+import logging
+
+logger = logging.getLogger('SchoolGradesServer.System')
 
 bp = Blueprint('system', __name__)
 
@@ -12,7 +15,7 @@ ALLOWED_STATIC_EXT = {
 
 @bp.route('/')
 def index():
-    current_app.config['LOGGER'].debug('Accessing index page')
+    logger.debug('Accessing index page')
     response = send_from_directory('public', 'index.html')
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Pragma'] = 'no-cache'
