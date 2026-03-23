@@ -4213,3 +4213,12 @@ body.read-only-mode .header {
 .mono { font-family: monospace; }
 
 .share-btn-style:hover { background: var(--color-surface); color: var(--color-text-main); border: 1px solid var(--color-border); }
+
+/* Disabled states for UX feedback */
+.modal-btn:disabled,
+.import-dropdown-btn:disabled,
+.form-group select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
