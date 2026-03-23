@@ -1,6 +1,8 @@
 import os
 import redis
+import tempfile
 import uuid
+from cachelib.file import FileSystemCache
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -52,10 +54,13 @@ def create_app():
         Session(app)
     except redis.exceptions.ConnectionError:
         app.config['REDIS_CLIENT'] = None
-        # 退回不使用 Redis session
-        app.config['SESSION_TYPE'] = 'null'
+        # 退回到 cachelib 檔案型 session，避免 Flask-Session 因無效的 SESSION_TYPE 直接拋錯
+        app.config['SESSION_TYPE'] = 'cachelib'
+        app.config['SESSION_CACHELIB'] = FileSystemCache(
+            cache_dir=os.path.join(tempfile.gettempdir(), 'grades-flask-session')
+        )
         Session(app)
-        print("WARNING: Redis not available. Using default cookie session for development.")
+        print("WARNING: Redis not available. Using filesystem session fallback for development.")
 
     app.config['TURNSTILE_SITE_KEY'] = os.environ.get('TURNSTILE_SITE_KEY', '')
     app.config['TURNSTILE_SECRET_KEY'] = os.environ.get('TURNSTILE_SECRET_KEY', '')
