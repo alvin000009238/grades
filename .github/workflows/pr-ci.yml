@@ -17,21 +17,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: npm
+          cache: pnpm
           cache-dependency-path: package.json
 
       - name: Install frontend dependencies
-        run: npm install
+        run: pnpm install
 
       - name: Run Frontend Tests
-        run: npm run test
+        run: pnpm test
 
       - name: Build frontend assets
-        run: npm run build
+        run: pnpm build
 
       - name: Set up Python
         uses: actions/setup-python@v5
