@@ -37,7 +37,7 @@ def create_share_link():
         return jsonify({'success': True, 'id': share_id})
     except Exception as exc:
         logger.error(f'Error creating share: {exc}', exc_info = True)
-        return jsonify({'error': str(exc)}), 500
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 
 @bp.route('/api/share/<share_id>', methods=['GET'])
@@ -53,7 +53,7 @@ def get_shared_grades(share_id):
         return jsonify({'success': True, 'data': data})
     except Exception as exc:
         logger.error(f'Error reading share: {exc}', exc_info = True)
-        return jsonify({'error': str(exc)}), 500
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 
 @bp.route('/share/<share_id>')
