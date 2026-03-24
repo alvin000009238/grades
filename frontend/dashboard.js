@@ -12,6 +12,8 @@ const SUBJECT_WEIGHTS = {
     '數學': 4,
 };
 
+const SUBJECT_WEIGHT_KEYS = Object.keys(SUBJECT_WEIGHTS);
+
 // 取得科目權重
 function getSubjectWeight(subjectName) {
     // 先嘗試完全匹配
@@ -19,7 +21,8 @@ function getSubjectWeight(subjectName) {
         return SUBJECT_WEIGHTS[subjectName];
     }
     // 嘗試部分匹配（例如 "選修化學-物質與能量" 匹配 "選修化學"）
-    for (const key of Object.keys(SUBJECT_WEIGHTS)) {
+    for (let i = 0; i < SUBJECT_WEIGHT_KEYS.length; i++) {
+        const key = SUBJECT_WEIGHT_KEYS[i];
         if (subjectName.includes(key) || key.includes(subjectName)) {
             return SUBJECT_WEIGHTS[key];
         }
@@ -127,19 +130,21 @@ function updateStatistics(subjects) {
         return;
     }
 
-    const scores = subjects.map(subject => subject.scoreValue);
-    const highest = Math.max(...scores);
-
-    // 計算加權平均
+    // ⚡ Bolt: 合併多次陣列遍歷與 spread 操作為單一迴圈
+    let highest = -Infinity;
     let totalWeightedScore = 0;
     let totalWeight = 0;
 
-    subjects.forEach(subject => {
+    for (let i = 0; i < subjects.length; i++) {
+        const subject = subjects[i];
         const score = subject.scoreValue;
+
+        if (score > highest) highest = score;
+
         const weight = getSubjectWeight(subject.SubjectName);
         totalWeightedScore += score * weight;
         totalWeight += weight;
-    });
+    }
 
     const weightedAvg = totalWeight > 0 ? totalWeightedScore / totalWeight : 0;
 

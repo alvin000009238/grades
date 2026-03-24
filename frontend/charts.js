@@ -16,9 +16,19 @@ let latestRenderToken = 0;
 export function generateCharts(subjects) {
     if (!Array.isArray(subjects) || subjects.length === 0) return;
 
-    const labels = subjects.map((subject) => shortenName(subject.SubjectName));
-    const myScores = subjects.map((subject) => subject.scoreValue ?? getNumericScore(subject.ScoreDisplay, subject.Score));
-    const avgScores = subjects.map((subject) => subject.classAvgValue ?? getNumericScore(subject.ClassAVGScoreDisplay, subject.ClassAVGScore));
+    // ⚡ Bolt: 合併多次 .map() 為單一迴圈以降低記憶體分配與迴圈開銷
+    const len = subjects.length;
+    const labels = new Array(len);
+    const myScores = new Array(len);
+    const avgScores = new Array(len);
+
+    for (let i = 0; i < len; i++) {
+        const subject = subjects[i];
+        labels[i] = shortenName(subject.SubjectName);
+        myScores[i] = subject.scoreValue ?? getNumericScore(subject.ScoreDisplay, subject.Score);
+        avgScores[i] = subject.classAvgValue ?? getNumericScore(subject.ClassAVGScoreDisplay, subject.ClassAVGScore);
+    }
+
     const renderToken = ++latestRenderToken;
 
     ensureChartJsLoaded()
