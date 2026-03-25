@@ -4213,3 +4213,9 @@ body.read-only-mode .header {
 .mono { font-family: monospace; }
 
 .share-btn-style:hover { background: var(--color-surface); color: var(--color-text-main); border: 1px solid var(--color-border); }
+
+/* Keyboard Accessibility - Focus Visible */
+*:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
