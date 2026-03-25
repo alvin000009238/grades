@@ -8,6 +8,7 @@ import { checkDisclaimer, loadGradesData } from './storage.js';
 import { setupSyncFeature } from './sync.js';
 import { setupShareFeature } from './share.js';
 import { setupOnboardingBootstrap } from './onboarding-bootstrap.js';
+import { setupMagneticPointer } from './magnetic-pointer.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     checkDisclaimer();
@@ -16,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSyncFeature();
     setupShareFeature();
     setupOnboardingBootstrap();
+    setupMagneticPointer();
 
     // 注入 Commit Hash
     const commitHash = import.meta.env.VITE_COMMIT_HASH;

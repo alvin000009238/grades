@@ -4213,3 +4213,69 @@ body.read-only-mode .header {
 .mono { font-family: monospace; }
 
 .share-btn-style:hover { background: var(--color-surface); color: var(--color-text-main); border: 1px solid var(--color-border); }
+
+/* Magnetic pointer overlay (desktop only) */
+@media (hover: hover) and (pointer: fine) {
+    .magnetic-target {
+        cursor: none;
+    }
+
+    .pointer-overlay {
+        --pointer-width: 2.5rem;
+        --pointer-height: 2.5rem;
+        position: fixed;
+        top: calc(var(--pointer-height) / -2);
+        left: calc(var(--pointer-width) / -2);
+        width: var(--pointer-width);
+        height: var(--pointer-height);
+        pointer-events: none;
+        transition: width .2s var(--ease), height .2s var(--ease);
+        z-index: 9999;
+    }
+
+    .pointer-overlay>div {
+        position: absolute;
+        width: .7rem;
+        height: .7rem;
+        border-width: 2px;
+        border-color: var(--color-primary);
+    }
+
+    .pointer-overlay>div:nth-child(1) {
+        top: 0;
+        left: 0;
+        border-top-style: solid;
+        border-left-style: solid;
+    }
+
+    .pointer-overlay>div:nth-child(2) {
+        top: 0;
+        right: 0;
+        border-top-style: solid;
+        border-right-style: solid;
+    }
+
+    .pointer-overlay>div:nth-child(3) {
+        bottom: 0;
+        left: 0;
+        border-bottom-style: solid;
+        border-left-style: solid;
+    }
+
+    .pointer-overlay>div:nth-child(4) {
+        bottom: 0;
+        right: 0;
+        border-bottom-style: solid;
+        border-right-style: solid;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pointer-overlay {
+        display: none !important;
+    }
+
+    .magnetic-target {
+        cursor: pointer;
+    }
+}
