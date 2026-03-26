@@ -1,0 +1,88 @@
+/* Shared utility classes */
+
+.icon-btn {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 6px 12px;
+
+    background: transparent;
+
+    border: 1px solid var(--color-border);
+
+    border-radius: var(--radius-sm);
+
+    color: var(--color-text-secondary);
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all var(--duration) var(--ease);
+
+    touch-action: manipulation;
+
+}
+
+
+
+.icon-btn:hover {
+
+    background: var(--color-fill);
+
+    border-color: var(--color-border);
+
+    color: var(--color-text-main);
+
+}
+
+
+
+.icon-btn:active {
+
+    transform: scale(0.96);
+
+}
+
+
+
+.share-btn-style {
+
+    background: var(--color-surface-elevated);
+
+    color: var(--color-text-main);
+
+    border: 1px solid var(--color-border-subtle);
+
+}
+
+
+
+.share-btn-style:hover {
+
+    background: var(--color-surface);
+
+    color: var(--color-text-main);
+
+    border: 1px solid var(--color-border);
+
+}
+
+
+
+/* share.js utils */
+
+.share-modal-container { text-align: center; padding: 8px 0; }
+.share-modal-text { color: var(--color-text-secondary); margin-bottom: 20px; font-size: 13px; line-height: 1.6; }
+.share-link-container { margin-bottom: 16px; }
+.mb-12 { margin-bottom: 12px; }
+.share-input-readonly { text-align: center; font-size: 13px; color: var(--color-primary); border-color: var(--color-primary); background: var(--color-primary-muted); }
+.w-full-center { width: 100%; justify-content: center; }
+.readonly-badge { color: var(--color-warning); font-weight: bold; padding: 4px 8px; border: 1px solid var(--color-warning); border-radius: 4px; font-size: 12px; }
+.mono { font-family: monospace; }

@@ -1,0 +1,164 @@
+/* ???? Reset ?????????????????????????????????????????????????????????????? */
+
+*,
+
+*::before,
+
+*::after {
+
+    margin: 0;
+
+    padding: 0;
+
+    box-sizing: border-box;
+
+    -webkit-tap-highlight-color: transparent;
+
+}
+
+
+
+html {
+
+    scroll-behavior: smooth;
+
+    -webkit-font-smoothing: antialiased;
+
+    -moz-osx-font-smoothing: grayscale;
+
+}
+
+
+
+body {
+
+    font-family: var(--font-stack);
+
+    background: var(--color-bg);
+
+    color: var(--color-text-main);
+
+    min-height: 100vh;
+
+    line-height: 1.5;
+
+    overflow-x: hidden;
+
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+
+}
+
+
+
+/* ???? Background ??void, minimal accent ?????? */
+
+.bg-orbs {
+
+    position: fixed;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    z-index: -1;
+
+    overflow: hidden;
+
+}
+
+
+
+/* Subtle ambient glow ??not orbs, just atmosphere */
+
+.orb {
+
+    position: absolute;
+
+    border-radius: 50%;
+
+    filter: blur(150px);
+
+    opacity: 0.08;
+
+}
+
+
+
+.orb-1 {
+
+    width: 800px;
+
+    height: 800px;
+
+    background: var(--color-primary);
+
+    top: -30%;
+
+    right: -15%;
+
+}
+
+
+
+.orb-2 {
+
+    width: 600px;
+
+    height: 600px;
+
+    background: var(--color-purple);
+
+    bottom: -20%;
+
+    left: -10%;
+
+}
+
+
+
+.orb-3 {
+
+    display: none;
+
+}
+
+
+
+/* ???? Container ?????????????????????????????????????????????????????? */
+
+.container {
+
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 0 24px 48px;
+
+}
+
+
+
+.seo-hidden {
+
+    position: absolute;
+
+    width: 1px;
+
+    height: 1px;
+
+    padding: 0;
+
+    margin: -1px;
+
+    overflow: hidden;
+
+    clip: rect(0, 0, 0, 0);
+
+    white-space: nowrap;
+
+    border: 0;
+
+}
+
+
+

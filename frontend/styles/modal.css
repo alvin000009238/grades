@@ -1,0 +1,808 @@
+/* ???? Modal ?????????????????????????????????????????????????????????????? */
+
+.modal-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    backdrop-filter: blur(10px);
+
+    -webkit-backdrop-filter: blur(10px);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    z-index: 1000;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transition: all 0.2s var(--ease);
+
+}
+
+
+
+.modal-overlay.active {
+
+    opacity: 1;
+
+    visibility: visible;
+
+}
+
+
+
+.modal-content {
+
+    background: var(--color-surface-elevated);
+
+    border-radius: var(--radius-lg);
+
+    border: none;
+
+    width: 90%;
+
+    max-width: 560px;
+
+    max-height: 80vh;
+
+    display: flex;
+
+    flex-direction: column;
+
+    box-shadow: var(--shadow-hover);
+
+    transform: scale(0.97) translateY(8px);
+
+    transition: all 0.25s var(--ease-spring);
+
+}
+
+
+
+.modal-overlay.active .modal-content {
+
+    transform: scale(1) translateY(0);
+
+}
+
+
+
+.modal-content.sm {
+
+    max-width: 400px;
+
+}
+
+
+
+.modal-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 24px 24px 16px 24px;
+
+    border-bottom: none;
+
+}
+
+
+
+.modal-header h3 {
+
+    font-size: 17px;
+
+    font-weight: 600;
+
+    color: var(--color-text-main);
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    letter-spacing: -0.02em;
+
+}
+
+
+
+.modal-header h3 svg {
+
+    color: var(--color-primary);
+
+}
+
+
+
+/* Tooltip Icon */
+
+.tooltip-icon {
+
+    font-size: 18px;
+
+    color: var(--color-text-dim, var(--color-text-muted));
+
+    cursor: pointer;
+
+    position: relative;
+
+    outline: none;
+
+    -webkit-tap-highlight-color: transparent;
+
+    touch-action: manipulation;
+
+    transition: transform var(--duration) var(--ease);
+
+}
+
+
+
+.tooltip-icon:active {
+
+    transform: scale(0.96);
+
+}
+
+
+
+.tooltip-icon::before {
+
+    content: attr(data-tooltip);
+
+    position: absolute;
+
+    bottom: 100%;
+
+    left: 50%;
+
+    transform: translateX(-50%) translateY(-6px);
+
+    background: var(--color-surface-hover);
+
+    color: var(--color-text-main);
+
+    padding: 8px 12px;
+
+    border-radius: var(--radius-sm);
+
+    font-size: 13px;
+
+    white-space: nowrap;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transition: all 0.2s var(--ease);
+
+    box-shadow: var(--shadow-soft);
+
+    pointer-events: none;
+
+    z-index: 1000;
+
+}
+
+
+
+.tooltip-icon::after {
+
+    content: '';
+
+    position: absolute;
+
+    bottom: 100%;
+
+    left: 50%;
+
+    transform: translateX(-50%) translateY(4px);
+
+    border-width: 5px;
+
+    border-style: solid;
+
+    border-color: var(--color-surface-hover) transparent transparent transparent;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transition: all 0.2s var(--ease);
+
+    pointer-events: none;
+
+    z-index: 1000;
+
+}
+
+
+
+.tooltip-icon:hover::before,
+
+.tooltip-icon:focus::before,
+
+.tooltip-icon:focus-within::before,
+
+.tooltip-icon:active::before {
+
+    opacity: 1;
+
+    visibility: visible;
+
+    transform: translateX(-50%) translateY(-10px);
+
+}
+
+
+
+.tooltip-icon:hover::after,
+
+.tooltip-icon:focus::after,
+
+.tooltip-icon:focus-within::after,
+
+.tooltip-icon:active::after {
+
+    opacity: 1;
+
+    visibility: visible;
+
+    transform: translateX(-50%) translateY(0);
+
+}
+
+
+
+.modal-close {
+
+    width: 40px;
+
+    height: 40px;
+
+    border: none;
+
+    background: transparent;
+
+    border-radius: var(--radius-pill);
+
+    color: var(--color-text-muted);
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    transition: transform var(--duration) var(--ease), background-color var(--duration) var(--ease), color var(--duration) var(--ease);
+
+    touch-action: manipulation;
+
+}
+
+
+
+.modal-close:hover {
+
+    background: var(--color-surface-hover);
+
+    color: var(--color-text-main);
+
+}
+
+
+
+.modal-close:active {
+
+    transform: scale(0.92);
+
+    background: var(--color-fill);
+
+}
+
+
+
+.modal-body {
+
+    padding: 24px;
+
+    flex: 1;
+
+    overflow: auto;
+
+}
+
+
+
+#sharePreview img {
+
+    max-width: 100%;
+
+    height: auto;
+
+    border-radius: 8px;
+
+    box-shadow: var(--shadow-card);
+
+}
+
+
+
+#jsonTextInput {
+
+    width: 100%;
+
+    height: 260px;
+
+    background: var(--color-bg);
+
+    border: 1px solid var(--color-border-subtle);
+
+    border-radius: var(--radius-sm);
+
+    padding: 14px;
+
+    color: var(--color-text-main);
+
+    font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+    resize: vertical;
+
+    transition: border-color var(--duration) var(--ease),
+
+        box-shadow var(--duration) var(--ease);
+
+}
+
+
+
+#jsonTextInput:focus {
+
+    outline: none;
+
+    border-color: var(--color-primary);
+
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+
+}
+
+
+
+#jsonTextInput::placeholder {
+
+    color: var(--color-text-muted);
+
+}
+
+
+
+.modal-footer {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 8px;
+
+    padding: 16px 24px 24px 24px;
+
+    border-top: none;
+
+    flex-wrap: wrap;
+
+}
+
+
+
+.modal-btn {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    height: 40px;
+
+    padding: 0 24px;
+
+    border-radius: var(--radius-pill);
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition: transform var(--duration) var(--ease), background-color var(--duration) var(--ease), color var(--duration) var(--ease);
+
+    border: none;
+
+    white-space: nowrap;
+
+    touch-action: manipulation;
+
+}
+
+
+
+.modal-btn.cancel {
+
+    background: transparent;
+
+    color: var(--color-primary);
+
+}
+
+
+
+.modal-btn.cancel:hover {
+
+    background: var(--color-fill);
+
+}
+
+
+
+.modal-btn.cancel:active {
+
+    transform: scale(0.96);
+
+    background: var(--color-fill);
+
+}
+
+
+
+.modal-btn.confirm {
+
+    background: var(--color-primary);
+
+    color: var(--md-sys-color-on-primary);
+
+}
+
+
+
+.modal-btn.confirm:hover {
+
+    background: var(--color-primary-hover);
+
+}
+
+
+
+.modal-btn.confirm:active {
+
+    transform: scale(0.96);
+
+    background: var(--color-primary-muted);
+
+}
+
+
+
+.modal-btn.reload {
+
+    background: transparent;
+
+    color: var(--color-primary);
+
+    border: 1px solid var(--color-border);
+
+}
+
+
+
+.modal-btn.reload:hover {
+
+    background: var(--color-fill);
+
+}
+
+
+
+.modal-btn.reload:disabled {
+
+    opacity: 0.38;
+
+    cursor: not-allowed;
+
+}
+
+
+
+.demo-fill-login-btn {
+
+    margin-bottom: 8px;
+
+}
+
+
+
+.modal-btn.danger {
+
+    background: transparent;
+
+    color: var(--color-danger);
+
+}
+
+
+
+.modal-btn.danger:hover {
+
+    background: var(--color-danger-muted);
+
+}
+
+
+
+.form-group {
+
+    position: relative;
+
+    margin-bottom: 24px;
+
+}
+
+
+
+.form-group label {
+
+    position: absolute;
+
+    left: 16px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: var(--color-text-secondary);
+
+    font-size: 16px;
+
+    pointer-events: none;
+
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    background: transparent;
+
+    padding: 0 4px;
+
+    margin: 0;
+
+}
+
+
+
+/* Float label when input is focused, or has content */
+
+.form-group input:focus~label,
+
+.form-group input:not(:placeholder-shown)~label,
+
+.form-group select:focus~label,
+
+.form-group select:not(:placeholder-shown)~label {
+
+    top: 0;
+
+    transform: translateY(-50%) scale(0.75);
+
+    left: 12px;
+
+    background: var(--color-surface-elevated);
+
+    /* Match modal surface */
+
+    color: var(--color-primary);
+
+}
+
+
+
+.form-group input::placeholder {
+
+    color: transparent;
+
+    /* Hide placeholder so :not(:placeholder-shown) works */
+
+}
+
+
+
+.form-group input,
+
+.form-group select {
+
+
+
+    width: 100%;
+
+    padding: 16px 16px;
+
+    background: transparent;
+
+    border: 1px solid var(--md-sys-color-outline);
+
+    border-radius: var(--radius-sm);
+
+    color: var(--color-text-main);
+
+    font-size: 16px;
+
+    line-height: 24px;
+
+    transition: border-color var(--duration) var(--ease),
+
+        box-shadow var(--duration) var(--ease);
+
+}
+
+
+
+.form-group input:focus,
+
+.form-group select:focus {
+
+    outline: none;
+
+    background: transparent;
+
+    border-color: var(--color-primary);
+
+    box-shadow: 0 0 0 1px var(--color-primary);
+
+}
+
+
+
+.form-group select {
+
+    cursor: pointer;
+
+    appearance: none;
+
+    -webkit-appearance: none;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238e9099' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+
+    background-repeat: no-repeat;
+
+    background-position: right 12px center;
+
+    padding-right: 48px;
+
+}
+
+
+
+.form-group select option {
+
+    background: var(--color-surface);
+
+    color: var(--color-text-main);
+
+}
+
+
+
+/* Password group */
+
+.password-group {
+
+    position: relative;
+
+    width: 100%;
+
+}
+
+
+
+.password-group input {
+
+    width: 100%;
+
+    padding-right: 44px;
+
+}
+
+
+
+.toggle-password-btn {
+
+    position: absolute;
+
+    right: 8px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    background: transparent;
+
+    border: none;
+
+    cursor: pointer;
+
+    color: var(--color-text-muted);
+
+    padding: 4px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    transition: transform var(--duration) var(--ease), color var(--duration) var(--ease);
+
+    touch-action: manipulation;
+
+}
+
+
+
+.toggle-password-btn:hover {
+
+    color: var(--color-primary);
+
+}
+
+
+
+.toggle-password-btn:active {
+
+    transform: translateY(-50%) scale(0.90);
+
+}
+
+
+
+/* Status message */
+
+.status-msg {
+
+    margin-top: 10px;
+
+    font-size: 13px;
+
+    min-height: 20px;
+
+}
+
+
+
+.status-msg.error {
+
+    color: var(--color-danger);
+
+}
+
+
+

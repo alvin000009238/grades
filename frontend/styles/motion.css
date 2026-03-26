@@ -1,0 +1,140 @@
+/* ???? Animations ???????????????????????????????????????????????????? */
+
+@keyframes fadeInUp {
+
+    from {
+
+        opacity: 0;
+
+        transform: translateY(12px);
+
+    }
+
+
+
+    to {
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+    }
+
+}
+
+
+
+.score-card,
+
+.chart-card,
+
+.distribution-card {
+
+    animation: fadeInUp 0.4s var(--ease) both;
+
+}
+
+
+
+.score-card:nth-child(1) {
+
+    animation-delay: 0.03s;
+
+}
+
+
+
+.score-card:nth-child(2) {
+
+    animation-delay: 0.06s;
+
+}
+
+
+
+.score-card:nth-child(3) {
+
+    animation-delay: 0.09s;
+
+}
+
+
+
+.score-card:nth-child(4) {
+
+    animation-delay: 0.12s;
+
+}
+
+
+
+.score-card:nth-child(5) {
+
+    animation-delay: 0.15s;
+
+}
+
+
+
+.score-card:nth-child(6) {
+
+    animation-delay: 0.18s;
+
+}
+
+
+
+.score-card:nth-child(7) {
+
+    animation-delay: 0.21s;
+
+}
+
+
+
+/* ???? Scrollbar ?????????????????????????????????????????????????????? */
+
+::-webkit-scrollbar {
+
+    width: 6px;
+
+    height: 6px;
+
+}
+
+
+
+::-webkit-scrollbar-track {
+
+    background: transparent;
+
+}
+
+
+
+::-webkit-scrollbar-thumb {
+
+    background: var(--color-surface-hover);
+
+    border-radius: var(--radius-pill);
+
+}
+
+
+
+::-webkit-scrollbar-thumb:hover {
+
+    background: var(--color-text-muted);
+
+}
+
+
+
+::selection {
+
+    background: rgba(0, 122, 255, 0.25);
+
+}
+
+
+
