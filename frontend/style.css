@@ -1666,20 +1666,6 @@ body {
 
     flex-wrap: wrap;
 
-    touch-action: manipulation;
-
-    transition: transform var(--duration) var(--ease), background-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
-
-}
-
-
-
-.student-card:active {
-
-    transform: scale(0.98);
-
-    background-color: var(--color-surface-hover);
-
 }
 
 
@@ -1998,33 +1984,9 @@ body {
 
     box-shadow: var(--shadow-soft);
 
-    transition: transform var(--duration) var(--ease), background-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
-
     position: relative;
 
     overflow: hidden;
-
-    touch-action: manipulation;
-
-}
-
-
-
-.score-card:hover {
-
-    background: var(--color-surface-hover);
-
-    box-shadow: var(--shadow-hover);
-
-}
-
-
-
-.score-card:active {
-
-    transform: scale(0.98);
-
-    background-color: var(--color-surface-hover);
 
 }
 
@@ -2470,28 +2432,6 @@ body {
 
     overflow: hidden;
 
-    transition: transform var(--duration) var(--ease), border-color var(--duration) var(--ease), background-color var(--duration) var(--ease);
-
-    touch-action: manipulation;
-
-}
-
-
-
-.chart-card:hover {
-
-    border-color: var(--color-border);
-
-}
-
-
-
-.chart-card:active {
-
-    transform: scale(0.99);
-
-    background-color: var(--color-surface-hover);
-
 }
 
 
@@ -2859,28 +2799,6 @@ body {
     padding: 20px;
 
     border: 1px solid var(--color-border-subtle);
-
-    transition: transform var(--duration) var(--ease), border-color var(--duration) var(--ease), background-color var(--duration) var(--ease);
-
-    touch-action: manipulation;
-
-}
-
-
-
-.distribution-card:hover {
-
-    border-color: var(--color-border);
-
-}
-
-
-
-.distribution-card:active {
-
-    transform: scale(0.99);
-
-    background-color: var(--color-surface-hover);
 
 }
 
