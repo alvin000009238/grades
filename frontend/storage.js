@@ -6,17 +6,19 @@ import { checkSharedLink } from './share.js';
 import { initDashboard } from './dashboard.js';
 
 // HTML 跳脫輔助函數，防範 XSS
+// ⚡ Bolt Optimization: Extracted object to module scope to reduce allocations during high-frequency text replacement
+const escapeHtmlMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+};
+
 export function escapeHTML(str) {
     if (str === null || str === undefined) return '';
     const text = String(str);
-    const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-    };
-    return text.replace(/[&<>"']/g, function (m) { return map[m]; });
+    return text.replace(/[&<>"']/g, function (m) { return escapeHtmlMap[m]; });
 }
 
 export function checkDisclaimer() {

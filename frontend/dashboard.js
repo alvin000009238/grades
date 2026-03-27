@@ -11,6 +11,8 @@ const SUBJECT_WEIGHTS = {
     '英語文': 4,
     '數學': 4,
 };
+// ⚡ Bolt Optimization: Cache Object.keys to avoid array allocation on every call
+const SUBJECT_WEIGHTS_KEYS = Object.keys(SUBJECT_WEIGHTS);
 
 // 取得科目權重
 function getSubjectWeight(subjectName) {
@@ -19,7 +21,7 @@ function getSubjectWeight(subjectName) {
         return SUBJECT_WEIGHTS[subjectName];
     }
     // 嘗試部分匹配（例如 "選修化學-物質與能量" 匹配 "選修化學"）
-    for (const key of Object.keys(SUBJECT_WEIGHTS)) {
+    for (const key of SUBJECT_WEIGHTS_KEYS) {
         if (subjectName.includes(key) || key.includes(subjectName)) {
             return SUBJECT_WEIGHTS[key];
         }
@@ -265,16 +267,18 @@ function getScoreClass(score) {
 }
 
 // 縮短科目名稱
+// ⚡ Bolt Optimization: Extract object allocation to module scope to prevent GC churn in hot loops
+const shortNamesMap = {
+    '英語文': '英文',
+    '公民與社會': '公民',
+    '選修化學-物質與能量': '化學',
+    '選修物理-力學一': '物理',
+    '選修化學': '化學',
+    '選修物理': '物理'
+};
+
 export function shortenName(name) {
-    const shortNames = {
-        '英語文': '英文',
-        '公民與社會': '公民',
-        '選修化學-物質與能量': '化學',
-        '選修物理-力學一': '物理',
-        '選修化學': '化學',
-        '選修物理': '物理'
-    };
-    return shortNames[name] || name;
+    return shortNamesMap[name] || name;
 }
 
 // 生成五標表格
