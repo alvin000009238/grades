@@ -4,9 +4,6 @@ import tempfile
 import uuid
 from cachelib.file import FileSystemCache
 from dotenv import load_dotenv
-
-load_dotenv()
-
 from flask import Flask, g, request
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_session import Session
@@ -14,6 +11,8 @@ from flask_session import Session
 from app.extensions import configure_logger, cors
 from app.routes import auth_bp, grades_bp, share_bp, system_bp
 from fetcher import GradeFetcher
+
+load_dotenv()
 
 
 def create_app():
