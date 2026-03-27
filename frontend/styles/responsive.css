@@ -1,0 +1,194 @@
+/* ???? Responsive ???????????????????????????????????????????????????? */
+
+@media (max-width: 768px) {
+
+    .container {
+
+        padding: 0 16px 32px;
+
+    }
+
+
+
+    .header {
+
+        margin: 0 -16px 28px;
+
+        padding-left: 16px;
+
+        padding-right: 16px;
+
+    }
+
+
+
+    .header-content {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+    }
+
+
+
+    .data-time-box {
+
+        align-self: stretch;
+
+        justify-content: space-between;
+
+    }
+
+
+
+    .logo-text h1 {
+
+        font-size: 18px;
+
+    }
+
+
+
+    .student-card {
+
+        padding: 20px;
+
+        gap: 16px;
+
+    }
+
+
+
+    .student-avatar {
+
+        width: 56px;
+
+        height: 56px;
+
+    }
+
+
+
+    .avatar-text {
+
+        width: 50px;
+
+        height: 50px;
+
+        font-size: 20px;
+
+    }
+
+
+
+    .student-name {
+
+        font-size: 20px;
+
+    }
+
+
+
+    .student-stats {
+
+        width: 100%;
+
+        justify-content: space-between;
+
+    }
+
+
+
+    .stat-box {
+
+        flex: 1;
+
+        min-width: auto;
+
+        padding: 12px;
+
+    }
+
+
+
+    .stat-value {
+
+        font-size: 20px;
+
+    }
+
+
+
+    .chart-row {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+
+    .scores-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+
+    .distribution-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+
+    .section-title {
+
+        font-size: 15px;
+
+    }
+
+}
+
+
+
+@media (max-width: 480px) {
+
+    .student-details {
+
+        flex-direction: column;
+
+        gap: 6px;
+
+    }
+
+
+
+    .student-stats {
+
+        gap: 8px;
+
+    }
+
+
+
+    .stat-box {
+
+        padding: 10px 8px;
+
+    }
+
+
+
+    .stat-value {
+
+        font-size: 18px;
+
+    }
+
+}
+
+
+

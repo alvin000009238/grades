@@ -1,0 +1,106 @@
+/* Legacy compat */
+
+.data-time {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-end;
+
+    background: var(--color-surface);
+
+    padding: 10px 18px;
+
+    border-radius: var(--radius-md);
+
+    border: 1px solid var(--color-border-subtle);
+
+}
+
+
+
+.data-import {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+}
+
+
+
+@keyframes pulse {
+
+
+
+    0%,
+
+    100% {
+
+        opacity: 1;
+
+    }
+
+
+
+    50% {
+
+        opacity: 0.85;
+
+    }
+
+}
+
+
+
+/* ???? Share Feature ?????????????????????????????????????????????? */
+
+#linkContainer {
+
+    animation: fadeInUp 0.3s var(--ease);
+
+}
+
+
+
+.share-indicator {
+
+    display: flex;
+
+    align-items: center;
+
+    margin-right: 12px;
+
+}
+
+
+
+/* Read Only Mode */
+
+body.read-only-mode .time-info,
+
+body.read-only-mode .import-dropdown,
+
+body.read-only-mode #shareBtn,
+
+body.read-only-mode #syncBtn,
+
+body.read-only-mode #logoutBtn {
+
+    display: none !important;
+
+}
+
+
+
+body.read-only-mode .header {
+
+    border-bottom: 1px solid var(--color-warning-muted);
+
+}
+
+
+

@@ -6,7 +6,7 @@
         "dev": "vite",
         "build": "vite build && node scripts/inject-hash.js",
         "preview": "vite preview",
-        "test": "vitest run --environment jsdom --root ."
+        "test": "node --test tests/frontend/*.test.js"
     },
     "devDependencies": {
         "jsdom": "29.0.1",

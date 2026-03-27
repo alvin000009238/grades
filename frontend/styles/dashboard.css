@@ -1,0 +1,1362 @@
+/* ???? Student Card ???????????????????????????????????????????????? */
+
+.student-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 28px;
+
+    background: var(--color-surface-elevated);
+
+    border-radius: var(--radius-lg);
+
+    padding: 28px 32px;
+
+    margin-bottom: 40px;
+
+    border: none;
+
+    box-shadow: var(--shadow-soft);
+
+    flex-wrap: wrap;
+
+}
+
+
+
+.student-avatar {
+
+    position: relative;
+
+    width: 72px;
+
+    height: 72px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+}
+
+
+
+.avatar-ring {
+
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: 50%;
+
+    background: conic-gradient(from 0deg, var(--color-primary), var(--color-purple), var(--color-primary));
+
+    animation: spin 8s linear infinite;
+
+}
+
+
+
+@keyframes spin {
+
+    to {
+
+        transform: rotate(360deg);
+
+    }
+
+}
+
+
+
+.avatar-text {
+
+    position: relative;
+
+    z-index: 1;
+
+    width: 64px;
+
+    height: 64px;
+
+    background: var(--color-surface);
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 26px;
+
+    font-weight: 700;
+
+    color: var(--color-primary);
+
+    letter-spacing: -0.02em;
+
+}
+
+
+
+.student-info {
+
+    flex: 1;
+
+    min-width: 180px;
+
+}
+
+
+
+.student-name {
+
+    font-size: 24px;
+
+    font-weight: 600;
+
+    margin-bottom: 8px;
+
+    color: var(--color-text-main);
+
+    letter-spacing: -0.02em;
+
+    background: none;
+
+    -webkit-background-clip: unset;
+
+    -webkit-text-fill-color: unset;
+
+    background-clip: unset;
+
+}
+
+
+
+.student-details {
+
+    display: flex;
+
+    gap: 20px;
+
+    flex-wrap: wrap;
+
+}
+
+
+
+.detail-item {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    color: var(--color-text-secondary);
+
+    font-size: 13px;
+
+}
+
+
+
+.detail-icon {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: var(--color-text-muted);
+
+}
+
+
+
+.student-stats {
+
+    display: flex;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+
+}
+
+
+
+.stat-box {
+
+    background: var(--color-surface-hover);
+
+    border: none;
+
+    border-radius: var(--radius-md);
+
+    padding: 14px 22px;
+
+    text-align: center;
+
+    min-width: 100px;
+
+    transition: background-color var(--duration) var(--ease);
+
+}
+
+
+
+.stat-box:hover {
+
+    background: var(--color-surface-hover);
+
+}
+
+
+
+.stat-value {
+
+    display: block;
+
+    font-size: 28px;
+
+    font-weight: 700;
+
+    color: var(--color-text-main);
+
+    line-height: 1.2;
+
+    letter-spacing: -0.03em;
+
+    font-variant-numeric: tabular-nums;
+
+}
+
+
+
+.stat-label {
+
+    display: block;
+
+    font-size: 11px;
+
+    color: var(--color-text-muted);
+
+    margin-top: 4px;
+
+    font-weight: 500;
+
+}
+
+
+
+/* ???? Section Titles ???????????????????????????????????????????? */
+
+.section-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    font-size: 17px;
+
+    font-weight: 600;
+
+    margin-bottom: 20px;
+
+    color: var(--color-text-main);
+
+    letter-spacing: -0.02em;
+
+}
+
+
+
+.title-icon {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: var(--color-text-muted);
+
+}
+
+
+
+.title-icon svg {
+
+    width: 20px;
+
+    height: 20px;
+
+}
+
+
+
+/* ???? Scores Overview ?????????????????????????????????????????? */
+
+.scores-overview {
+
+    margin-bottom: 48px;
+
+}
+
+
+
+.scores-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+
+    gap: 12px;
+
+}
+
+
+
+.score-card {
+
+    background: var(--color-surface-elevated);
+
+    border-radius: var(--radius-lg);
+
+    padding: 20px 22px;
+
+    border: none;
+
+    box-shadow: var(--shadow-soft);
+
+    position: relative;
+
+    overflow: hidden;
+
+}
+
+
+
+.score-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    margin-bottom: 14px;
+
+}
+
+
+
+.subject-name {
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    color: var(--color-text-main);
+
+    max-width: 180px;
+
+    letter-spacing: -0.01em;
+
+}
+
+
+
+.score-badge {
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    padding: 4px 14px;
+
+    border-radius: var(--radius-pill);
+
+    background: var(--color-primary-muted);
+
+    color: var(--color-primary-hover);
+
+    font-variant-numeric: tabular-nums;
+
+}
+
+
+
+.score-badge.high {
+
+    background: var(--color-success-muted);
+
+    color: var(--color-success);
+
+}
+
+
+
+.score-badge.medium {
+
+    background: var(--color-warning-muted);
+
+    color: var(--color-warning);
+
+}
+
+
+
+.score-badge.low {
+
+    background: var(--color-danger-muted);
+
+    color: var(--color-danger);
+
+}
+
+
+
+.score-details {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+}
+
+
+
+.score-row {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+}
+
+
+
+.score-label {
+
+    font-size: 13px;
+
+    color: var(--color-text-muted);
+
+}
+
+
+
+.score-value {
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    color: var(--color-text-secondary);
+
+    font-variant-numeric: tabular-nums;
+
+}
+
+
+
+/* ???? Rank Section ???????????????????????????????????????????????? */
+
+.rank-section {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+
+    padding: 10px 12px;
+
+    margin-top: 4px;
+
+    background: var(--color-fill);
+
+    border-radius: var(--radius-sm);
+
+    border: none;
+
+}
+
+
+
+.rank-item {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+}
+
+
+
+.rank-icon-wrapper {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 26px;
+
+    height: 26px;
+
+    border-radius: 50%;
+
+    flex-shrink: 0;
+
+}
+
+
+
+.rank-icon-wrapper.class-rank-color {
+
+    background: var(--color-primary-muted);
+
+    color: var(--color-primary);
+
+}
+
+
+
+.rank-icon-wrapper.year-rank-color {
+
+    background: var(--color-warning-muted);
+
+    color: var(--color-warning);
+
+}
+
+
+
+.rank-label {
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    color: var(--color-text-muted);
+
+    min-width: 28px;
+
+}
+
+
+
+.rank-value {
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    color: var(--color-text-main);
+
+    margin-left: auto;
+
+    display: flex;
+
+    align-items: baseline;
+
+    gap: 1px;
+
+    font-variant-numeric: tabular-nums;
+
+}
+
+
+
+.rank-number {
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    color: var(--color-text-main);
+
+    background: none;
+
+    -webkit-background-clip: unset;
+
+    -webkit-text-fill-color: unset;
+
+    background-clip: unset;
+
+}
+
+
+
+.rank-total {
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    color: var(--color-text-muted);
+
+    -webkit-text-fill-color: var(--color-text-muted);
+
+}
+
+
+
+.rank-percentile {
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    padding: 2px 8px;
+
+    border-radius: var(--radius-pill);
+
+    margin-left: 6px;
+
+    letter-spacing: 0.3px;
+
+}
+
+
+
+.rank-percentile.pr-excellent {
+
+    background: var(--color-purple-muted);
+
+    color: var(--color-purple);
+
+}
+
+
+
+.rank-percentile.pr-good {
+
+    background: var(--color-primary-muted);
+
+    color: var(--color-primary);
+
+}
+
+
+
+.rank-percentile.pr-average {
+
+    background: var(--color-success-muted);
+
+    color: var(--color-success);
+
+}
+
+
+
+.rank-percentile.pr-below {
+
+    background: var(--color-warning-muted);
+
+    color: var(--color-warning);
+
+}
+
+
+
+.rank-percentile.pr-poor {
+
+    background: var(--color-danger-muted);
+
+    color: var(--color-danger);
+
+}
+
+
+
+/* ???? Progress Bar ???????????????????????????????????????????????? */
+
+.progress-bar {
+
+    height: 4px;
+
+    background: var(--color-fill);
+
+    border-radius: var(--radius-pill);
+
+    overflow: hidden;
+
+    margin-top: 8px;
+
+}
+
+
+
+.progress-fill {
+
+    height: 100%;
+
+    border-radius: var(--radius-pill);
+
+    background: var(--color-primary);
+
+    transition: width 0.8s var(--ease);
+
+}
+
+
+
+.diff-indicator {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 3px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    font-variant-numeric: tabular-nums;
+
+}
+
+
+
+.diff-indicator.positive {
+
+    color: var(--color-success);
+
+}
+
+
+
+.diff-indicator.negative {
+
+    color: var(--color-danger);
+
+}
+
+
+
+/* ???? Charts ???????????????????????????????????????????????????????????? */
+
+.charts-section {
+
+    margin-bottom: 48px;
+
+}
+
+
+
+.chart-row {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+
+    gap: 14px;
+
+}
+
+
+
+.chart-card {
+
+    background: var(--color-surface-elevated);
+
+    border-radius: var(--radius-lg);
+
+    border: 1px solid var(--color-border-subtle);
+
+    overflow: hidden;
+
+}
+
+
+
+.chart-header {
+
+    padding: 16px 22px;
+
+    border-bottom: 1px solid var(--color-border-subtle);
+
+}
+
+
+
+.chart-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    color: var(--color-text-main);
+
+    letter-spacing: -0.01em;
+
+}
+
+
+
+.chart-title .chart-icon {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: var(--color-text-muted);
+
+}
+
+
+
+.chart-title .chart-icon svg {
+
+    width: 18px;
+
+    height: 18px;
+
+}
+
+
+
+.chart-body {
+
+    padding: 22px;
+
+    min-height: 350px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+
+/* ???? Standards Table ?????????????????????????????????????????? */
+
+.standards-section {
+
+    margin-bottom: 48px;
+
+}
+
+
+
+.standards-table-wrapper {
+
+    overflow-x: auto;
+
+    background: transparent;
+
+    border-radius: var(--radius-sm);
+
+    border: 1px solid var(--color-border-subtle);
+
+}
+
+
+
+.standards-table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    font-size: 13px;
+
+}
+
+
+
+.standards-table th,
+
+.standards-table td {
+
+    padding: 13px 16px;
+
+    text-align: center;
+
+    border-bottom: 1px solid var(--color-border-subtle);
+
+}
+
+
+
+.standards-table th {
+
+    background: transparent;
+
+    font-weight: 600;
+
+    color: var(--color-text-secondary);
+
+    white-space: nowrap;
+
+    font-size: 13px;
+
+    letter-spacing: 0.02em;
+
+}
+
+
+
+.standards-table tbody tr {
+
+    transition: background var(--duration) var(--ease);
+
+}
+
+
+
+.standards-table tbody tr:hover {
+
+    background: var(--color-fill);
+
+}
+
+
+
+.standards-table tbody tr:last-child td {
+
+    border-bottom: none;
+
+}
+
+
+
+.standards-table td:first-child {
+
+    font-weight: 600;
+
+    color: var(--color-text-main);
+
+    text-align: left;
+
+}
+
+
+
+.top-mark {
+
+    color: var(--color-purple);
+
+}
+
+
+
+.front-mark {
+
+    color: var(--color-primary);
+
+}
+
+
+
+.avg-mark {
+
+    color: var(--color-success);
+
+}
+
+
+
+.back-mark {
+
+    color: var(--color-warning);
+
+}
+
+
+
+.bottom-mark {
+
+    color: var(--color-danger);
+
+}
+
+
+
+.my-score {
+
+    font-weight: 700;
+
+    font-size: 14px;
+
+    font-variant-numeric: tabular-nums;
+
+}
+
+
+
+.my-score.excellent {
+
+    color: var(--color-purple);
+
+}
+
+
+
+.my-score.good {
+
+    color: var(--color-primary);
+
+}
+
+
+
+.my-score.average {
+
+    color: var(--color-success);
+
+}
+
+
+
+.my-score.below {
+
+    color: var(--color-warning);
+
+}
+
+
+
+.my-score.poor {
+
+    color: var(--color-danger);
+
+}
+
+
+
+.level-badge {
+
+    display: inline-block;
+
+    padding: 3px 10px;
+
+    border-radius: var(--radius-pill);
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+}
+
+
+
+.level-badge.excellent {
+
+    background: var(--color-purple-muted);
+
+    color: var(--color-purple);
+
+}
+
+
+
+.level-badge.good {
+
+    background: var(--color-primary-muted);
+
+    color: var(--color-primary);
+
+}
+
+
+
+.level-badge.average {
+
+    background: var(--color-success-muted);
+
+    color: var(--color-success);
+
+}
+
+
+
+.level-badge.below {
+
+    background: var(--color-warning-muted);
+
+    color: var(--color-warning);
+
+}
+
+
+
+.level-badge.poor {
+
+    background: var(--color-danger-muted);
+
+    color: var(--color-danger);
+
+}
+
+
+
+/* ???? Distribution Cards ???????????????????????????????????? */
+
+.distribution-section {
+
+    margin-bottom: 48px;
+
+}
+
+
+
+.charts-section,
+
+.standards-section,
+
+.distribution-section {
+
+    content-visibility: auto;
+
+    contain-intrinsic-size: auto 600px;
+
+}
+
+
+
+.distribution-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+
+    gap: 12px;
+
+}
+
+
+
+.distribution-card {
+
+    background: var(--color-surface-elevated);
+
+    border-radius: var(--radius-lg);
+
+    padding: 20px;
+
+    border: 1px solid var(--color-border-subtle);
+
+}
+
+
+
+.distribution-card h4 {
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    margin-bottom: 14px;
+
+    color: var(--color-text-main);
+
+}
+
+
+
+.distribution-bars {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+}
+
+
+
+.dist-row {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+
+
+.dist-label {
+
+    width: 52px;
+
+    font-size: 11px;
+
+    color: var(--color-text-muted);
+
+    text-align: right;
+
+    font-variant-numeric: tabular-nums;
+
+    font-weight: 500;
+
+}
+
+
+
+.dist-bar-container {
+
+    flex: 1;
+
+    height: 22px;
+
+    background: var(--color-fill);
+
+    border-radius: 6px;
+
+    position: relative;
+
+    margin-right: 44px;
+
+}
+
+
+
+.dist-bar {
+
+    height: 100%;
+
+    border-radius: 6px;
+
+    transition: width 0.8s var(--ease);
+
+}
+
+
+
+.dist-bar-container span.dist-count {
+
+    position: absolute;
+
+    right: -42px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    color: var(--color-text-muted);
+
+    white-space: nowrap;
+
+    font-variant-numeric: tabular-nums;
+
+}
+
+
+
+.dist-bar.high-score {
+
+    background: var(--color-purple);
+
+    opacity: 0.8;
+
+}
+
+
+
+.dist-bar.good-score {
+
+    background: var(--color-primary);
+
+    opacity: 0.8;
+
+}
+
+
+
+.dist-bar.avg-score {
+
+    background: var(--color-success);
+
+    opacity: 0.8;
+
+}
+
+
+
+.dist-bar.low-score {
+
+    background: var(--color-warning);
+
+    opacity: 0.8;
+
+}
+
+
+
+.dist-bar.poor-score {
+
+    background: var(--color-danger);
+
+    opacity: 0.8;
+
+}
+
+
+
+.my-score-marker {
+
+    position: absolute;
+
+    right: 6px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    background: var(--color-text-main);
+
+    color: var(--color-bg);
+
+    font-size: 10px;
+
+    padding: 1px 6px;
+
+    border-radius: 4px;
+
+    font-weight: 700;
+
+}
+
+
+

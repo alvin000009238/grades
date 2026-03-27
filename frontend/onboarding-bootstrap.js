@@ -106,6 +106,7 @@ reopenTipEl.addEventListener('click', (event) => {
             break;
         case 'disable':
             localStorage.setItem(ONBOARDING_REOPEN_TIP_DISABLED_KEY, 'true');
+            localStorage.setItem(ONBOARDING_COMPLETED_KEY, 'true');
             removeReopenTip();
             break;
         case 'start':
