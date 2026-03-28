@@ -1,7 +1,7 @@
 """速率限制服務 — 基於 Redis 固定視窗計數器。"""
 
 
-def is_rate_limited(redis_client, ip, max_attempts=5, window_seconds=60):
+def is_rate_limited(redis_client, ip, max_attempts=5, window_seconds=60, key_prefix="login"):
     """檢查指定 IP 是否超過速率限制。
 
     使用 Redis INCR + EXPIRE 的固定視窗計數器策略。
@@ -11,6 +11,7 @@ def is_rate_limited(redis_client, ip, max_attempts=5, window_seconds=60):
         ip: 客戶端 IP 位址。
         max_attempts: 視窗內最大嘗試次數。
         window_seconds: 視窗長度（秒）。
+        key_prefix: Redis key 的前綴
 
     Returns:
         tuple: (is_limited, remaining, retry_after)
@@ -18,7 +19,7 @@ def is_rate_limited(redis_client, ip, max_attempts=5, window_seconds=60):
             - remaining (int): 剩餘可用次數。
             - retry_after (int): 若被限速，需等待的秒數。
     """
-    key = f"rate_limit:login:{ip}"
+    key = f"rate_limit:{key_prefix}:{ip}"
 
     current = redis_client.incr(key)
 
