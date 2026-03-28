@@ -138,18 +138,26 @@ function loadOnboardingCore() {
     return onboardingCorePromise;
 }
 
-function startOnboarding(trigger) {
+async function startOnboarding(trigger) {
     removeStartPrompt();
     removeReopenTip();
     onboardingRunning = true;
 
-    loadOnboardingCore()
-        .then(({ startOnboardingSession }) => {
-            startOnboardingSession(trigger);
-        })
-        .catch((error) => {
-            onboardingRunning = false;
-            console.warn('Failed to load onboarding core', error);
-            showReopenTip();
-        });
+    try {
+        // 教學流程會 programmatically click syncBtn / shareBtn，
+        // 需要先確保這兩個模組已載入並綁定好事件
+        const { ensureSyncReady, ensureShareReady } = await import('./main.js');
+        await Promise.all([
+            ensureSyncReady(),
+            ensureShareReady(),
+            loadOnboardingCore()
+        ]);
+
+        const { startOnboardingSession } = await loadOnboardingCore();
+        startOnboardingSession(trigger);
+    } catch (error) {
+        onboardingRunning = false;
+        console.warn('Failed to load onboarding core', error);
+        showReopenTip();
+    }
 }
