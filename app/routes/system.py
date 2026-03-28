@@ -33,7 +33,9 @@ def static_files(filename):
         return jsonify({'error': 'Forbidden'}), 403
 
     response = send_from_directory('public', filename)
-    if ext in ('.js', '.css', '.woff', '.woff2', '.ttf', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico'):
+    if ext in ('.js', '.css', '.ico'):
+        response.cache_control.max_age = 31536000
+    elif ext in ('.woff', '.woff2', '.ttf', '.png', '.jpg', '.jpeg', '.gif', '.svg'):
         response.cache_control.max_age = 86400
     return response
 
