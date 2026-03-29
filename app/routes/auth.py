@@ -22,7 +22,10 @@ def check_login():
 
 @bp.route('/api/login', methods=['POST'])
 def login():
-    data = request.json or {}
+    data = request.json
+    if not isinstance(data, (dict, type(None))):
+        return jsonify({'success': False, 'message': 'Invalid payload format: expected a JSON object.'}), 400
+    data = data or {}
     username = data.get('username')
     password = data.get('password')
 

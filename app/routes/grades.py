@@ -10,7 +10,10 @@ bp = Blueprint('grades', __name__)
 
 @bp.route('/api/fetch', methods=['POST'])
 def fetch_grades_route():
-    payload = request.json or {}
+    payload = request.json
+    if not isinstance(payload, (dict, type(None))):
+        return jsonify({'success': False, 'error': 'Invalid payload format: expected a JSON object.'}), 400
+    payload = payload or {}
     year_value = payload.get('year_value')
     exam_value = payload.get('exam_value')
 
