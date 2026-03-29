@@ -95,25 +95,25 @@ function showReopenTip() {
         <button type="button" class="onboarding-reopen-close" data-role="close" aria-label="關閉提示">×</button>
     `;
 
-reopenTipEl.addEventListener('click', (event) => {
-    const button = event.target.closest('button[data-role]');
-    if (!button) return;
+    reopenTipEl.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-role]');
+        if (!button) return;
 
-    const role = button.dataset.role;
-    switch (role) {
-        case 'close':
-            removeReopenTip();
-            break;
-        case 'disable':
-            localStorage.setItem(ONBOARDING_REOPEN_TIP_DISABLED_KEY, 'true');
-            localStorage.setItem(ONBOARDING_COMPLETED_KEY, 'true');
-            removeReopenTip();
-            break;
-        case 'start':
-            startOnboarding('manual');
-            break;
-    }
-});
+        const role = button.dataset.role;
+        switch (role) {
+            case 'close':
+                removeReopenTip();
+                break;
+            case 'disable':
+                localStorage.setItem(ONBOARDING_REOPEN_TIP_DISABLED_KEY, 'true');
+                localStorage.setItem(ONBOARDING_COMPLETED_KEY, 'true');
+                removeReopenTip();
+                break;
+            case 'start':
+                startOnboarding('manual');
+                break;
+        }
+    });
 
     document.body.appendChild(reopenTipEl);
     reopenTipTimer = setTimeout(() => {

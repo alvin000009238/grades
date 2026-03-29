@@ -24,8 +24,8 @@
 
     pointer-events: none;
 
-    transition: opacity 0.2s var(--ease);
-
+    visibility: hidden;
+    transition: opacity 0.2s var(--ease), visibility 0s linear 0.2s;
 }
 
 
@@ -36,6 +36,8 @@
 
     pointer-events: auto;
 
+visibility: visible;
+    transition: opacity 0.2s var(--ease), visibility 0s linear 0s;
 }
 
 
