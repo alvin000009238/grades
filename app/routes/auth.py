@@ -23,6 +23,8 @@ def check_login():
 @bp.route('/api/login', methods=['POST'])
 def login():
     data = request.json or {}
+    if not isinstance(data, dict):
+        data = {}
     username = data.get('username')
     password = data.get('password')
 
