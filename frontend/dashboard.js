@@ -12,6 +12,9 @@ const SUBJECT_WEIGHTS = {
     '數學': 4,
 };
 
+// 預先計算鍵值，避免在熱點函數中重複建立陣列，提升效能並減少 GC 開銷
+const SUBJECT_WEIGHT_KEYS = Object.keys(SUBJECT_WEIGHTS);
+
 // 取得科目權重
 function getSubjectWeight(subjectName) {
     // 先嘗試完全匹配
@@ -19,7 +22,7 @@ function getSubjectWeight(subjectName) {
         return SUBJECT_WEIGHTS[subjectName];
     }
     // 嘗試部分匹配（例如 "選修化學-物質與能量" 匹配 "選修化學"）
-    for (const key of Object.keys(SUBJECT_WEIGHTS)) {
+    for (const key of SUBJECT_WEIGHT_KEYS) {
         if (subjectName.includes(key) || key.includes(subjectName)) {
             return SUBJECT_WEIGHTS[key];
         }
