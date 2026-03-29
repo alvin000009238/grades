@@ -12,7 +12,7 @@ const SUBJECT_WEIGHTS = {
     '數學': 4,
 };
 
-// 避免在每次呼叫 getSubjectWeight 時重新建立陣列，減少記憶體分配與垃圾回收開銷
+// 預先計算鍵值，避免在熱點函數中重複建立陣列，提升效能並減少 GC 開銷
 const SUBJECT_WEIGHT_KEYS = Object.keys(SUBJECT_WEIGHTS);
 
 // 取得科目權重
