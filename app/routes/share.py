@@ -20,8 +20,8 @@ bp = Blueprint('share', __name__)
 def create_share_link():
     try:
         data = request.json
-        if not data:
-            return jsonify({'error': 'No data provided'}), 400
+        if not data or not isinstance(data, dict):
+            return jsonify({'error': 'No data provided or invalid format'}), 400
 
         # Turnstile 人機驗證
         ts_ok, ts_err = verify_turnstile_token(
