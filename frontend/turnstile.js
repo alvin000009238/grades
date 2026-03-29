@@ -3,19 +3,28 @@
 // ========================================
 
 let turnstileSiteKey = '';
+let configLoaded = false;
 
 export async function loadTurnstileConfig() {
+    if (configLoaded) return;
+    configLoaded = true;
     try {
         const res = await fetch('/api/turnstile-config');
         const data = await res.json();
         turnstileSiteKey = data.siteKey || '';
     } catch (e) {
+        configLoaded = false; // 允許重試
         console.warn('Failed to load Turnstile config', e);
     }
 }
 
 export function requestTurnstileVerification() {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
+        // Lazy load config on first verification
+        if (!configLoaded) {
+            await loadTurnstileConfig();
+        }
+
         // 若未設定 site key，直接放行
         if (!turnstileSiteKey) {
             resolve('');

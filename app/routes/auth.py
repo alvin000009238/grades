@@ -29,7 +29,15 @@ def login():
     masked_username = (username[:3] + "***") if username and len(username) > 3 else "***"
     logger.info(f'Login attempt for user: {masked_username}')
 
-    # 速率限制檢查（在 Turnstile 之前）
+    # Turnstile 人機驗證
+    ts_ok, ts_err = verify_turnstile_token(
+        data.get('turnstile_token'),
+        remoteip=request.remote_addr
+    )
+    if not ts_ok:
+        return jsonify({'success': False, 'message': ts_err}), 403
+
+    # 速率限制檢查（在 Turnstile 之後）
     redis_client = current_app.config.get('REDIS_CLIENT')
     if redis_client:
         try:
@@ -48,11 +56,6 @@ def login():
                 return resp, 429
         except Exception as exc:
             logger.error(f'Rate limiter error: {exc}', exc_info=True)
-
-    # Turnstile 人機驗證
-    ts_ok, ts_err = verify_turnstile_token(data.get('turnstile_token'))
-    if not ts_ok:
-        return jsonify({'success': False, 'message': ts_err}), 403
 
     if not username or not password:
         return jsonify({'success': False, 'message': '請輸入帳號密碼'}), 400

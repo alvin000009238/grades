@@ -2,7 +2,6 @@
 // localStorage 管理與資料驗證
 // ========================================
 
-import { checkSharedLink } from './share.js';
 import { initDashboard } from './dashboard.js';
 
 // HTML 跳脫輔助函數，防範 XSS
@@ -35,8 +34,10 @@ export function checkDisclaimer() {
 }
 
 export async function loadGradesData() {
-    if (await checkSharedLink()) {
-        return;
+    // 只在 /share/ 路由時才動態載入分享模組
+    if (window.location.pathname.startsWith('/share/')) {
+        const { checkSharedLink } = await import('./share.js');
+        if (await checkSharedLink()) return;
     }
 
     try {

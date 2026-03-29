@@ -1,5 +1,6 @@
 from flask import Blueprint, current_app, jsonify, request, send_from_directory
 
+from app.services.rate_limiter import is_rate_limited
 from app.services.share_service import (
     generate_share_id,
     is_valid_share_id,
@@ -23,9 +24,33 @@ def create_share_link():
             return jsonify({'error': 'No data provided'}), 400
 
         # Turnstile 人機驗證
-        ts_ok, ts_err = verify_turnstile_token(data.get('turnstile_token'))
+        ts_ok, ts_err = verify_turnstile_token(
+            data.get('turnstile_token'),
+            remoteip=request.remote_addr
+        )
         if not ts_ok:
             return jsonify({'error': ts_err}), 403
+
+        # 速率限制檢查（在 Turnstile 之後）
+        redis_client = current_app.config.get('REDIS_CLIENT')
+        if redis_client:
+            try:
+                # 較寬鬆的速率限制：每小時 (3600 秒) 10 次
+                limited, remaining, retry_after = is_rate_limited(
+                    redis_client, request.remote_addr,
+                    max_attempts=10,
+                    window_seconds=3600,
+                    key_prefix="share"
+                )
+                if limited:
+                    logger.warning(f'Rate limited share creation from IP: {request.remote_addr}')
+                    resp = jsonify({
+                        'error': f'建立分享連結過於頻繁，請在 {retry_after} 秒後再試',
+                    })
+                    resp.headers['Retry-After'] = str(retry_after)
+                    return resp, 429
+            except Exception as exc:
+                logger.error(f'Rate limiter error: {exc}', exc_info=True)
 
         # Payload 大小與結構校驗
         valid, err, cleaned = validate_share_payload(data)
