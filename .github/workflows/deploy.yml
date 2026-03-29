@@ -261,7 +261,7 @@ jobs:
             echo "🏥 Health Check 驗證..."
             HEALTH_OK=false
             for i in $(seq 1 6); do
-              if curl -sf http://localhost:5000/health; then
+              if docker run --rm --network app_network "$TARGET_IMAGE" curl -sf http://$APP_SERVICE_NAME:5000/health > /dev/null; then
                 echo ""
                 HEALTH_OK=true
                 break
