@@ -14,6 +14,17 @@ from fetcher import GradeFetcher
 
 load_dotenv()
 
+SECRETS_DIR = '/run/secrets'
+
+
+def _read_secret(name, default=''):
+    """優先從 Docker Swarm Secret 檔案讀取，fallback 到環境變數。"""
+    secret_path = os.path.join(SECRETS_DIR, name)
+    if os.path.isfile(secret_path):
+        with open(secret_path) as f:
+            return f.read().strip()
+    return os.environ.get(name, default)
+
 
 def create_app():
     root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,7 +35,7 @@ def create_app():
         g.request_id = request.headers.get('X-Request-Id', str(uuid.uuid4())[:8])
 
 
-    secret_key = os.environ.get('SECRET_KEY')
+    secret_key = _read_secret('SECRET_KEY', '')
     if not secret_key:
         flask_env = os.environ.get('FLASK_ENV', '').lower()
         app_env = os.environ.get('APP_ENV', '').lower()
@@ -62,7 +73,7 @@ def create_app():
         print("WARNING: Redis not available. Using filesystem session fallback for development.")
 
     app.config['TURNSTILE_SITE_KEY'] = os.environ.get('TURNSTILE_SITE_KEY', '')
-    app.config['TURNSTILE_SECRET_KEY'] = os.environ.get('TURNSTILE_SECRET_KEY', '')
+    app.config['TURNSTILE_SECRET_KEY'] = _read_secret('TURNSTILE_SECRET_KEY', '')
 
     app.config['SHARE_TTL'] = int(os.environ.get('SHARE_TTL', 7200))
 

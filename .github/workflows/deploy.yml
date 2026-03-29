@@ -23,9 +23,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Basic Syntax Check
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Syntax Check & Smoke Test
+        env:
+          APP_ENV: testing
         run: |
+          pip install -r requirements.txt
           python3 -m compileall app fetcher.py server.py
+          python3 -c "from app import create_app; app = create_app(); print(f'✅ Flask loaded with {len(app.url_map._rules)} routes')"
 
       - name: Set Environment Variables based on Branch
         run: |
@@ -86,7 +97,7 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           envs: GHCR_PAT,SECRET_KEY,CORS_ORIGINS,TURNSTILE_SITE_KEY,TURNSTILE_SECRET_KEY,TUNNEL_TOKEN_PROD,TUNNEL_TOKEN_DEV
           script: |
-            # Determine target environment settings
+            # ===== 環境判斷 =====
             if [ "${{ github.ref_name }}" = "main" ]; then
               APP_SERVICE_NAME="school_grades_app"
               TUNNEL_SERVICE_NAME="school_grades_tunnel"
@@ -98,65 +109,173 @@ jobs:
               CURRENT_TUNNEL_TOKEN="$TUNNEL_TOKEN_DEV"
               IMAGE_TAG_PREFIX="dev-sha-"
             fi
-            
-            # 登入 GHCR
-            echo "$GHCR_PAT" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            
-            # 確保 overlay 網路存在
-            docker network create -d overlay app_network || true
-            
+
             TARGET_IMAGE="ghcr.io/${{ github.repository }}:${IMAGE_TAG_PREFIX}${{ github.sha }}"
-            
-            # 使用明確 SHA tag 更新應用程式服務 (避免 latest 不觸發更新的問題)
-            if docker service inspect $APP_SERVICE_NAME > /dev/null 2>&1; then
-              docker service update \
-                --with-registry-auth \
-                --image "$TARGET_IMAGE" \
-                --env-add REDIS_URL=redis://redis:6379/0 \
-                --env-add SECRET_KEY="$SECRET_KEY" \
-                --env-add CORS_ORIGINS="$CORS_ORIGINS" \
-                --env-add TURNSTILE_SITE_KEY="$TURNSTILE_SITE_KEY" \
-                --env-add TURNSTILE_SECRET_KEY="$TURNSTILE_SECRET_KEY" \
-                $APP_SERVICE_NAME
-            else
-              docker service create \
-                --with-registry-auth \
-                --name $APP_SERVICE_NAME \
-                --network app_network \
-                --env REDIS_URL=redis://redis:6379/0 \
-                --env SECRET_KEY="$SECRET_KEY" \
-                --env CORS_ORIGINS="$CORS_ORIGINS" \
-                --env TURNSTILE_SITE_KEY="$TURNSTILE_SITE_KEY" \
-                --env TURNSTILE_SECRET_KEY="$TURNSTILE_SECRET_KEY" \
-                "$TARGET_IMAGE"
+
+            # ===== Step 1: 登入 GHCR =====
+            echo "🔑 登入 GHCR..."
+            echo "$GHCR_PAT" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+
+            # ===== Step 2: 確保 overlay 網路 =====
+            if ! docker network inspect app_network > /dev/null 2>&1; then
+              echo "🌐 建立 overlay 網路 app_network..."
+              docker network create -d overlay app_network
             fi
-              
-            # 確保 Redis 服務啟動並加入網路
+
+            # ===== Step 3: 確保 Redis 就緒 =====
+            echo "📦 部署 Redis..."
             if docker service inspect redis > /dev/null 2>&1; then
-              docker service update \
-                --image redis:7-alpine \
-                redis
+              docker service update --image redis:7-alpine redis
             else
               docker service create \
                 --name redis \
                 --network app_network \
                 redis:7-alpine
             fi
-            
-            # 確保 Tunnel 也加入此網路 (如果您原本有啟動 tunnel)
+
+            echo "⏳ 等待 Redis 就緒..."
+            for i in $(seq 1 30); do
+              REDIS_CONTAINER=$(docker ps -q -f name=redis 2>/dev/null | head -1)
+              if [ -n "$REDIS_CONTAINER" ] && docker exec "$REDIS_CONTAINER" redis-cli ping 2>/dev/null | grep -q PONG; then
+                echo "✅ Redis 已就緒 (PONG)"
+                break
+              fi
+              if [ "$i" = "30" ]; then
+                echo "❌ Redis 等待逾時！"
+                exit 1
+              fi
+              sleep 2
+            done
+
+            # ===== Step 4: 建立版本化 Docker Swarm Secrets =====
+            SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+            echo "🔐 建立 Swarm Secrets (版本: ${SHORT_SHA})..."
+            echo "$SECRET_KEY" | docker secret create "SECRET_KEY_${SHORT_SHA}" -
+            echo "$TURNSTILE_SECRET_KEY" | docker secret create "TURNSTILE_SECRET_KEY_${SHORT_SHA}" -
+
+            # ===== Step 5: 部署 App（含 healthcheck + rollback + secrets） =====
+            echo "🚀 部署 App: $TARGET_IMAGE"
+            if docker service inspect $APP_SERVICE_NAME > /dev/null 2>&1; then
+              # 找出目前掛載的 secrets 以便移除
+              OLD_SECRETS=$(docker service inspect $APP_SERVICE_NAME \
+                --format '{{range .Spec.TaskTemplate.ContainerSpec.Secrets}}{{.SecretName}} {{end}}' 2>/dev/null || echo "")
+
+              SECRET_RM_ARGS=""
+              for s in $OLD_SECRETS; do
+                SECRET_RM_ARGS="$SECRET_RM_ARGS --secret-rm $s"
+              done
+
+              # 同時清理可能殘留的 env 版 secrets
+              docker service update \
+                --with-registry-auth \
+                --image "$TARGET_IMAGE" \
+                --env-rm REDIS_URL \
+                --env-add REDIS_URL=redis://redis:6379/0 \
+                --env-rm SECRET_KEY \
+                --env-rm TURNSTILE_SECRET_KEY \
+                --env-rm CORS_ORIGINS \
+                --env-add CORS_ORIGINS="$CORS_ORIGINS" \
+                --env-rm TURNSTILE_SITE_KEY \
+                --env-add TURNSTILE_SITE_KEY="$TURNSTILE_SITE_KEY" \
+                $SECRET_RM_ARGS \
+                --secret-add source=SECRET_KEY_${SHORT_SHA},target=SECRET_KEY \
+                --secret-add source=TURNSTILE_SECRET_KEY_${SHORT_SHA},target=TURNSTILE_SECRET_KEY \
+                --health-cmd "curl -f http://localhost:5000/health || exit 1" \
+                --health-interval 10s \
+                --health-timeout 5s \
+                --health-retries 3 \
+                --health-start-period 15s \
+                --update-order start-first \
+                --update-failure-action rollback \
+                --rollback-order stop-first \
+                --rollback-max-failure-ratio 0 \
+                $APP_SERVICE_NAME
+
+              # 清理舊版 secrets
+              for s in $OLD_SECRETS; do
+                docker secret rm "$s" 2>/dev/null || true
+              done
+            else
+              docker service create \
+                --with-registry-auth \
+                --name $APP_SERVICE_NAME \
+                --network app_network \
+                --env REDIS_URL=redis://redis:6379/0 \
+                --env CORS_ORIGINS="$CORS_ORIGINS" \
+                --env TURNSTILE_SITE_KEY="$TURNSTILE_SITE_KEY" \
+                --secret source=SECRET_KEY_${SHORT_SHA},target=SECRET_KEY \
+                --secret source=TURNSTILE_SECRET_KEY_${SHORT_SHA},target=TURNSTILE_SECRET_KEY \
+                --health-cmd "curl -f http://localhost:5000/health || exit 1" \
+                --health-interval 10s \
+                --health-timeout 5s \
+                --health-retries 3 \
+                --health-start-period 15s \
+                --update-order start-first \
+                --update-failure-action rollback \
+                --rollback-order stop-first \
+                --rollback-max-failure-ratio 0 \
+                "$TARGET_IMAGE"
+            fi
+
+            # ===== Step 6: 部署 Tunnel =====
             if [ -n "$CURRENT_TUNNEL_TOKEN" ]; then
+              echo "🔗 部署 Cloudflare Tunnel..."
               if docker service inspect $TUNNEL_SERVICE_NAME > /dev/null 2>&1; then
                 docker service update \
+                  --env-rm TUNNEL_TOKEN \
                   --env-add TUNNEL_TOKEN="$CURRENT_TUNNEL_TOKEN" \
+                  $TUNNEL_SERVICE_NAME
+                docker service update \
                   --network-add app_network $TUNNEL_SERVICE_NAME > /dev/null 2>&1 || true
               else
                 docker service create \
                   --name $TUNNEL_SERVICE_NAME \
                   --network app_network \
                   --env TUNNEL_TOKEN="$CURRENT_TUNNEL_TOKEN" \
-                  cloudflare/cloudflared:latest tunnel run
+                  cloudflare/cloudflared:latest tunnel --no-autoupdate run
               fi
             fi
-            
-            # 等待更新完成並檢查狀態
-            docker service ps $APP_SERVICE_NAME --no-trunc --format "{{.CurrentState}}" | head -1
+
+            # ===== Step 7: 部署驗證 =====
+            echo ""
+            echo "========================================="
+            echo "  📋 部署驗證"
+            echo "========================================="
+            echo ""
+
+            echo "⏳ 等待服務啟動..."
+            sleep 15
+
+            echo "📋 服務總覽："
+            docker service ls
+            echo ""
+
+            echo "📋 App 服務任務狀態："
+            docker service ps $APP_SERVICE_NAME --no-trunc
+            echo ""
+
+            echo "📋 App 最近日誌："
+            docker service logs $APP_SERVICE_NAME --tail 30 --no-task-ids 2>&1 || true
+            echo ""
+
+            echo "🏥 Health Check 驗證..."
+            HEALTH_OK=false
+            for i in $(seq 1 6); do
+              if curl -sf http://localhost:5000/health; then
+                echo ""
+                HEALTH_OK=true
+                break
+              fi
+              echo "  重試中... ($i/6)"
+              sleep 5
+            done
+
+            if [ "$HEALTH_OK" = "true" ]; then
+              echo "✅ 部署驗證通過！"
+            else
+              echo ""
+              echo "❌ Health Check 驗證失敗！"
+              echo "📋 錯誤日誌："
+              docker service logs $APP_SERVICE_NAME --tail 50 --no-task-ids 2>&1 || true
+              exit 1
+            fi
