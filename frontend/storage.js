@@ -5,17 +5,18 @@
 import { initDashboard } from './dashboard.js';
 
 // HTML 跳脫輔助函數，防範 XSS
+const ESCAPE_MAP = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+};
+
 export function escapeHTML(str) {
     if (str === null || str === undefined) return '';
     const text = String(str);
-    const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-    };
-    return text.replace(/[&<>"']/g, function (m) { return map[m]; });
+    return text.replace(/[&<>"']/g, function (m) { return ESCAPE_MAP[m]; });
 }
 
 export function checkDisclaimer() {

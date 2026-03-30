@@ -268,16 +268,17 @@ function getScoreClass(score) {
 }
 
 // 縮短科目名稱
+const SHORT_NAMES = {
+    '英語文': '英文',
+    '公民與社會': '公民',
+    '選修化學-物質與能量': '化學',
+    '選修物理-力學一': '物理',
+    '選修化學': '化學',
+    '選修物理': '物理'
+};
+
 export function shortenName(name) {
-    const shortNames = {
-        '英語文': '英文',
-        '公民與社會': '公民',
-        '選修化學-物質與能量': '化學',
-        '選修物理-力學一': '物理',
-        '選修化學': '化學',
-        '選修物理': '物理'
-    };
-    return shortNames[name] || name;
+    return SHORT_NAMES[name] || name;
 }
 
 // 生成五標表格
@@ -320,12 +321,20 @@ function cleanSubjectName(name) {
 }
 
 // 取得成績等級
+const SCORE_LEVELS = {
+    EXCELLENT: Object.freeze({ text: '頂標以上', class: 'excellent' }),
+    GOOD: Object.freeze({ text: '前標以上', class: 'good' }),
+    AVERAGE: Object.freeze({ text: '均標以上', class: 'average' }),
+    BELOW: Object.freeze({ text: '後標以上', class: 'below' }),
+    POOR: Object.freeze({ text: '底標以下', class: 'poor' })
+};
+
 function getScoreLevel(score, std) {
-    if (score >= std["頂標"]) return { text: '頂標以上', class: 'excellent' };
-    if (score >= std["前標"]) return { text: '前標以上', class: 'good' };
-    if (score >= std["均標"]) return { text: '均標以上', class: 'average' };
-    if (score >= std["後標"]) return { text: '後標以上', class: 'below' };
-    return { text: '底標以下', class: 'poor' };
+    if (score >= std["頂標"]) return SCORE_LEVELS.EXCELLENT;
+    if (score >= std["前標"]) return SCORE_LEVELS.GOOD;
+    if (score >= std["均標"]) return SCORE_LEVELS.AVERAGE;
+    if (score >= std["後標"]) return SCORE_LEVELS.BELOW;
+    return SCORE_LEVELS.POOR;
 }
 
 // 生成分佈圖
