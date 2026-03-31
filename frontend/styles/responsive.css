@@ -24,9 +24,13 @@
 
     .header-content {
 
-        flex-direction: column;
+        flex-direction: row;
 
-        align-items: flex-start;
+        align-items: center;
+
+        gap: 10px;
+
+        flex-wrap: nowrap;
 
     }
 
@@ -34,9 +38,11 @@
 
     .data-time-box {
 
-        align-self: stretch;
+        align-self: auto;
 
-        justify-content: space-between;
+        justify-content: flex-end;
+
+        gap: 8px;
 
     }
 
@@ -45,11 +51,17 @@
         justify-content: flex-end;
     }
 
+    .time-info {
+        display: none;
+    }
+
 
 
     .logo-text h1 {
 
         font-size: 18px;
+
+        line-height: 1.2;
 
     }
 
@@ -194,4 +206,3 @@
     }
 
 }
-

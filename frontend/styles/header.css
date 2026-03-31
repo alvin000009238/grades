@@ -8,7 +8,7 @@
 
     z-index: 100;
 
-    padding: 14px 0;
+    padding: 10px 0;
 
     margin: 0 -24px 40px;
 
@@ -36,9 +36,9 @@
 
     align-items: center;
 
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 
-    gap: 16px;
+    gap: 12px;
 
     max-width: 1200px;
 
@@ -68,9 +68,9 @@
 
     justify-content: center;
 
-    width: 36px;
+    width: 32px;
 
-    height: 36px;
+    height: 32px;
 
     background: var(--color-primary);
 
@@ -86,9 +86,9 @@
 
 .logo-icon svg {
 
-    width: 20px;
+    width: 18px;
 
-    height: 20px;
+    height: 18px;
 
 }
 
@@ -97,6 +97,8 @@
 .logo-text h1 {
 
     font-size: 20px;
+
+    line-height: 1.2;
 
     font-weight: 600;
 
@@ -112,6 +114,8 @@
 
     background-clip: unset;
 
+    margin: 0;
+
 }
 
 
@@ -122,7 +126,9 @@
 
     font-size: 12px;
 
-    margin-top: 1px;
+    line-height: 1.2;
+
+    margin: 1px 0 0;
 
     font-weight: 400;
 
@@ -138,7 +144,7 @@
 
     align-items: center;
 
-    gap: 12px;
+    gap: 10px;
 
     position: relative;
 
@@ -197,6 +203,8 @@
 
     font-size: 12px;
 
+    line-height: 1.2;
+
     font-weight: 500;
 
     color: var(--color-text-secondary);
@@ -241,9 +249,9 @@
 
     gap: 8px;
 
-    height: 40px;
+    min-height: 36px;
 
-    padding: 0 18px;
+    padding: 0 14px;
 
     background: var(--color-primary);
 
@@ -484,4 +492,3 @@ visibility: visible;
     color: var(--color-text-muted);
 
 }
-
