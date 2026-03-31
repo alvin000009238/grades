@@ -3,7 +3,7 @@ const STORAGE_KEY = 'grades-theme';
 function getInitialTheme() {
     const storedTheme = localStorage.getItem(STORAGE_KEY);
     if (storedTheme === 'light' || storedTheme === 'dark') return storedTheme;
-    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    return 'dark';
 }
 
 function applyTheme(theme) {
