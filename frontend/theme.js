@@ -29,6 +29,10 @@ function applyTheme(theme) {
         toggleBtn.setAttribute('aria-label', `切換至${nextThemeLabel}模式`);
         toggleBtn.setAttribute('title', `切換至${nextThemeLabel}模式`);
     }
+
+    document.dispatchEvent(new CustomEvent('themechange', {
+        detail: { theme }
+    }));
 }
 
 export function setupThemeToggle() {
