@@ -105,3 +105,13 @@ body.read-only-mode .data-time-box {
     justify-content: space-between;
 }
 
+body.read-only-mode .time-label {
+    display: none;
+}
+
+body.read-only-mode .time-info {
+    min-height: 36px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
