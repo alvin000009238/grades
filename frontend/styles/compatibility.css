@@ -80,8 +80,6 @@
 
 /* Read Only Mode */
 
-body.read-only-mode .time-info,
-
 body.read-only-mode .import-dropdown,
 
 body.read-only-mode #shareBtn,
@@ -101,6 +99,5 @@ body.read-only-mode .header {
     border-bottom: 1px solid var(--color-warning-muted);
 
 }
-
 
 
