@@ -152,7 +152,6 @@
 
     white-space: nowrap;
 
-<<<<<<< codex/reduce-header-height-for-better-ux-d99l1w
     flex: 1 1 auto;
 
     min-width: 0;
@@ -164,8 +163,6 @@
     align-items: baseline;
     gap: 6px;
     min-width: 0;
-=======
->>>>>>> dev
 }
 
 
@@ -199,7 +196,6 @@
 .header-status-badge {
     display: none;
     align-items: center;
-<<<<<<< codex/reduce-header-height-for-better-ux-d99l1w
     min-height: 18px;
     padding: 1px 6px;
     border: 1px solid var(--color-warning-muted);
@@ -211,18 +207,6 @@
     line-height: 1.2;
     white-space: nowrap;
     flex-shrink: 0;
-=======
-    min-height: 24px;
-    padding: 2px 8px;
-    border: 1px solid var(--color-warning-muted);
-    border-radius: var(--radius-pill);
-    color: var(--color-warning);
-    background: color-mix(in srgb, var(--color-warning-muted) 60%, transparent);
-    font-size: 11px;
-    font-weight: 500;
-    line-height: 1.2;
-    white-space: nowrap;
->>>>>>> dev
 }
 
 body.read-only-mode .header-status-badge {
