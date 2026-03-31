@@ -13,6 +13,12 @@ let barChartInstance = null;
 let chartJsLoadPromise = null;
 let latestRenderToken = 0;
 
+if (typeof document !== 'undefined') {
+    document.addEventListener('themechange', () => {
+        applyThemeToExistingCharts();
+    });
+}
+
 export function generateCharts(subjects) {
     if (!Array.isArray(subjects) || subjects.length === 0) return;
 
@@ -103,6 +109,8 @@ function updateRadarChart(ChartCtor, labels, myScores, avgScores) {
     const radarCtx = radarCanvas?.getContext('2d');
     if (!radarCtx) return;
 
+    const palette = getChartThemePalette();
+
     if (!radarChartInstance) {
         radarChartInstance = new ChartCtor(radarCtx, {
             type: 'radar',
@@ -116,8 +124,8 @@ function updateRadarChart(ChartCtor, labels, myScores, avgScores) {
                         borderColor: '#6366f1',
                         borderWidth: 2,
                         pointBackgroundColor: '#6366f1',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
+                        pointBorderColor: palette.surface,
+                        pointHoverBackgroundColor: palette.surface,
                         pointHoverBorderColor: '#6366f1'
                     },
                     {
@@ -127,8 +135,8 @@ function updateRadarChart(ChartCtor, labels, myScores, avgScores) {
                         borderColor: '#10b981',
                         borderWidth: 2,
                         pointBackgroundColor: '#10b981',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
+                        pointBorderColor: palette.surface,
+                        pointHoverBackgroundColor: palette.surface,
                         pointHoverBorderColor: '#10b981'
                     }
                 ]
@@ -142,17 +150,17 @@ function updateRadarChart(ChartCtor, labels, myScores, avgScores) {
                         max: 100,
                         ticks: {
                             stepSize: 20,
-                            color: '#94a3b8',
+                            color: palette.textMuted,
                             backdropColor: 'transparent'
                         },
                         grid: {
-                            color: 'rgba(148, 163, 184, 0.2)'
+                            color: palette.grid
                         },
                         angleLines: {
-                            color: 'rgba(148, 163, 184, 0.2)'
+                            color: palette.grid
                         },
                         pointLabels: {
-                            color: '#f8fafc',
+                            color: palette.textSecondary,
                             font: {
                                 size: 12
                             }
@@ -163,7 +171,7 @@ function updateRadarChart(ChartCtor, labels, myScores, avgScores) {
                     legend: {
                         position: 'bottom',
                         labels: {
-                            color: '#f8fafc',
+                            color: palette.textMain,
                             padding: 20,
                             font: {
                                 size: 13
@@ -186,6 +194,8 @@ function updateBarChart(ChartCtor, labels, myScores, avgScores) {
     const barCanvas = document.getElementById('barChart');
     const barCtx = barCanvas?.getContext('2d');
     if (!barCtx) return;
+
+    const palette = getChartThemePalette();
 
     if (!barChartInstance) {
         barChartInstance = new ChartCtor(barCtx, {
@@ -217,20 +227,20 @@ function updateBarChart(ChartCtor, labels, myScores, avgScores) {
                 scales: {
                     x: {
                         grid: {
-                            color: 'rgba(148, 163, 184, 0.1)'
+                            color: palette.gridSubtle
                         },
                         ticks: {
-                            color: '#94a3b8'
+                            color: palette.textMuted
                         }
                     },
                     y: {
                         beginAtZero: true,
                         max: 100,
                         grid: {
-                            color: 'rgba(148, 163, 184, 0.1)'
+                            color: palette.gridSubtle
                         },
                         ticks: {
-                            color: '#94a3b8'
+                            color: palette.textMuted
                         }
                     }
                 },
@@ -238,7 +248,7 @@ function updateBarChart(ChartCtor, labels, myScores, avgScores) {
                     legend: {
                         position: 'bottom',
                         labels: {
-                            color: '#f8fafc',
+                            color: palette.textMain,
                             padding: 20,
                             font: {
                                 size: 13
@@ -255,6 +265,69 @@ function updateBarChart(ChartCtor, labels, myScores, avgScores) {
     barChartInstance.data.datasets[0].data = myScores;
     barChartInstance.data.datasets[1].data = avgScores;
     barChartInstance.update('none');
+}
+
+function getChartThemePalette() {
+    const styles = getComputedStyle(document.documentElement);
+    const readVar = (name, fallback) => {
+        const value = styles.getPropertyValue(name).trim();
+        return value || fallback;
+    };
+
+    return {
+        textMain: readVar('--color-text-main', '#0f172a'),
+        textSecondary: readVar('--color-text-secondary', '#334155'),
+        textMuted: readVar('--color-text-muted', '#64748b'),
+        surface: readVar('--color-surface-elevated', '#ffffff'),
+        grid: readVar('--color-border-subtle', 'rgba(148, 163, 184, 0.22)'),
+        gridSubtle: readVar('--color-border-subtle', 'rgba(148, 163, 184, 0.16)')
+    };
+}
+
+function applyThemeToExistingCharts() {
+    const palette = getChartThemePalette();
+
+    if (radarChartInstance) {
+        const radarOptions = radarChartInstance.options;
+        const radarScale = radarOptions.scales?.r;
+        const radarLegendLabels = radarOptions.plugins?.legend?.labels;
+        if (radarScale) {
+            radarScale.ticks.color = palette.textMuted;
+            radarScale.grid.color = palette.grid;
+            radarScale.angleLines.color = palette.grid;
+            radarScale.pointLabels.color = palette.textSecondary;
+        }
+        if (radarLegendLabels) {
+            radarLegendLabels.color = palette.textMain;
+        }
+
+        radarChartInstance.data.datasets.forEach((dataset) => {
+            dataset.pointBorderColor = palette.surface;
+            dataset.pointHoverBackgroundColor = palette.surface;
+        });
+
+        radarChartInstance.update('none');
+    }
+
+    if (barChartInstance) {
+        const barOptions = barChartInstance.options;
+        const xScale = barOptions.scales?.x;
+        const yScale = barOptions.scales?.y;
+        const barLegendLabels = barOptions.plugins?.legend?.labels;
+        if (xScale) {
+            xScale.grid.color = palette.gridSubtle;
+            xScale.ticks.color = palette.textMuted;
+        }
+        if (yScale) {
+            yScale.grid.color = palette.gridSubtle;
+            yScale.ticks.color = palette.textMuted;
+        }
+        if (barLegendLabels) {
+            barLegendLabels.color = palette.textMain;
+        }
+
+        barChartInstance.update('none');
+    }
 }
 
 function clearCanvas(canvasId) {

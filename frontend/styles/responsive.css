@@ -40,6 +40,11 @@
 
     }
 
+    .header-actions {
+        width: auto;
+        justify-content: flex-end;
+    }
+
 
 
     .logo-text h1 {
@@ -189,6 +194,4 @@
     }
 
 }
-
-
 
