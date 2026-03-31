@@ -25,13 +25,14 @@ export function generateCharts(subjects) {
     const labels = subjects.map((subject) => shortenName(subject.SubjectName));
     const myScores = subjects.map((subject) => subject.scoreValue ?? getNumericScore(subject.ScoreDisplay, subject.Score));
     const avgScores = subjects.map((subject) => subject.classAvgValue ?? getNumericScore(subject.ClassAVGScoreDisplay, subject.ClassAVGScore));
+    const palette = getChartThemePalette();
     const renderToken = ++latestRenderToken;
 
     ensureChartJsLoaded()
         .then((ChartCtor) => {
             if (renderToken !== latestRenderToken) return;
-            updateRadarChart(ChartCtor, labels, myScores, avgScores);
-            updateBarChart(ChartCtor, labels, myScores, avgScores);
+            updateRadarChart(ChartCtor, labels, myScores, avgScores, palette);
+            updateBarChart(ChartCtor, labels, myScores, avgScores, palette);
         })
         .catch((error) => {
             console.warn('Failed to load Chart.js', error);
@@ -104,12 +105,10 @@ function ensureChartJsLoaded() {
     return chartJsLoadPromise;
 }
 
-function updateRadarChart(ChartCtor, labels, myScores, avgScores) {
+function updateRadarChart(ChartCtor, labels, myScores, avgScores, palette) {
     const radarCanvas = document.getElementById('radarChart');
     const radarCtx = radarCanvas?.getContext('2d');
     if (!radarCtx) return;
-
-    const palette = getChartThemePalette();
 
     if (!radarChartInstance) {
         radarChartInstance = new ChartCtor(radarCtx, {
@@ -190,12 +189,10 @@ function updateRadarChart(ChartCtor, labels, myScores, avgScores) {
     radarChartInstance.update('none');
 }
 
-function updateBarChart(ChartCtor, labels, myScores, avgScores) {
+function updateBarChart(ChartCtor, labels, myScores, avgScores, palette) {
     const barCanvas = document.getElementById('barChart');
     const barCtx = barCanvas?.getContext('2d');
     if (!barCtx) return;
-
-    const palette = getChartThemePalette();
 
     if (!barChartInstance) {
         barChartInstance = new ChartCtor(barCtx, {
@@ -280,7 +277,7 @@ function getChartThemePalette() {
         textMuted: readVar('--color-text-muted', '#64748b'),
         surface: readVar('--color-surface-elevated', '#ffffff'),
         grid: readVar('--color-border-subtle', 'rgba(148, 163, 184, 0.22)'),
-        gridSubtle: readVar('--color-border-subtle', 'rgba(148, 163, 184, 0.16)')
+        gridSubtle: readVar('--color-border-extra-subtle', 'rgba(148, 163, 184, 0.16)')
     };
 }
 
@@ -328,6 +325,11 @@ function applyThemeToExistingCharts() {
 
         barChartInstance.update('none');
     }
+}
+
+export function __setChartInstancesForTest(instances = {}) {
+    if (Object.hasOwn(instances, 'radar')) radarChartInstance = instances.radar;
+    if (Object.hasOwn(instances, 'bar')) barChartInstance = instances.bar;
 }
 
 function clearCanvas(canvasId) {
