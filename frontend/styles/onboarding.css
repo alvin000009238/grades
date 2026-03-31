@@ -20,7 +20,7 @@
 
     inset: 0;
 
-    background: rgba(7, 10, 18, 0.68);
+    background: var(--color-tour-overlay);
 
 }
 
@@ -30,17 +30,17 @@
 
     position: fixed;
 
-    border: 2px solid rgba(168, 199, 250, 0.95);
+    border: 2px solid var(--color-tour-highlight);
 
     border-radius: 12px;
 
     box-shadow:
 
-        0 0 0 9999px rgba(7, 10, 18, 0.68),
+        0 0 0 9999px var(--color-tour-overlay),
 
-        0 0 0 1px rgba(255, 255, 255, 0.15) inset,
+        0 0 0 1px var(--color-tour-highlight-inset) inset,
 
-        0 0 24px rgba(168, 199, 250, 0.45);
+        0 0 24px var(--color-tour-highlight-glow);
 
     transition: all 0.2s var(--ease);
 
@@ -164,7 +164,7 @@
 
     z-index: 1550;
 
-    background: rgba(7, 10, 18, 0.68);
+    background: var(--color-tour-overlay);
 
     display: flex;
 

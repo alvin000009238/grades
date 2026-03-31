@@ -16,7 +16,7 @@
 
     padding-right: 24px;
 
-    background: rgba(28, 28, 30, 0.72);
+    background: var(--color-header-bg);
 
     backdrop-filter: blur(20px) saturate(1.8);
 
@@ -154,6 +154,12 @@
 
 }
 
+.header-actions {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    row-gap: 10px;
+}
+
 
 
 .time-info {
@@ -259,6 +265,10 @@
     box-shadow: none;
 
     touch-action: manipulation;
+
+    white-space: nowrap;
+
+    flex-shrink: 0;
 
 }
 
@@ -475,6 +485,5 @@ visibility: visible;
     color: var(--color-text-muted);
 
 }
-
 
 
