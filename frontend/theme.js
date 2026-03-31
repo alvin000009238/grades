@@ -1,12 +1,12 @@
 const STORAGE_KEY = 'grades-theme';
 
-function getInitialTheme() {
+export function getInitialTheme() {
     const storedTheme = localStorage.getItem(STORAGE_KEY);
     if (storedTheme === 'light' || storedTheme === 'dark') return storedTheme;
     return 'dark';
 }
 
-function applyTheme(theme) {
+export function applyTheme(theme) {
     const root = document.documentElement;
     if (theme === 'light') {
         root.setAttribute('data-theme', 'light');
