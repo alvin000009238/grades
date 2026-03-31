@@ -187,6 +187,10 @@
         display: none;
     }
 
+    .header-actions #syncBtn > span:last-child {
+        display: inline;
+    }
+
     .header-actions {
         flex-wrap: wrap;
     }
