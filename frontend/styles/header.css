@@ -56,6 +56,14 @@
 
     gap: 12px;
 
+    min-width: 0;
+
+    flex: 1 1 auto;
+
+}
+
+.header-title-group {
+    min-width: 0;
 }
 
 
@@ -116,6 +124,12 @@
 
     margin: 0;
 
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
 }
 
 
@@ -131,6 +145,12 @@
     margin: 1px 0 0;
 
     font-weight: 400;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
 
 }
 
@@ -158,11 +178,13 @@
 
     backdrop-filter: none;
 
+    min-width: 0;
+
 }
 
 .header-actions {
     justify-content: flex-end;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
 }
 
 

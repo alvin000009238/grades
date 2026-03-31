@@ -24,13 +24,9 @@
 
     .header-content {
 
-        flex-direction: row;
+        flex-wrap: wrap;
 
-        align-items: center;
-
-        gap: 10px;
-
-        flex-wrap: nowrap;
+        gap: 8px;
 
     }
 
@@ -38,21 +34,19 @@
 
     .data-time-box {
 
-        align-self: auto;
+        align-self: stretch;
 
-        justify-content: flex-end;
+        justify-content: space-between;
 
         gap: 8px;
+
+        flex-wrap: wrap;
 
     }
 
     .header-actions {
-        width: auto;
+        width: 100%;
         justify-content: flex-end;
-    }
-
-    .time-info {
-        display: none;
     }
 
 
@@ -60,8 +54,6 @@
     .logo-text h1 {
 
         font-size: 18px;
-
-        line-height: 1.2;
 
     }
 
@@ -172,6 +164,31 @@
 
 
 @media (max-width: 480px) {
+
+    .header {
+        margin-bottom: 20px;
+    }
+
+    .time-label {
+        display: none;
+    }
+
+    .time-info {
+        padding-right: 8px;
+    }
+
+    .time-value {
+        font-size: 11px;
+    }
+
+    .header-actions .import-dropdown-btn {
+        min-width: 36px;
+        padding: 0 10px;
+    }
+
+    .header-actions .import-dropdown-btn > span:last-child {
+        display: none;
+    }
 
     .student-details {
 
