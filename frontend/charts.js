@@ -12,9 +12,11 @@ let radarChartInstance = null;
 let barChartInstance = null;
 let chartJsLoadPromise = null;
 let latestRenderToken = 0;
+let cachedChartPalette = null;
 
 if (typeof document !== 'undefined') {
     document.addEventListener('themechange', () => {
+        cachedChartPalette = null;
         applyThemeToExistingCharts();
     });
 }
@@ -31,6 +33,8 @@ export function generateCharts(subjects) {
     ensureChartJsLoaded()
         .then((ChartCtor) => {
             if (renderToken !== latestRenderToken) return;
+
+            const palette = getCachedChartThemePalette();
             updateRadarChart(ChartCtor, labels, myScores, avgScores, palette);
             updateBarChart(ChartCtor, labels, myScores, avgScores, palette);
         })
@@ -281,8 +285,15 @@ function getChartThemePalette() {
     };
 }
 
+function getCachedChartThemePalette() {
+    if (!cachedChartPalette) {
+        cachedChartPalette = getChartThemePalette();
+    }
+    return cachedChartPalette;
+}
+
 function applyThemeToExistingCharts() {
-    const palette = getChartThemePalette();
+    const palette = getCachedChartThemePalette();
 
     if (radarChartInstance) {
         const radarOptions = radarChartInstance.options;

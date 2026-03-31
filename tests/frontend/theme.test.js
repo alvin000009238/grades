@@ -1,6 +1,7 @@
 import { beforeEach, afterEach, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
+import { getInitialTheme, applyTheme, setupThemeToggle } from '../../frontend/theme.js';
 
 let dom;
 let cleanupGlobals = [];
@@ -49,8 +50,6 @@ describe('theme.js', () => {
     });
 
     it('getInitialTheme should handle stored light/dark/invalid/missing values', async () => {
-        const { getInitialTheme } = await import(`../../frontend/theme.js?case=${Math.random()}`);
-
         localStorage.setItem('grades-theme', 'light');
         assert.equal(getInitialTheme(), 'light');
 
@@ -65,7 +64,6 @@ describe('theme.js', () => {
     });
 
     it('applyTheme should update data-theme, icon states, aria-label and title', async () => {
-        const { applyTheme } = await import(`../../frontend/theme.js?case=${Math.random()}`);
         const root = document.documentElement;
         const btn = document.getElementById('themeToggleBtn');
         const moon = btn.querySelector('.theme-icon-moon');
@@ -87,7 +85,6 @@ describe('theme.js', () => {
     });
 
     it('setupThemeToggle should toggle theme, persist localStorage and dispatch themechange', async () => {
-        const { setupThemeToggle } = await import(`../../frontend/theme.js?case=${Math.random()}`);
         localStorage.setItem('grades-theme', 'dark');
 
         const events = [];
@@ -115,8 +112,7 @@ describe('theme.js', () => {
         document.documentElement.style.setProperty('--color-border-subtle', 'rgba(1,1,1,0.3)');
         document.documentElement.style.setProperty('--color-border-extra-subtle', 'rgba(2,2,2,0.2)');
 
-        const charts = await import(`../../frontend/charts.js?case=${Math.random()}`);
-        const { applyTheme } = await import(`../../frontend/theme.js?case=${Math.random()}`);
+        const charts = await import('../../frontend/charts.js');
 
         const radar = {
             options: {
@@ -146,5 +142,17 @@ describe('theme.js', () => {
         assert.equal(radar.data.datasets[0].pointBorderColor, 'rgb(70, 80, 90)');
         assert.equal(radar.updateCalls, 1);
         assert.equal(bar.updateCalls, 1);
+
+        document.documentElement.style.setProperty('--color-border-subtle', 'rgba(9,9,9,0.9)');
+        document.documentElement.style.setProperty('--color-border-extra-subtle', 'rgba(8,8,8,0.8)');
+        document.documentElement.style.setProperty('--color-surface-elevated', 'rgb(7, 8, 9)');
+
+        applyTheme('dark');
+
+        assert.equal(radar.options.scales.r.grid.color, 'rgba(9,9,9,0.9)');
+        assert.equal(bar.options.scales.x.grid.color, 'rgba(8,8,8,0.8)');
+        assert.equal(radar.data.datasets[0].pointBorderColor, 'rgb(7, 8, 9)');
+        assert.equal(radar.updateCalls, 2);
+        assert.equal(bar.updateCalls, 2);
     });
 });
