@@ -156,8 +156,7 @@
 
 .header-actions {
     justify-content: flex-end;
-    flex-wrap: wrap;
-    row-gap: 10px;
+    flex-wrap: nowrap;
 }
 
 
@@ -244,7 +243,7 @@
 
     height: 40px;
 
-    padding: 0 24px;
+    padding: 0 18px;
 
     background: var(--color-primary);
 
@@ -254,7 +253,7 @@
 
     color: var(--md-sys-color-on-primary);
 
-    font-size: 14px;
+    font-size: 13px;
 
     font-weight: 500;
 
@@ -485,5 +484,4 @@ visibility: visible;
     color: var(--color-text-muted);
 
 }
-
 

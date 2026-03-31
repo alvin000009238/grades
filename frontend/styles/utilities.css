@@ -75,7 +75,9 @@
 }
 
 .theme-toggle-btn {
-    min-width: 92px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
     justify-content: center;
     background: var(--color-surface-elevated);
     color: var(--color-text-main);
@@ -87,8 +89,8 @@
     border-color: var(--color-border);
 }
 
-.theme-label {
-    line-height: 1;
+.theme-toggle-btn .dropdown-icon {
+    font-size: 18px;
 }
 
 

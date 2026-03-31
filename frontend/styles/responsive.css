@@ -41,8 +41,8 @@
     }
 
     .header-actions {
-        width: 100%;
-        justify-content: flex-start;
+        width: auto;
+        justify-content: flex-end;
     }
 
 
@@ -194,5 +194,4 @@
     }
 
 }
-
 
