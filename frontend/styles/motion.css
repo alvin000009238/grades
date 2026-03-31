@@ -132,7 +132,7 @@
 
 ::selection {
 
-    background: rgba(0, 122, 255, 0.25);
+    background: var(--color-selection);
 
 }
 

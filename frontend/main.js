@@ -4,6 +4,7 @@
 
 import './style.css';
 import { checkDisclaimer, loadGradesData } from './storage.js';
+import { setupThemeToggle } from './theme.js';
 
 // ── Lazy init 狀態 ──────────────────────
 let syncInited = false;
@@ -27,6 +28,7 @@ export async function ensureShareReady() {
 
 // ── 首屏必要初始化 ──────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+    setupThemeToggle();
     checkDisclaimer();
     loadGradesData();
 

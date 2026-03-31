@@ -74,6 +74,25 @@
 
 }
 
+.theme-toggle-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    justify-content: center;
+    background: var(--color-surface-elevated);
+    color: var(--color-text-main);
+    border: 1px solid var(--color-border-subtle);
+}
+
+.theme-toggle-btn:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-border);
+}
+
+.theme-toggle-btn .dropdown-icon {
+    font-size: 18px;
+}
+
 
 
 /* share.js utils */
