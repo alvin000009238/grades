@@ -27,6 +27,7 @@ export function generateCharts(subjects) {
     const labels = subjects.map((subject) => shortenName(subject.SubjectName));
     const myScores = subjects.map((subject) => subject.scoreValue ?? getNumericScore(subject.ScoreDisplay, subject.Score));
     const avgScores = subjects.map((subject) => subject.classAvgValue ?? getNumericScore(subject.ClassAVGScoreDisplay, subject.ClassAVGScore));
+    const palette = getChartThemePalette();
     const renderToken = ++latestRenderToken;
 
     ensureChartJsLoaded()
