@@ -267,17 +267,19 @@ function getScoreClass(score) {
     return 'low';
 }
 
+// 靜態科目縮寫對照表，提取至模組範圍以減少 GC
+const SHORT_NAMES = Object.freeze({
+    '英語文': '英文',
+    '公民與社會': '公民',
+    '選修化學-物質與能量': '化學',
+    '選修物理-力學一': '物理',
+    '選修化學': '化學',
+    '選修物理': '物理'
+});
+
 // 縮短科目名稱
 export function shortenName(name) {
-    const shortNames = {
-        '英語文': '英文',
-        '公民與社會': '公民',
-        '選修化學-物質與能量': '化學',
-        '選修物理-力學一': '物理',
-        '選修化學': '化學',
-        '選修物理': '物理'
-    };
-    return shortNames[name] || name;
+    return SHORT_NAMES[name] || name;
 }
 
 // 生成五標表格
@@ -319,13 +321,22 @@ function cleanSubjectName(name) {
     return name.replace(/<br\/>/g, '');
 }
 
+// 靜態成績等級結果，提取至模組範圍以減少 render loop 中的物件配置與 GC
+const SCORE_LEVELS = Object.freeze({
+    excellent: Object.freeze({ text: '頂標以上', class: 'excellent' }),
+    good: Object.freeze({ text: '前標以上', class: 'good' }),
+    average: Object.freeze({ text: '均標以上', class: 'average' }),
+    below: Object.freeze({ text: '後標以上', class: 'below' }),
+    poor: Object.freeze({ text: '底標以下', class: 'poor' })
+});
+
 // 取得成績等級
 function getScoreLevel(score, std) {
-    if (score >= std["頂標"]) return { text: '頂標以上', class: 'excellent' };
-    if (score >= std["前標"]) return { text: '前標以上', class: 'good' };
-    if (score >= std["均標"]) return { text: '均標以上', class: 'average' };
-    if (score >= std["後標"]) return { text: '後標以上', class: 'below' };
-    return { text: '底標以下', class: 'poor' };
+    if (score >= std["頂標"]) return SCORE_LEVELS.excellent;
+    if (score >= std["前標"]) return SCORE_LEVELS.good;
+    if (score >= std["均標"]) return SCORE_LEVELS.average;
+    if (score >= std["後標"]) return SCORE_LEVELS.below;
+    return SCORE_LEVELS.poor;
 }
 
 // 生成分佈圖
