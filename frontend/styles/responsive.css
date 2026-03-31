@@ -40,6 +40,11 @@
 
     }
 
+    .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
 
 
     .logo-text h1 {
@@ -189,6 +194,5 @@
     }
 
 }
-
 
 

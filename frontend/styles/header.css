@@ -154,6 +154,12 @@
 
 }
 
+.header-actions {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    row-gap: 10px;
+}
+
 
 
 .time-info {
@@ -259,6 +265,10 @@
     box-shadow: none;
 
     touch-action: manipulation;
+
+    white-space: nowrap;
+
+    flex-shrink: 0;
 
 }
 
@@ -475,6 +485,5 @@ visibility: visible;
     color: var(--color-text-muted);
 
 }
-
 
 
