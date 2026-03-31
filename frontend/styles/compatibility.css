@@ -100,4 +100,8 @@ body.read-only-mode .header {
 
 }
 
+body.read-only-mode .data-time-box {
+    width: 100%;
+    justify-content: space-between;
+}
 

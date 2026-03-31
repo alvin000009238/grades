@@ -213,6 +213,10 @@ body.read-only-mode .header-status-badge {
     display: inline-flex;
 }
 
+body.read-only-mode .header-status-badge:empty {
+    display: none;
+}
+
 .header-actions {
     justify-content: flex-end;
     flex-wrap: nowrap;
@@ -232,7 +236,7 @@ body.read-only-mode .header-status-badge {
 
     border-right: 1px solid var(--color-border-subtle);
 
-    align-items: flex-end;
+    align-items: center;
 
 }
 
@@ -314,7 +318,7 @@ body.read-only-mode .header-status-badge {
 
     border: none;
 
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-sm);
 
     color: var(--md-sys-color-on-primary);
 
