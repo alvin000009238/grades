@@ -22,30 +22,16 @@
 
 
 
-    .header-content {
-
-        flex-wrap: wrap;
-
-        gap: 8px;
-
-    }
-
-
-
     .data-time-box {
 
-        align-self: stretch;
-
-        justify-content: space-between;
+        justify-content: flex-end;
 
         gap: 8px;
-
-        flex-wrap: wrap;
 
     }
 
     .header-actions {
-        width: 100%;
+        width: auto;
         justify-content: flex-end;
     }
 
@@ -169,6 +155,17 @@
         margin-bottom: 20px;
     }
 
+    .header-content {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .data-time-box {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
     .time-label {
         display: none;
     }
@@ -188,6 +185,10 @@
 
     .header-actions .import-dropdown-btn > span:last-child {
         display: none;
+    }
+
+    .header-actions {
+        flex-wrap: wrap;
     }
 
     .student-details {

@@ -184,7 +184,7 @@
 
 .header-actions {
     justify-content: flex-end;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 
