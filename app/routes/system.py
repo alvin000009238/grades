@@ -33,16 +33,31 @@ def static_files(filename):
         return jsonify({'error': 'Forbidden'}), 403
 
     response = send_from_directory('public', filename)
-    if ext in ('.js', '.css', '.ico'):
+    if ext in ('.js', '.css'):
         response.cache_control.max_age = 31536000
-    elif ext in ('.woff', '.woff2', '.ttf', '.png', '.jpg', '.jpeg', '.gif', '.svg'):
+    elif ext in ('.woff', '.woff2', '.ttf', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico'):
         response.cache_control.max_age = 86400
     return response
 
 
 @bp.route('/health')
 def health_check():
-    return jsonify({'status': 'ok'}), 200
+    redis_client = current_app.config.get('REDIS_CLIENT')
+    redis_status = 'not_configured'
+
+    if redis_client:
+        try:
+            redis_client.ping()
+            redis_status = 'connected'
+        except Exception as e:
+            logger.error(f'Health check: Redis ping failed: {e}')
+            return jsonify({
+                'status': 'error',
+                'redis': 'disconnected',
+                'detail': str(e),
+            }), 503
+
+    return jsonify({'status': 'ok', 'redis': redis_status}), 200
 
 
 @bp.route('/api/turnstile-config')

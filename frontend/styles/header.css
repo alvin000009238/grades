@@ -354,8 +354,8 @@
 
     transform: translateY(-4px) scale(0.98);
 
-    transition: opacity 0.15s var(--ease), transform 0.15s var(--ease);
-
+    visibility: hidden;
+    transition: opacity 0.15s var(--ease), transform 0.15s var(--ease), visibility 0s linear 0.15s;
     z-index: 1000;
 
     overflow: hidden;
@@ -372,6 +372,8 @@
 
     transform: translateY(0) scale(1);
 
+visibility: visible;
+    transition: opacity 0.15s var(--ease), transform 0.15s var(--ease), visibility 0s linear 0s;
 }
 
 
