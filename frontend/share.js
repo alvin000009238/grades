@@ -164,14 +164,10 @@ export async function checkSharedLink() {
             if (data.success) {
                 initDashboard(data.data);
 
-                // Add header indicator
-                const header = document.querySelector('.header-content');
-                const indicator = document.createElement('div');
-                indicator.className = 'share-indicator';
-                indicator.innerHTML = '<span class="readonly-badge">僅供檢視 (唯讀)</span>';
-                // Insert before data-time-box
-                const timeBox = document.querySelector('.data-time-box');
-                header.insertBefore(indicator, timeBox);
+                document.querySelectorAll('.header-status-badge')
+                    .forEach((headerStatusBadge) => {
+                        headerStatusBadge.textContent = '僅供檢視';
+                    });
 
                 if (updateTime) updateTime.textContent = '分享存檔';
             } else {

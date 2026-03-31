@@ -22,21 +22,11 @@
 
 
 
-    .header-content {
-
-        flex-direction: column;
-
-        align-items: flex-start;
-
-    }
-
-
-
     .data-time-box {
 
-        align-self: stretch;
+        justify-content: flex-end;
 
-        justify-content: space-between;
+        gap: 8px;
 
     }
 
@@ -161,6 +151,50 @@
 
 @media (max-width: 480px) {
 
+    .header {
+        margin-bottom: 20px;
+    }
+
+    .header-content {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .data-time-box {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .time-label {
+        display: none;
+    }
+
+    .time-info {
+        padding-right: 8px;
+    }
+
+    .time-value {
+        font-size: 11px;
+    }
+
+    .header-actions .import-dropdown-btn {
+        min-width: 36px;
+        padding: 0 10px;
+    }
+
+    .header-actions .import-dropdown-btn > span:last-child {
+        display: none;
+    }
+
+    .header-actions #syncBtn > span:last-child {
+        display: inline;
+    }
+
+    .header-actions {
+        flex-wrap: wrap;
+    }
+
     .student-details {
 
         flex-direction: column;
@@ -194,4 +228,3 @@
     }
 
 }
-
