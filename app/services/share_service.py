@@ -1,17 +1,19 @@
 import json
 import secrets
 import string
+from datetime import datetime, timezone
 
 CHARS = string.ascii_letters + string.digits + '-_.~'
+SHARE_ID_LENGTH = 15
 SHARE_MAX_PAYLOAD_BYTES = 512_000  # 500 KB
 
 
-def generate_share_id(length=15):
-    return ''.join(secrets.choice(CHARS) for _ in range(length))
+def generate_share_id():
+    return ''.join(secrets.choice(CHARS) for _ in range(SHARE_ID_LENGTH))
 
 
 def is_valid_share_id(share_id):
-    return all(c in CHARS for c in share_id)
+    return len(share_id) == SHARE_ID_LENGTH and all(c in CHARS for c in share_id)
 
 
 def validate_share_payload(data, max_bytes=SHARE_MAX_PAYLOAD_BYTES):
@@ -51,6 +53,15 @@ def write_shared_data(redis_client, share_id, data, ttl=7200):
     redis_client.setex(cache_key, ttl, json.dumps(data, ensure_ascii=False))
 
 
+def write_share_metadata(redis_client, share_id, creator_student_no, ttl=7200):
+    cache_key = f"share_meta:{share_id}"
+    metadata = {
+        'creator_student_no': creator_student_no,
+        'created_at': datetime.now(timezone.utc).isoformat(),
+    }
+    redis_client.setex(cache_key, ttl, json.dumps(metadata, ensure_ascii=False))
+
+
 def read_shared_data(redis_client, share_id):
     cache_key = f"share:{share_id}"
     data_str = redis_client.get(cache_key)
@@ -58,3 +69,15 @@ def read_shared_data(redis_client, share_id):
         return None
     return json.loads(data_str)
 
+
+def read_share_metadata(redis_client, share_id):
+    cache_key = f"share_meta:{share_id}"
+    data_str = redis_client.get(cache_key)
+    if not data_str:
+        return None
+    return json.loads(data_str)
+
+
+def refresh_share_metadata_ttl(redis_client, share_id, ttl=7200):
+    cache_key = f"share_meta:{share_id}"
+    return redis_client.expire(cache_key, ttl) == 1

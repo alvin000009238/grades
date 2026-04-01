@@ -8,6 +8,30 @@ import { initDashboard } from './dashboard.js';
 import { emitOnboardingEvent, ONBOARDING_EVENTS } from './onboarding-events.js';
 import { showAlert } from './dialog.js';
 
+const ACTIVE_SHARE_ID_KEY = 'activeShareId';
+
+export function getActiveShareId() {
+    return localStorage.getItem(ACTIVE_SHARE_ID_KEY);
+}
+
+export async function updateActiveShare(gradesData) {
+    const shareId = getActiveShareId();
+    if (!shareId || !gradesData) return { attempted: false, ok: false, status: null };
+
+    const res = await fetch(`/api/share/${shareId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(gradesData)
+    });
+
+    if (!res.ok && (res.status === 404 || res.status === 403)) {
+        localStorage.removeItem(ACTIVE_SHARE_ID_KEY);
+    }
+
+    return { attempted: true, ok: res.ok, status: res.status };
+}
+
 export function setupShareFeature() {
     const shareBtn = document.getElementById('shareBtn');
     const shareModal = document.getElementById('shareModal');
@@ -86,12 +110,14 @@ export function setupShareFeature() {
                 const res = await fetch('/api/share', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
 
                 if (data.success) {
                     const link = `${window.location.origin}/share/${data.id}`;
+                    localStorage.setItem(ACTIVE_SHARE_ID_KEY, data.id);
                     shareLinkInput.value = link;
                     linkContainer.style.display = 'block';
                     createLinkBtn.style.display = 'none';
