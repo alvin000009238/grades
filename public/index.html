@@ -72,7 +72,7 @@
                         <h1>成績分析平台</h1>
                         <div class="subtitle-row">
                             <p class="subtitle" id="examTitle">--</p>
-                            <span class="header-status-badge" aria-live="polite"></span>
+                            <span class="header-status-badge" id="headerStatusBadge" aria-live="polite"></span>
                         </div>
                     </div>
                 </div>
@@ -80,8 +80,8 @@
                     <span class="header-status-badge" id="headerStatusBadge" aria-live="polite"></span>
                     <div class="time-info">
 
-                        <span class="time-label">資料更新時間</span>
-                        <span class="time-value" id="updateTime">--</span>
+                        <span class="time-label" id="updateTimeLabel">資料更新時間</span>
+                        <span class="time-value" id="updateTime" aria-labelledby="updateTimeLabel">--</span>
                     </div>
                     <div class="flex-center-gap-8 header-actions">
                         <button class="icon-btn theme-toggle-btn" id="themeToggleBtn" type="button" aria-label="切換至淺色模式"

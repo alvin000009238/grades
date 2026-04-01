@@ -164,10 +164,8 @@ export async function checkSharedLink() {
             if (data.success) {
                 initDashboard(data.data);
 
-                document.querySelectorAll('.header-status-badge')
-                    .forEach((headerStatusBadge) => {
-                        headerStatusBadge.textContent = '僅供檢視';
-                    });
+                const headerStatusBadge = document.getElementById('headerStatusBadge');
+                if (headerStatusBadge) headerStatusBadge.textContent = '僅供檢視';
 
                 if (updateTime) updateTime.textContent = '分享存檔';
             } else {

@@ -66,18 +66,6 @@
 
 
 
-.share-indicator {
-
-    display: flex;
-
-    align-items: center;
-
-    margin-right: 12px;
-
-}
-
-
-
 /* Read Only Mode */
 
 body.read-only-mode .import-dropdown,
