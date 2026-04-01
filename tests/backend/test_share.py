@@ -31,10 +31,12 @@ def test_validate_share_payload_valid():
         'Result': {
             'SubjectExamInfoList': []
         },
-        'turnstile_token': 'abc'
+        'turnstile_token': 'abc',
+        'share_expiry': '7d'
     }
     is_valid, err, cleaned = validate_share_payload(payload)
     assert is_valid
     assert err is None
     assert 'turnstile_token' not in cleaned
+    assert 'share_expiry' not in cleaned
     assert 'Result' in cleaned

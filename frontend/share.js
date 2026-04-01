@@ -45,9 +45,15 @@ export function setupShareFeature() {
         sharePreview.innerHTML = `
             <div class="share-modal-container">
                 <p class="share-modal-text">
-                    建立一個唯讀的分享連結，讓他人查看此成績單。<br>
-                    連結將於 <strong class="text-warning">2 小時後</strong> 自動失效。
+                    建立一個唯讀的分享連結，讓他人查看此成績單。
                 </p>
+                <div class="form-group mb-12">
+                    <label for="shareExpirySelect" class="form-label">連結有效期限</label>
+                    <select id="shareExpirySelect" class="form-input">
+                        <option value="2h">2 小時</option>
+                        <option value="7d">7 天</option>
+                    </select>
+                </div>
                 <div id="linkContainer" class="share-link-container hidden">
                     <div class="form-group mb-12">
                         <input type="text" id="shareLinkInput" readonly
@@ -81,6 +87,7 @@ export function setupShareFeature() {
         const shareLinkInput = document.getElementById('shareLinkInput');
         const copyLinkBtn = document.getElementById('copyLinkBtn');
         const shareStatus = document.getElementById('shareStatus');
+        const shareExpirySelect = document.getElementById('shareExpirySelect');
 
         createLinkBtn.addEventListener('click', async () => {
             const gradesData = getStoredGrades();
@@ -106,7 +113,11 @@ export function setupShareFeature() {
             shareStatus.textContent = '';
 
             try {
-                const payload = { ...gradesData, turnstile_token: turnstileToken };
+                const payload = {
+                    ...gradesData,
+                    turnstile_token: turnstileToken,
+                    share_expiry: shareExpirySelect?.value || '2h'
+                };
                 const res = await fetch('/api/share', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

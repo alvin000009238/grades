@@ -83,6 +83,33 @@ def test_share_create_and_update_by_owner_resets_ttl(client):
     assert redis_client.ttl(f'share_meta:{share_id}') == 7200
 
 
+def test_share_create_with_7d_expiry(client):
+    with client.session_transaction() as sess:
+        sess['student_no'] = 'A123'
+
+    payload = _share_payload()
+    payload['share_expiry'] = '7d'
+    create_res = client.post('/api/share', json=payload)
+    assert create_res.status_code == 200
+    share_id = create_res.get_json()['id']
+
+    redis_client = client.application.config['REDIS_CLIENT']
+    assert redis_client.ttl(f'share:{share_id}') == 604800
+    metadata = json.loads(redis_client.get(f'share_meta:{share_id}'))
+    assert metadata['ttl_seconds'] == 604800
+
+
+def test_share_create_rejects_invalid_expiry(client):
+    with client.session_transaction() as sess:
+        sess['student_no'] = 'A123'
+
+    payload = _share_payload()
+    payload['share_expiry'] = '30d'
+    create_res = client.post('/api/share', json=payload)
+    assert create_res.status_code == 400
+    assert create_res.get_json()['error'] == 'Invalid share expiry option'
+
+
 def test_share_update_by_other_user_forbidden(client):
     with client.session_transaction() as sess:
         sess['student_no'] = 'A123'

@@ -30,7 +30,7 @@ def validate_share_payload(data, max_bytes=SHARE_MAX_PAYLOAD_BYTES):
         return False, 'Payload 必須為 JSON 物件', None
 
     # 剝離非必要欄位
-    cleaned = {k: v for k, v in data.items() if k != 'turnstile_token'}
+    cleaned = {k: v for k, v in data.items() if k not in ('turnstile_token', 'share_expiry')}
 
     # 大小檢查
     serialized = json.dumps(cleaned, ensure_ascii=False)
@@ -58,6 +58,7 @@ def write_share_metadata(redis_client, share_id, creator_student_no, ttl=7200):
     metadata = {
         'creator_student_no': creator_student_no,
         'created_at': datetime.now(timezone.utc).isoformat(),
+        'ttl_seconds': ttl,
     }
     redis_client.setex(cache_key, ttl, json.dumps(metadata, ensure_ascii=False))
 

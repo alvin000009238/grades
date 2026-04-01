@@ -15,6 +15,10 @@ from app.services.turnstile_service import verify_turnstile_token
 import logging
 
 logger = logging.getLogger('SchoolGradesServer.Share')
+SHARE_EXPIRY_OPTIONS = {
+    '2h': 7200,
+    '7d': 604800,
+}
 
 bp = Blueprint('share', __name__)
 
@@ -67,8 +71,12 @@ def create_share_link():
         if not valid:
             return jsonify({'error': err}), 400
 
+        requested_expiry = data.get('share_expiry', '2h')
+        if requested_expiry not in SHARE_EXPIRY_OPTIONS:
+            return jsonify({'error': 'Invalid share expiry option'}), 400
+
         share_id = generate_share_id()
-        share_ttl = current_app.config['SHARE_TTL']
+        share_ttl = SHARE_EXPIRY_OPTIONS[requested_expiry]
         write_shared_data(redis_client, share_id, cleaned, share_ttl)
         write_share_metadata(redis_client, share_id, student_no, share_ttl)
         return jsonify({'success': True, 'id': share_id})
@@ -129,7 +137,9 @@ def update_share_link(share_id):
         if not valid:
             return jsonify({'error': err}), 400
 
-        share_ttl = current_app.config['SHARE_TTL']
+        share_ttl = metadata.get('ttl_seconds', current_app.config['SHARE_TTL'])
+        if share_ttl not in SHARE_EXPIRY_OPTIONS.values():
+            return jsonify({'error': 'Share metadata state conflict'}), 409
         metadata_ttl_refreshed = refresh_share_metadata_ttl(redis_client, share_id, share_ttl)
         if not metadata_ttl_refreshed:
             return jsonify({'error': 'Share metadata state conflict'}), 409
