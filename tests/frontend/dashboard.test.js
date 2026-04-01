@@ -17,13 +17,14 @@ describe('dashboard.js', () => {
     });
 
     describe('shortenName', () => {
-        it('should shorten known subjects', () => {
-            assert.equal(shortenName('英語文'), '英文');
-            assert.equal(shortenName('選修化學-物質與能量'), '化學');
+        it('should keep only the text before hyphen', () => {
+            assert.equal(shortenName('選修化學-物質構造與反應速率'), '選修化學');
+            assert.equal(shortenName('選修物理-力學二與熱學'), '選修物理');
         });
 
-        it('should return original name if unknown', () => {
+        it('should return original name when no hyphen exists', () => {
             assert.equal(shortenName('數學A'), '數學A');
+            assert.equal(shortenName('英語文'), '英語文');
         });
     });
 });
