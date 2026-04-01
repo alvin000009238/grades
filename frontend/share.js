@@ -16,25 +16,20 @@ export function getActiveShareId() {
 
 export async function updateActiveShare(gradesData) {
     const shareId = getActiveShareId();
-    if (!shareId || !gradesData) return;
+    if (!shareId || !gradesData) return { attempted: false, ok: false, status: null };
 
-    try {
-        const res = await fetch(`/api/share/${shareId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(gradesData)
-        });
+    const res = await fetch(`/api/share/${shareId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(gradesData)
+    });
 
-        if (!res.ok) {
-            if (res.status === 404 || res.status === 403) {
-                localStorage.removeItem(ACTIVE_SHARE_ID_KEY);
-            }
-            return;
-        }
-    } catch (error) {
-        console.error('更新分享失敗:', error);
+    if (!res.ok && (res.status === 404 || res.status === 403)) {
+        localStorage.removeItem(ACTIVE_SHARE_ID_KEY);
     }
+
+    return { attempted: true, ok: res.ok, status: res.status };
 }
 
 export function setupShareFeature() {

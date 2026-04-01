@@ -1,6 +1,4 @@
 import json
-import os
-
 import pytest
 
 from app import create_app
@@ -40,7 +38,7 @@ class FakeRedis:
 
 @pytest.fixture
 def client(monkeypatch):
-    os.environ['APP_ENV'] = 'testing'
+    monkeypatch.setenv('APP_ENV', 'testing')
     app = create_app()
     app.config['TESTING'] = True
     app.config['SHARE_TTL'] = 7200
@@ -153,3 +151,28 @@ def test_share_update_rate_limited(client):
     assert last_response is not None
     assert last_response.status_code == 429
     assert 'Retry-After' in last_response.headers
+
+
+def test_share_create_returns_503_when_redis_unavailable(client):
+    with client.session_transaction() as sess:
+        sess['student_no'] = 'A123'
+
+    client.application.config['REDIS_CLIENT'] = None
+    create_res = client.post('/api/share', json=_share_payload())
+
+    assert create_res.status_code == 503
+    assert create_res.get_json()['error'] == 'Share service unavailable'
+
+
+def test_share_update_returns_503_when_redis_unavailable(client):
+    with client.session_transaction() as sess:
+        sess['student_no'] = 'A123'
+
+    create_res = client.post('/api/share', json=_share_payload())
+    share_id = create_res.get_json()['id']
+
+    client.application.config['REDIS_CLIENT'] = None
+    update_res = client.put(f'/api/share/{share_id}', json=_share_payload())
+
+    assert update_res.status_code == 503
+    assert update_res.get_json()['error'] == 'Share service unavailable'

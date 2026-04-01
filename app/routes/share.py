@@ -26,6 +26,14 @@ def create_share_link():
         if not data or not isinstance(data, dict):
             return jsonify({'error': 'No data provided or invalid format'}), 400
 
+        student_no = session.get('student_no')
+        if not student_no:
+            return jsonify({'error': 'Authentication required'}), 401
+
+        redis_client = current_app.config.get('REDIS_CLIENT')
+        if redis_client is None:
+            return jsonify({'error': 'Share service unavailable'}), 503
+
         # Turnstile 人機驗證
         ts_ok, ts_err = verify_turnstile_token(
             data.get('turnstile_token'),
@@ -35,7 +43,6 @@ def create_share_link():
             return jsonify({'error': ts_err}), 403
 
         # 速率限制檢查（在 Turnstile 之後）
-        redis_client = current_app.config.get('REDIS_CLIENT')
         if redis_client:
             try:
                 # 較寬鬆的速率限制：每小時 (3600 秒) 10 次
@@ -60,12 +67,7 @@ def create_share_link():
         if not valid:
             return jsonify({'error': err}), 400
 
-        student_no = session.get('student_no')
-        if not student_no:
-            return jsonify({'error': 'Authentication required'}), 401
-
         share_id = generate_share_id()
-        redis_client = current_app.config['REDIS_CLIENT']
         share_ttl = current_app.config['SHARE_TTL']
         write_shared_data(redis_client, share_id, cleaned, share_ttl)
         write_share_metadata(redis_client, share_id, student_no, share_ttl)
@@ -85,7 +87,9 @@ def update_share_link(share_id):
         if not data or not isinstance(data, dict):
             return jsonify({'error': 'No data provided or invalid format'}), 400
 
-        redis_client = current_app.config['REDIS_CLIENT']
+        redis_client = current_app.config.get('REDIS_CLIENT')
+        if redis_client is None:
+            return jsonify({'error': 'Share service unavailable'}), 503
 
         requester_student_no = session.get('student_no')
         if requester_student_no is None:
