@@ -1,11 +1,14 @@
-from flask import Blueprint, current_app, jsonify, request, send_from_directory
+from flask import Blueprint, current_app, jsonify, request, send_from_directory, session
 
 from app.services.rate_limiter import is_rate_limited
 from app.services.share_service import (
     generate_share_id,
     is_valid_share_id,
+    refresh_share_metadata_ttl,
+    read_share_metadata,
     read_shared_data,
     validate_share_payload,
+    write_share_metadata,
     write_shared_data,
 )
 from app.services.turnstile_service import verify_turnstile_token
@@ -58,10 +61,45 @@ def create_share_link():
             return jsonify({'error': err}), 400
 
         share_id = generate_share_id()
-        write_shared_data(current_app.config['REDIS_CLIENT'], share_id, cleaned, current_app.config['SHARE_TTL'])
+        redis_client = current_app.config['REDIS_CLIENT']
+        share_ttl = current_app.config['SHARE_TTL']
+        write_shared_data(redis_client, share_id, cleaned, share_ttl)
+        write_share_metadata(redis_client, share_id, session.get('student_no'), share_ttl)
         return jsonify({'success': True, 'id': share_id})
     except Exception as exc:
         logger.error(f'Error creating share: {exc}', exc_info = True)
+        return jsonify({'error': str(exc)}), 500
+
+
+@bp.route('/api/share/<share_id>', methods=['PUT'])
+def update_share_link(share_id):
+    try:
+        if not is_valid_share_id(share_id):
+            return jsonify({'error': 'Invalid ID format'}), 400
+
+        data = request.json
+        if not data or not isinstance(data, dict):
+            return jsonify({'error': 'No data provided or invalid format'}), 400
+
+        redis_client = current_app.config['REDIS_CLIENT']
+        metadata = read_share_metadata(redis_client, share_id)
+        if metadata is None:
+            return jsonify({'error': 'Link expired or not found'}), 404
+
+        requester_student_no = session.get('student_no')
+        if requester_student_no != metadata.get('creator_student_no'):
+            return jsonify({'error': 'Forbidden'}), 403
+
+        valid, err, cleaned = validate_share_payload(data)
+        if not valid:
+            return jsonify({'error': err}), 400
+
+        share_ttl = current_app.config['SHARE_TTL']
+        write_shared_data(redis_client, share_id, cleaned, share_ttl)
+        refresh_share_metadata_ttl(redis_client, share_id, share_ttl)
+        return jsonify({'success': True, 'id': share_id})
+    except Exception as exc:
+        logger.error(f'Error updating share: {exc}', exc_info=True)
         return jsonify({'error': str(exc)}), 500
 
 
