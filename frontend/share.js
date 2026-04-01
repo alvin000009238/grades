@@ -47,9 +47,9 @@ export function setupShareFeature() {
                 <p class="share-modal-text">
                     建立一個唯讀的分享連結，讓他人查看此成績單。
                 </p>
+                <p class="share-modal-text mb-12">連結有效期限</p>
                 <div class="form-group mb-12">
-                    <label for="shareExpirySelect" class="form-label">連結有效期限</label>
-                    <select id="shareExpirySelect" class="form-input">
+                    <select id="shareExpirySelect" aria-label="連結有效期限" class="form-input">
                         <option value="2h">2 小時</option>
                         <option value="7d">7 天</option>
                     </select>
