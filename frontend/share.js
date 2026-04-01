@@ -25,7 +25,7 @@ export async function updateActiveShare(gradesData) {
         body: JSON.stringify(gradesData)
     });
 
-    if (!res.ok && (res.status === 404 || res.status === 403)) {
+    if (!res.ok && (res.status === 400 || res.status === 403 || res.status === 404)) {
         localStorage.removeItem(ACTIVE_SHARE_ID_KEY);
     }
 
