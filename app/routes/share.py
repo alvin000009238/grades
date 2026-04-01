@@ -28,7 +28,7 @@ def create_share_link():
 
         student_no = session.get('student_no')
         if not student_no:
-            return jsonify({'error': 'Authentication required'}), 401
+            return jsonify({'error': 'Unauthorized'}), 401
 
         redis_client = current_app.config.get('REDIS_CLIENT')
         if redis_client is None:
@@ -130,10 +130,10 @@ def update_share_link(share_id):
             return jsonify({'error': err}), 400
 
         share_ttl = current_app.config['SHARE_TTL']
-        write_shared_data(redis_client, share_id, cleaned, share_ttl)
         metadata_ttl_refreshed = refresh_share_metadata_ttl(redis_client, share_id, share_ttl)
         if not metadata_ttl_refreshed:
             return jsonify({'error': 'Share metadata state conflict'}), 409
+        write_shared_data(redis_client, share_id, cleaned, share_ttl)
         return jsonify({'success': True, 'id': share_id})
     except Exception as exc:
         logger.error(f'Error updating share: {exc}', exc_info=True)

@@ -1,7 +1,7 @@
 from app.services.share_service import generate_share_id, is_valid_share_id, validate_share_payload
 
 def test_generate_share_id():
-    sid = generate_share_id(15)
+    sid = generate_share_id()
     assert len(sid) == 15
     assert is_valid_share_id(sid)
 

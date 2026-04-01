@@ -134,7 +134,7 @@ def test_share_create_requires_login(client):
 
     create_res = client.post('/api/share', json=_share_payload())
     assert create_res.status_code == 401
-    assert create_res.get_json()['error'] == 'Authentication required'
+    assert create_res.get_json()['error'] == 'Unauthorized'
 
 
 def test_share_update_rate_limited(client):

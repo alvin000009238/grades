@@ -8,8 +8,8 @@ SHARE_ID_LENGTH = 15
 SHARE_MAX_PAYLOAD_BYTES = 512_000  # 500 KB
 
 
-def generate_share_id(length=SHARE_ID_LENGTH):
-    return ''.join(secrets.choice(CHARS) for _ in range(length))
+def generate_share_id():
+    return ''.join(secrets.choice(CHARS) for _ in range(SHARE_ID_LENGTH))
 
 
 def is_valid_share_id(share_id):
