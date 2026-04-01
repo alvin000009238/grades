@@ -8,6 +8,30 @@ import { initDashboard } from './dashboard.js';
 import { emitOnboardingEvent, ONBOARDING_EVENTS } from './onboarding-events.js';
 import { showAlert } from './dialog.js';
 
+const ACTIVE_SHARE_ID_KEY = 'activeShareId';
+
+export function getActiveShareId() {
+    return localStorage.getItem(ACTIVE_SHARE_ID_KEY);
+}
+
+export async function updateActiveShare(gradesData) {
+    const shareId = getActiveShareId();
+    if (!shareId || !gradesData) return { attempted: false, ok: false, status: null };
+
+    const res = await fetch(`/api/share/${shareId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(gradesData)
+    });
+
+    if (!res.ok && (res.status === 404 || res.status === 403)) {
+        localStorage.removeItem(ACTIVE_SHARE_ID_KEY);
+    }
+
+    return { attempted: true, ok: res.ok, status: res.status };
+}
+
 export function setupShareFeature() {
     const shareBtn = document.getElementById('shareBtn');
     const shareModal = document.getElementById('shareModal');
@@ -21,9 +45,15 @@ export function setupShareFeature() {
         sharePreview.innerHTML = `
             <div class="share-modal-container">
                 <p class="share-modal-text">
-                    建立一個唯讀的分享連結，讓他人查看此成績單。<br>
-                    連結將於 <strong class="text-warning">2 小時後</strong> 自動失效。
+                    建立一個唯讀的分享連結，讓他人查看此成績單。
                 </p>
+                <div class="form-group mb-12">
+                    <label for="shareExpirySelect" class="form-label">連結有效期限</label>
+                    <select id="shareExpirySelect" class="form-input">
+                        <option value="2h">2 小時</option>
+                        <option value="7d">7 天</option>
+                    </select>
+                </div>
                 <div id="linkContainer" class="share-link-container hidden">
                     <div class="form-group mb-12">
                         <input type="text" id="shareLinkInput" readonly
@@ -57,6 +87,7 @@ export function setupShareFeature() {
         const shareLinkInput = document.getElementById('shareLinkInput');
         const copyLinkBtn = document.getElementById('copyLinkBtn');
         const shareStatus = document.getElementById('shareStatus');
+        const shareExpirySelect = document.getElementById('shareExpirySelect');
 
         createLinkBtn.addEventListener('click', async () => {
             const gradesData = getStoredGrades();
@@ -82,16 +113,22 @@ export function setupShareFeature() {
             shareStatus.textContent = '';
 
             try {
-                const payload = { ...gradesData, turnstile_token: turnstileToken };
+                const payload = {
+                    ...gradesData,
+                    turnstile_token: turnstileToken,
+                    share_expiry: shareExpirySelect?.value || '2h'
+                };
                 const res = await fetch('/api/share', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
 
                 if (data.success) {
                     const link = `${window.location.origin}/share/${data.id}`;
+                    localStorage.setItem(ACTIVE_SHARE_ID_KEY, data.id);
                     shareLinkInput.value = link;
                     linkContainer.style.display = 'block';
                     createLinkBtn.style.display = 'none';

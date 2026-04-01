@@ -6,6 +6,7 @@ import { requestTurnstileVerification } from './turnstile.js';
 import { validateGradesData, storeGradesData } from './storage.js';
 import { initDashboard } from './dashboard.js';
 import { getDemoCredentials, getDemoResultData, getDemoStructure, isDemoModeEnabled } from './demo-mode.js';
+import { updateActiveShare } from './share.js';
 import { emitOnboardingEvent, ONBOARDING_EVENTS } from './onboarding-events.js';
 import { showConfirm, showAlert } from './dialog.js';
 
@@ -336,6 +337,9 @@ export function setupSyncFeature() {
                 validateGradesData(data.data);
                 storeGradesData(data.data);
                 initDashboard(data.data);
+                updateActiveShare(data.data).catch((err) => {
+                    console.error('Failed to update share', err);
+                });
 
                 setTimeout(() => {
                     toggleModal(selectExamModal, false);
