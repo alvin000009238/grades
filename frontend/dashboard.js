@@ -267,17 +267,11 @@ function getScoreClass(score) {
     return 'low';
 }
 
-// 縮短科目名稱
-export function shortenName(name) {
-    const shortNames = {
-        '英語文': '英文',
-        '公民與社會': '公民',
-        '選修化學-物質與能量': '化學',
-        '選修物理-力學一': '物理',
-        '選修化學': '化學',
-        '選修物理': '物理'
-    };
-    return shortNames[name] || name;
+// 縮短科目名稱（僅保留 '-' 前的文字）
+export function shortenName(name = '') {
+    const cleanedName = cleanSubjectName(String(name));
+    const [baseName] = cleanedName.split('-');
+    return baseName.trim() || cleanedName;
 }
 
 // 生成五標表格
