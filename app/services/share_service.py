@@ -4,15 +4,16 @@ import string
 from datetime import datetime, timezone
 
 CHARS = string.ascii_letters + string.digits + '-_.~'
+SHARE_ID_LENGTH = 15
 SHARE_MAX_PAYLOAD_BYTES = 512_000  # 500 KB
 
 
-def generate_share_id(length=15):
+def generate_share_id(length=SHARE_ID_LENGTH):
     return ''.join(secrets.choice(CHARS) for _ in range(length))
 
 
 def is_valid_share_id(share_id):
-    return all(c in CHARS for c in share_id)
+    return len(share_id) == SHARE_ID_LENGTH and all(c in CHARS for c in share_id)
 
 
 def validate_share_payload(data, max_bytes=SHARE_MAX_PAYLOAD_BYTES):
@@ -79,4 +80,4 @@ def read_share_metadata(redis_client, share_id):
 
 def refresh_share_metadata_ttl(redis_client, share_id, ttl=7200):
     cache_key = f"share_meta:{share_id}"
-    redis_client.expire(cache_key, ttl)
+    return redis_client.expire(cache_key, ttl) == 1

@@ -110,6 +110,7 @@ export function setupShareFeature() {
                 const res = await fetch('/api/share', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();

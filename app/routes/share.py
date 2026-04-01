@@ -131,7 +131,9 @@ def update_share_link(share_id):
 
         share_ttl = current_app.config['SHARE_TTL']
         write_shared_data(redis_client, share_id, cleaned, share_ttl)
-        refresh_share_metadata_ttl(redis_client, share_id, share_ttl)
+        metadata_ttl_refreshed = refresh_share_metadata_ttl(redis_client, share_id, share_ttl)
+        if not metadata_ttl_refreshed:
+            return jsonify({'error': 'Share metadata state conflict'}), 409
         return jsonify({'success': True, 'id': share_id})
     except Exception as exc:
         logger.error(f'Error updating share: {exc}', exc_info=True)
@@ -144,7 +146,11 @@ def get_shared_grades(share_id):
         if not is_valid_share_id(share_id):
             return jsonify({'error': 'Invalid ID format'}), 400
 
-        data = read_shared_data(current_app.config['REDIS_CLIENT'], share_id)
+        redis_client = current_app.config.get('REDIS_CLIENT')
+        if redis_client is None:
+            return jsonify({'error': 'Share service unavailable'}), 503
+
+        data = read_shared_data(redis_client, share_id)
         if data is None:
             return jsonify({'error': 'Link expired or not found'}), 404
 

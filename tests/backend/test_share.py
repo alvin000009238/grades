@@ -5,6 +5,11 @@ def test_generate_share_id():
     assert len(sid) == 15
     assert is_valid_share_id(sid)
 
+
+def test_is_valid_share_id_rejects_invalid_length():
+    assert not is_valid_share_id('a' * 14)
+    assert not is_valid_share_id('a' * 16)
+
 def test_validate_share_payload_invalid():
     # Not a dict
     is_valid, err, _ = validate_share_payload([])

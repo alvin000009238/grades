@@ -176,3 +176,27 @@ def test_share_update_returns_503_when_redis_unavailable(client):
 
     assert update_res.status_code == 503
     assert update_res.get_json()['error'] == 'Share service unavailable'
+
+
+def test_share_get_returns_503_when_redis_unavailable(client):
+    client.application.config['REDIS_CLIENT'] = None
+    get_res = client.get('/api/share/aaaaaaaaaaaaaaa')
+
+    assert get_res.status_code == 503
+    assert get_res.get_json()['error'] == 'Share service unavailable'
+
+
+def test_share_update_returns_409_when_metadata_ttl_refresh_fails(client):
+    with client.session_transaction() as sess:
+        sess['student_no'] = 'A123'
+
+    create_res = client.post('/api/share', json=_share_payload())
+    share_id = create_res.get_json()['id']
+
+    redis_client = client.application.config['REDIS_CLIENT']
+    redis_client.expire = lambda *_args, **_kwargs: 0
+
+    update_res = client.put(f'/api/share/{share_id}', json=_share_payload())
+
+    assert update_res.status_code == 409
+    assert update_res.get_json()['error'] == 'Share metadata state conflict'
