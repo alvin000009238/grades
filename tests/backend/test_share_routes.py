@@ -74,6 +74,9 @@ def test_share_create_and_update_by_owner_resets_ttl(client):
     redis_client = client.application.config['REDIS_CLIENT']
     assert json.loads(redis_client.get(f'share_meta:{share_id}'))['creator_student_no'] == 'A123'
 
+    redis_client.ttl_map[f'share:{share_id}'] = 100
+    redis_client.ttl_map[f'share_meta:{share_id}'] = 100
+
     update_res = client.put(f'/api/share/{share_id}', json=_share_payload())
     assert update_res.status_code == 200
     assert update_res.get_json()['success'] is True
@@ -95,3 +98,58 @@ def test_share_update_by_other_user_forbidden(client):
     update_res = client.put(f'/api/share/{share_id}', json=_share_payload())
     assert update_res.status_code == 403
     assert update_res.get_json()['error'] == 'Forbidden'
+
+
+def test_share_update_requires_login(client):
+    with client.session_transaction() as sess:
+        sess['student_no'] = 'A123'
+
+    create_res = client.post('/api/share', json=_share_payload())
+    share_id = create_res.get_json()['id']
+
+    with client.session_transaction() as sess:
+        sess.pop('student_no', None)
+
+    update_res = client.put(f'/api/share/{share_id}', json=_share_payload())
+    assert update_res.status_code == 401
+    assert update_res.get_json()['error'] == 'Unauthorized'
+
+
+def test_share_update_forbidden_when_metadata_has_no_owner(client):
+    with client.session_transaction() as sess:
+        sess['student_no'] = 'A123'
+
+    create_res = client.post('/api/share', json=_share_payload())
+    share_id = create_res.get_json()['id']
+
+    redis_client = client.application.config['REDIS_CLIENT']
+    redis_client.setex(f'share_meta:{share_id}', 7200, json.dumps({'created_at': '2026-01-01T00:00:00+00:00'}))
+
+    update_res = client.put(f'/api/share/{share_id}', json=_share_payload())
+    assert update_res.status_code == 403
+    assert update_res.get_json()['error'] == 'Forbidden'
+
+
+def test_share_create_requires_login(client):
+    with client.session_transaction() as sess:
+        sess.pop('student_no', None)
+
+    create_res = client.post('/api/share', json=_share_payload())
+    assert create_res.status_code == 401
+    assert create_res.get_json()['error'] == 'Authentication required'
+
+
+def test_share_update_rate_limited(client):
+    with client.session_transaction() as sess:
+        sess['student_no'] = 'A123'
+
+    create_res = client.post('/api/share', json=_share_payload())
+    share_id = create_res.get_json()['id']
+
+    last_response = None
+    for _ in range(11):
+        last_response = client.put(f'/api/share/{share_id}', json=_share_payload())
+
+    assert last_response is not None
+    assert last_response.status_code == 429
+    assert 'Retry-After' in last_response.headers

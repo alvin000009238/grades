@@ -337,7 +337,9 @@ export function setupSyncFeature() {
                 validateGradesData(data.data);
                 storeGradesData(data.data);
                 initDashboard(data.data);
-                await updateActiveShare(data.data);
+                updateActiveShare(data.data).catch((err) => {
+                    console.error('Failed to update share', err);
+                });
 
                 setTimeout(() => {
                     toggleModal(selectExamModal, false);

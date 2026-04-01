@@ -60,11 +60,15 @@ def create_share_link():
         if not valid:
             return jsonify({'error': err}), 400
 
+        student_no = session.get('student_no')
+        if not student_no:
+            return jsonify({'error': 'Authentication required'}), 401
+
         share_id = generate_share_id()
         redis_client = current_app.config['REDIS_CLIENT']
         share_ttl = current_app.config['SHARE_TTL']
         write_shared_data(redis_client, share_id, cleaned, share_ttl)
-        write_share_metadata(redis_client, share_id, session.get('student_no'), share_ttl)
+        write_share_metadata(redis_client, share_id, student_no, share_ttl)
         return jsonify({'success': True, 'id': share_id})
     except Exception as exc:
         logger.error(f'Error creating share: {exc}', exc_info = True)
@@ -82,12 +86,39 @@ def update_share_link(share_id):
             return jsonify({'error': 'No data provided or invalid format'}), 400
 
         redis_client = current_app.config['REDIS_CLIENT']
+
+        requester_student_no = session.get('student_no')
+        if requester_student_no is None:
+            return jsonify({'error': 'Unauthorized'}), 401
+
+        rate_limit_subject = requester_student_no or request.remote_addr
+        if redis_client:
+            try:
+                limited, remaining, retry_after = is_rate_limited(
+                    redis_client,
+                    rate_limit_subject,
+                    max_attempts=10,
+                    window_seconds=60,
+                    key_prefix='share_update'
+                )
+                if limited:
+                    resp = jsonify({
+                        'error': f'更新分享過於頻繁，請在 {retry_after} 秒後再試',
+                    })
+                    resp.headers['Retry-After'] = str(retry_after)
+                    return resp, 429
+            except Exception as exc:
+                logger.error(f'Share update rate limiter error: {exc}', exc_info=True)
+
         metadata = read_share_metadata(redis_client, share_id)
         if metadata is None:
             return jsonify({'error': 'Link expired or not found'}), 404
 
-        requester_student_no = session.get('student_no')
-        if requester_student_no != metadata.get('creator_student_no'):
+        creator_student_no = metadata.get('creator_student_no')
+        if not creator_student_no:
+            return jsonify({'error': 'Forbidden'}), 403
+
+        if requester_student_no != creator_student_no:
             return jsonify({'error': 'Forbidden'}), 403
 
         valid, err, cleaned = validate_share_payload(data)
