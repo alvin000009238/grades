@@ -1,6 +1,8 @@
 {
   "name": "成績分析平台",
   "short_name": "成績分析",
+  "start_url": "/",
+  "scope": "/",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
