@@ -35,7 +35,7 @@ def static_files(filename):
     response = send_from_directory('public', filename)
     if ext in ('.js', '.css'):
         response.cache_control.max_age = 31536000
-    elif ext in ('.woff', '.woff2', '.ttf', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico'):
+    elif ext in ('.woff', '.woff2', '.ttf', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webmanifest'):
         response.cache_control.max_age = 86400
     return response
 
