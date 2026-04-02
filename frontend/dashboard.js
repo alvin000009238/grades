@@ -130,25 +130,27 @@ function updateStatistics(subjects) {
         return;
     }
 
-    const scores = subjects.map(subject => subject.scoreValue);
-    const highest = Math.max(...scores);
-
-    // 計算加權平均
+    // 計算最高分與加權平均，將多次 O(n) 迴圈合併為單次，減少 GC 開銷並提升效能
+    let highest = -Infinity;
     let totalWeightedScore = 0;
     let totalWeight = 0;
 
-    subjects.forEach(subject => {
+    for (let i = 0; i < subjects.length; i++) {
+        const subject = subjects[i];
         const score = subject.scoreValue;
         const weight = getSubjectWeight(subject.SubjectName);
+
+        if (score > highest) highest = score;
+
         totalWeightedScore += score * weight;
         totalWeight += weight;
-    });
+    }
 
     const weightedAvg = totalWeight > 0 ? totalWeightedScore / totalWeight : 0;
 
     document.getElementById('avgScore').textContent = weightedAvg.toFixed(1);
     document.getElementById('totalSubjects').textContent = subjects.length;
-    document.getElementById('highestScore').textContent = highest;
+    document.getElementById('highestScore').textContent = highest === -Infinity ? '--' : highest;
 }
 
 // 生成成績卡片
