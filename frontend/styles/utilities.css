@@ -104,3 +104,15 @@
 .share-input-readonly { text-align: center; font-size: 13px; color: var(--color-primary); border-color: var(--color-primary); background: var(--color-primary-muted); }
 .w-full-center { width: 100%; justify-content: center; }
 .mono { font-family: monospace; }
+
+/* Accessibility: Focus Visible */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px var(--color-focus-ring);
+}
