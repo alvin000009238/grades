@@ -9,7 +9,7 @@ bp = Blueprint('system', __name__)
 
 ALLOWED_STATIC_EXT = {
     '.html', '.css', '.js', '.json', '.png', '.jpg', '.jpeg', '.gif',
-    '.svg', '.ico', '.woff', '.woff2', '.ttf', '.xml', '.txt',
+    '.svg', '.ico', '.woff', '.woff2', '.webmanifest', '.ttf', '.xml', '.txt',
 }
 
 
@@ -35,7 +35,7 @@ def static_files(filename):
     response = send_from_directory('public', filename)
     if ext in ('.js', '.css'):
         response.cache_control.max_age = 31536000
-    elif ext in ('.woff', '.woff2', '.ttf', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico'):
+    elif ext in ('.woff', '.woff2', '.ttf', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webmanifest'):
         response.cache_control.max_age = 86400
     return response
 
