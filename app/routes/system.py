@@ -9,7 +9,7 @@ bp = Blueprint('system', __name__)
 
 ALLOWED_STATIC_EXT = {
     '.html', '.css', '.js', '.json', '.png', '.jpg', '.jpeg', '.gif',
-    '.svg', '.ico', '.woff', '.woff2', '.ttf', '.xml', '.txt',
+    '.svg', '.ico', '.woff', '.woff2', '.webmanifest', '.ttf', '.xml', '.txt',
 }
 
 
