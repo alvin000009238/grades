@@ -130,15 +130,19 @@ function updateStatistics(subjects) {
         return;
     }
 
-    const scores = subjects.map(subject => subject.scoreValue);
-    const highest = Math.max(...scores);
-
-    // 計算加權平均
+    // 計算最高分與加權平均，使用單次迴圈提升效能並避免大陣列導致 stack overflow
+    let highest = -Infinity;
     let totalWeightedScore = 0;
     let totalWeight = 0;
 
     subjects.forEach(subject => {
         const score = subject.scoreValue;
+
+        // 尋找最高分
+        if (score > highest) {
+            highest = score;
+        }
+
         const weight = getSubjectWeight(subject.SubjectName);
         totalWeightedScore += score * weight;
         totalWeight += weight;
