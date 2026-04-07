@@ -375,11 +375,13 @@ export function setupSyncFeature() {
                 eyeOffIcon.style.display = 'block';
                 togglePasswordBtn.setAttribute('aria-label', '隱藏密碼');
                 togglePasswordBtn.setAttribute('title', '隱藏密碼');
+                togglePasswordBtn.setAttribute('aria-pressed', 'true');
             } else {
                 eyeIcon.style.display = 'block';
                 eyeOffIcon.style.display = 'none';
                 togglePasswordBtn.setAttribute('aria-label', '顯示密碼');
                 togglePasswordBtn.setAttribute('title', '顯示密碼');
+                togglePasswordBtn.setAttribute('aria-pressed', 'false');
             }
         });
     }
