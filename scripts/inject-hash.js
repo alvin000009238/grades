@@ -7,7 +7,10 @@ const __dirname = path.dirname(__filename);
 
 const projectRoot = path.resolve(__dirname, '..');
 const manifestPath = path.resolve(projectRoot, 'public/dist/.vite/manifest.json');
-const htmlPath = path.resolve(projectRoot, 'public/index.html');
+const htmlPaths = [
+    path.resolve(projectRoot, 'public/index.html'),
+    path.resolve(projectRoot, 'public/privacy.html')
+];
 
 try {
     // 1. Read manifest.json
@@ -18,10 +21,15 @@ try {
     
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
     
-    let html = fs.readFileSync(htmlPath, 'utf-8');
-    
-    // Iterate over manifest keys to find entry points and inject their new names
-    Object.keys(manifest).forEach(key => {
+    htmlPaths.forEach(htmlPath => {
+        if (!fs.existsSync(htmlPath)) {
+            return;
+        }
+
+        let html = fs.readFileSync(htmlPath, 'utf-8');
+
+        // Iterate over manifest keys to find entry points and inject their new names
+        Object.keys(manifest).forEach(key => {
         const entryData = manifest[key];
         if (entryData && (entryData.isEntry || entryData.isDynamicEntry) && entryData.file) {
             // chunk name could be 'main.js' or 'frontend/main.js'
@@ -41,10 +49,11 @@ try {
                 html = html.replace(cssRegex, `<link rel="stylesheet" href="/dist/${cssFile}" id="vite-css">`);
             }
         }
+        });
+
+        fs.writeFileSync(htmlPath, html, 'utf-8');
+        console.log(`[Hash Injector] Successfully updated ${path.relative(projectRoot, htmlPath)}`);
     });
-    
-    fs.writeFileSync(htmlPath, html, 'utf-8');
-    console.log(`[Hash Injector] Successfully updated public/index.html`);
     
 } catch (error) {
     console.error('[Hash Injector] Error:', error);
