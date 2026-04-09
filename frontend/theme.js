@@ -28,6 +28,7 @@ export function applyTheme(theme) {
         const nextThemeLabel = theme === 'light' ? '深色' : '淺色';
         toggleBtn.setAttribute('aria-label', `切換至${nextThemeLabel}模式`);
         toggleBtn.setAttribute('title', `切換至${nextThemeLabel}模式`);
+        toggleBtn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
     }
 
     document.dispatchEvent(new CustomEvent('themechange', {
