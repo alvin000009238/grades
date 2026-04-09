@@ -129,7 +129,7 @@ class GradeFetcher:
 
         except Exception as e:
             _log('error', username, f"Login Exception: {e}")
-            return False, f"登入錯誤: {str(e)}", None, None, None
+            return False, "登入錯誤: 伺服器內部錯誤", None, None, None
 
     def get_structure_via_api(self, cookies, student_no, token, session=None):
         """Fetch structure using requests"""
