@@ -5,6 +5,7 @@ from flask import g, has_request_context
 import base64
 import time
 from urllib.parse import urljoin
+import re
 
 logger = logging.getLogger('SchoolGradesServer.Fetcher')
 
@@ -91,6 +92,23 @@ class GradeFetcher:
             return ""
         return urljoin(self.BASE + "/", node.get("src"))
 
+    def _decode_hex_image_bytes(self, raw_text: str):
+        # 支援純 hex（可含空白/換行），例如: 89504e47...
+        text = (raw_text or "").strip()
+        if not text:
+            return None
+        normalized = re.sub(r'\\s+', '', text)
+        if normalized.startswith("0x"):
+            normalized = normalized[2:]
+        if len(normalized) < 64 or len(normalized) % 2 != 0:
+            return None
+        if not re.fullmatch(r'[0-9a-fA-F]+', normalized):
+            return None
+        try:
+            return bytes.fromhex(normalized)
+        except ValueError:
+            return None
+
     def prepare_login_captcha(self):
         """Prepare school login captcha and context for subsequent login POST."""
         try:
@@ -114,11 +132,16 @@ class GradeFetcher:
                 image_resp = s.get(self._build_captcha_url(), headers=req_headers)
             image_resp.raise_for_status()
             content_type = image_resp.headers.get("Content-Type", "image/png")
+            image_bytes = image_resp.content
 
             if "image" not in content_type.lower():
-                return False, "學校驗證碼回應格式異常", None
+                # 有些情況可能回傳 hex 文本，嘗試轉回 png bytes
+                image_bytes = self._decode_hex_image_bytes(image_resp.text)
+                if image_bytes is None:
+                    return False, "學校驗證碼回應格式異常", None
+                content_type = "image/png"
 
-            image_b64 = base64.b64encode(image_resp.content).decode("ascii")
+            image_b64 = base64.b64encode(image_bytes).decode("ascii")
 
             context = {
                 "login_token": login_token,
