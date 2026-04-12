@@ -41,6 +41,7 @@ export function setupSyncFeature() {
 
     const API_BASE = '/api';
     let availableStructure = {}; // Store the loaded structure
+    let captchaObjectUrl = '';
 
     // Helper to toggle modal
     const toggleModal = (modal, show) => {
@@ -64,27 +65,34 @@ export function setupSyncFeature() {
 
     const loadSchoolCaptcha = async () => {
         if (!schoolCaptchaImage) return;
+        if (captchaObjectUrl) {
+            URL.revokeObjectURL(captchaObjectUrl);
+            captchaObjectUrl = '';
+        }
         schoolCaptchaImage.src = '';
         schoolCaptchaImage.alt = '學校系統驗證碼載入中';
         showStatus(loginStatus, '正在載入學校驗證碼...', 'normal');
         try {
-            const res = await fetch(`${API_BASE}/school-captcha`, {
+            const res = await fetch(`${API_BASE}/school-captcha/image?t=${Date.now()}`, {
                 credentials: 'include'
             });
             const contentType = res.headers.get('content-type') || '';
-            let data;
-            if (contentType.includes('application/json')) {
-                data = await res.json();
-            } else {
-                const raw = await res.text();
-                throw new Error(`伺服器回傳非 JSON 內容（HTTP ${res.status}）: ${raw.slice(0, 80)}`);
+            if (contentType.includes('image/')) {
+                const blob = await res.blob();
+                captchaObjectUrl = URL.createObjectURL(blob);
+                schoolCaptchaImage.src = captchaObjectUrl;
+                schoolCaptchaImage.alt = '學校系統驗證碼';
+                showStatus(loginStatus, '請輸入圖中的驗證碼。', 'normal');
+                return;
             }
-            if (!res.ok || !data.success || !data.image_data_url) {
+
+            if (contentType.includes('application/json')) {
+                const data = await res.json();
                 throw new Error(data.message || '驗證碼載入失敗');
             }
-            schoolCaptchaImage.src = data.image_data_url;
-            schoolCaptchaImage.alt = '學校系統驗證碼';
-            showStatus(loginStatus, '請輸入圖中的驗證碼。', 'normal');
+
+            const raw = await res.text();
+            throw new Error(`伺服器回傳非圖片內容（HTTP ${res.status}）: ${raw.slice(0, 80)}`);
         } catch (error) {
             showStatus(loginStatus, `驗證碼載入失敗：${error.message}`, 'error');
         }
@@ -263,8 +271,15 @@ export function setupSyncFeature() {
     }
 
     // Close Login Modal
-    closeLoginModal.addEventListener('click', () => toggleModal(loginModal, false));
-    cancelLogin.addEventListener('click', () => toggleModal(loginModal, false));
+    const closeLogin = () => {
+        if (captchaObjectUrl) {
+            URL.revokeObjectURL(captchaObjectUrl);
+            captchaObjectUrl = '';
+        }
+        toggleModal(loginModal, false);
+    };
+    closeLoginModal.addEventListener('click', closeLogin);
+    cancelLogin.addEventListener('click', closeLogin);
 
     // 3. Select Exam Logic
     const openSelectExamModal = async (forceReload = false) => {

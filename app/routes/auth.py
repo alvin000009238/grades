@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, jsonify, request, session
+from flask import Blueprint, current_app, jsonify, request, session, Response
 
 from app.services.auth_service import is_logged_in, login_and_build_session_payload
 from app.services.rate_limiter import is_rate_limited
@@ -103,6 +103,24 @@ def school_captcha():
         return jsonify({'success': True, 'image_data_url': payload['image_data_url']})
     except Exception as exc:
         logger.error(f'Failed to load school captcha: {exc}', exc_info=True)
+        return jsonify({'success': False, 'message': '驗證碼服務暫時異常，請稍後再試'}), 200
+
+
+@bp.route('/api/school-captcha/image')
+def school_captcha_image():
+    try:
+        fetcher = current_app.config['GRADE_FETCHER']
+        success, message, payload = fetcher.prepare_login_captcha()
+        if not success:
+            return jsonify({'success': False, 'message': message}), 200
+
+        session['school_login_context'] = payload['context']
+        resp = Response(payload['image_bytes'], mimetype=payload.get('content_type') or 'image/png')
+        resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        resp.headers['Pragma'] = 'no-cache'
+        return resp
+    except Exception as exc:
+        logger.error(f'Failed to load school captcha image: {exc}', exc_info=True)
         return jsonify({'success': False, 'message': '驗證碼服務暫時異常，請稍後再試'}), 200
 
 
