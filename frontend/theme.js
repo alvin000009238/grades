@@ -25,9 +25,11 @@ export function applyTheme(theme) {
     }
 
     if (toggleBtn) {
-        const nextThemeLabel = theme === 'light' ? '深色' : '淺色';
+        const isLight = theme === 'light';
+        const nextThemeLabel = isLight ? '深色' : '淺色';
         toggleBtn.setAttribute('aria-label', `切換至${nextThemeLabel}模式`);
         toggleBtn.setAttribute('title', `切換至${nextThemeLabel}模式`);
+        toggleBtn.setAttribute('aria-pressed', isLight ? 'true' : 'false');
     }
 
     document.dispatchEvent(new CustomEvent('themechange', {

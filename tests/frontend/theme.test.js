@@ -38,7 +38,7 @@ function uninstallDom() {
 describe('theme.js', () => {
     beforeEach(() => {
         installDom(`<!doctype html><html><body>
-            <button id="themeToggleBtn" aria-label="" title="">
+            <button id="themeToggleBtn" aria-label="" title="" aria-pressed="false">
                 <span class="theme-icon theme-icon-moon"></span>
                 <span class="theme-icon theme-icon-sun hidden"></span>
             </button>
@@ -75,6 +75,7 @@ describe('theme.js', () => {
         assert.equal(moon.classList.contains('hidden'), true);
         assert.equal(btn.getAttribute('aria-label'), '切換至深色模式');
         assert.equal(btn.getAttribute('title'), '切換至深色模式');
+        assert.equal(btn.getAttribute('aria-pressed'), 'true');
 
         applyTheme('dark');
         assert.equal(root.hasAttribute('data-theme'), false);
@@ -82,6 +83,7 @@ describe('theme.js', () => {
         assert.equal(moon.classList.contains('hidden'), false);
         assert.equal(btn.getAttribute('aria-label'), '切換至淺色模式');
         assert.equal(btn.getAttribute('title'), '切換至淺色模式');
+        assert.equal(btn.getAttribute('aria-pressed'), 'false');
     });
 
     it('setupThemeToggle should toggle theme, persist localStorage and dispatch themechange', async () => {
