@@ -2,6 +2,9 @@ import logging
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 from flask import g, has_request_context
+import base64
+import time
+from urllib.parse import urljoin
 
 logger = logging.getLogger('SchoolGradesServer.Fetcher')
 
@@ -42,6 +45,7 @@ def _log(level: str, user_id: str, msg: str, req_id: str = None):
 class GradeFetcher:
     BASE = "https://shcloud2.k12ea.gov.tw/CLHSTYC"
     LOGIN_PAGE = f"{BASE}/Auth/Auth/CloudLogin"
+    CAPTCHA_ENDPOINT = f"{BASE}/Auth/Auth/GetCaptcha"
     DO_CHECK = f"{BASE}/Auth/Auth/DoCloudLoginCheck"
     GRADES_PAGE = f"{BASE}/ICampus/StudentInfo/Index?page=%E6%88%90%E7%B8%BE%E6%9F%A5%E8%A9%A2"
     API_BASE = f"{BASE}/ICampus"
@@ -62,16 +66,98 @@ class GradeFetcher:
             raise RuntimeError("找不到 __RequestVerificationToken hidden input")
         return el["value"]
 
-    def login_and_get_tokens(self, username, password):
+    def _extract_hidden_input(self, html: str, field_name: str, default: str = "") -> str:
+        soup = BeautifulSoup(html, "html.parser")
+        el = soup.select_one(f'input[name="{field_name}"]')
+        if not el:
+            return default
+        return (el.get("value") or default).strip()
+
+    def _build_captcha_url(self) -> str:
+        # 學校系統使用 t query 參數避免快取
+        ts = int(time.time() * 1000)
+        return f"{self.CAPTCHA_ENDPOINT}?t={ts}"
+
+    def _find_captcha_image_url(self, html: str) -> str:
+        soup = BeautifulSoup(html, "html.parser")
+        # 優先使用頁面上實際的 captcha 圖片網址（可能包含額外查詢參數）
+        node = (
+            soup.select_one('img[src*="/Auth/Auth/GetCaptcha"]')
+            or soup.select_one('img[src*="GetCaptcha"]')
+            or soup.select_one('img[id*="captcha" i]')
+            or soup.select_one('img[class*="captcha" i]')
+        )
+        if not node or not node.get("src"):
+            return ""
+        return urljoin(self.BASE + "/", node.get("src"))
+
+    def prepare_login_captcha(self):
+        """Prepare school login captcha and context for subsequent login POST."""
+        try:
+            s = self.session_factory()
+            r = s.get(self.LOGIN_PAGE)
+            r.raise_for_status()
+
+            html = r.text
+            login_token = self._get_hidden_token(html)
+            shcaptcha_gen_code = self._extract_hidden_input(html, "ShCaptchaGenCode", "10")
+            captcha_url = self._find_captcha_image_url(html) or self._build_captcha_url()
+
+            req_headers = {
+                "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+                "Referer": self.LOGIN_PAGE,
+            }
+            image_resp = s.get(captcha_url, headers=req_headers)
+            if image_resp.status_code == 403:
+                # fallback：部分情況頁面上的舊 URL 會被擋，改用最新 timestamp 再試一次
+                image_resp = s.get(self._build_captcha_url(), headers=req_headers)
+            image_resp.raise_for_status()
+            content_type = image_resp.headers.get("Content-Type", "image/png")
+
+            if "image" not in content_type.lower():
+                return False, "學校驗證碼回應格式異常", None
+
+            image_b64 = base64.b64encode(image_resp.content).decode("ascii")
+
+            context = {
+                "login_token": login_token,
+                "shcaptcha_gen_code": shcaptcha_gen_code,
+                "cookies": {c.name: c.value for c in s.cookies if c.name and c.value is not None},
+            }
+
+            payload = {
+                "image_data_url": f"data:{content_type};base64,{image_b64}",
+                "context": context,
+            }
+            return True, "OK", payload
+        except Exception as e:
+            _log('error', '', f"Prepare captcha exception: {e}")
+            return False, f"取得學校驗證碼失敗: {str(e)}", None
+
+    def login_and_get_tokens(self, username, password, captcha_code=None, login_context=None):
         """Login via requests session, return (success, message, cookies_dict, student_no, token)."""
         try:
             _log('info', username, "Attempting login (requests mode)")
             s = self.session_factory()
 
-            # 1) GET login page to obtain cookies + hidden token
-            r = s.get(self.LOGIN_PAGE)
-            r.raise_for_status()
-            login_token = self._get_hidden_token(r.text)
+            login_token = None
+            shcaptcha_gen_code = "10"
+
+            # 優先使用前端先取得的驗證碼上下文，確保驗證碼與登入請求同步
+            if login_context:
+                login_token = login_context.get("login_token")
+                shcaptcha_gen_code = login_context.get("shcaptcha_gen_code") or "10"
+                for k, v in (login_context.get("cookies") or {}).items():
+                    if k and v is not None:
+                        s.cookies.set(k, v)
+
+            # fallback：若未提供 context，沿用舊流程直接抓 login page
+            if not login_token:
+                r = s.get(self.LOGIN_PAGE)
+                r.raise_for_status()
+                login_token = self._get_hidden_token(r.text)
+                shcaptcha_gen_code = self._extract_hidden_input(r.text, "ShCaptchaGenCode", "10")
 
             # 2) POST login
             headers = {
@@ -90,7 +176,8 @@ class GradeFetcher:
                 "SchoolName": "國立中大壢中",
                 "GoogleToken": "8",
                 "isRegistration": "false",
-                "ShCaptchaGenCode": "10",
+                "ShCaptchaGenCode": shcaptcha_gen_code,
+                "ShCaptcha": (captcha_code or "").strip(),
                 "__RequestVerificationToken": login_token,
             }
 
