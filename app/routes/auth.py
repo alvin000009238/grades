@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, jsonify, request, session
+from flask import Blueprint, current_app, jsonify, request, session, Response
 
 from app.services.auth_service import is_logged_in, login_and_build_session_payload
 from app.services.rate_limiter import is_rate_limited
@@ -28,6 +28,7 @@ def login():
     data = data or {}
     username = data.get('username')
     password = data.get('password')
+    captcha_code = (data.get('captcha_code') or '').strip()
 
     masked_username = (username[:3] + "***") if username and len(username) > 3 else "***"
     logger.info(f'Login attempt for user: {masked_username}')
@@ -63,15 +64,48 @@ def login():
     if not username or not password:
         return jsonify({'success': False, 'message': '請輸入帳號密碼'}), 400
 
+    if not captcha_code:
+        return jsonify({'success': False, 'message': '請輸入驗證碼'}), 400
+
     fetcher = current_app.config['GRADE_FETCHER']
-    success, message, payload = login_and_build_session_payload(fetcher, username, password)
+    school_login_context = session.get('school_login_context')
+    success, message, payload = login_and_build_session_payload(
+        fetcher,
+        username,
+        password,
+        captcha_code=captcha_code,
+        login_context=school_login_context,
+    )
+
+    # 驗證碼一次性使用，避免重放
+    session.pop('school_login_context', None)
+
     if not success:
-        return jsonify({'success': False, 'message': message}), 401
+        # 驗證碼為一次性使用，登入失敗後一律需要重新取得
+        return jsonify({'success': False, 'message': message, 'need_refresh_captcha': True}), 401
 
     session.update(payload)
     logger.info('Login successful')
 
     return jsonify({'success': True, 'message': message})
+
+
+@bp.route('/api/school-captcha/image')
+def school_captcha_image():
+    try:
+        fetcher = current_app.config['GRADE_FETCHER']
+        success, message, payload = fetcher.prepare_login_captcha()
+        if not success:
+            return jsonify({'success': False, 'message': message}), 200
+
+        session['school_login_context'] = payload['context']
+        resp = Response(payload['image_bytes'], mimetype=payload.get('content_type') or 'image/png')
+        resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        resp.headers['Pragma'] = 'no-cache'
+        return resp
+    except Exception as exc:
+        logger.error(f'Failed to load school captcha image: {exc}', exc_info=True)
+        return jsonify({'success': False, 'message': '驗證碼服務暫時異常，請稍後再試'}), 200
 
 
 @bp.route('/api/logout', methods=['POST'])

@@ -26,6 +26,9 @@ export function setupSyncFeature() {
     const passwordInput = document.getElementById('passwordInput');
     const demoFillLoginBtn = document.getElementById('demoFillLoginBtn');
     const loginStatus = document.getElementById('loginStatus');
+    const captchaInput = document.getElementById('captchaInput');
+    const schoolCaptchaImage = document.getElementById('schoolCaptchaImage');
+    const refreshSchoolCaptcha = document.getElementById('refreshSchoolCaptcha');
 
     // Select Exam Form
     const closeSelectModal = document.getElementById('closeSelectModal');
@@ -38,6 +41,7 @@ export function setupSyncFeature() {
 
     const API_BASE = '/api';
     let availableStructure = {}; // Store the loaded structure
+    let captchaObjectUrl = '';
 
     // Helper to toggle modal
     const toggleModal = (modal, show) => {
@@ -59,6 +63,48 @@ export function setupSyncFeature() {
         emitOnboardingEvent(ONBOARDING_EVENTS.DEMO_CREDENTIALS_FILLED);
     };
 
+    const loadSchoolCaptcha = async () => {
+        if (!schoolCaptchaImage) return;
+        if (captchaObjectUrl) {
+            URL.revokeObjectURL(captchaObjectUrl);
+            captchaObjectUrl = '';
+        }
+        schoolCaptchaImage.src = '';
+        schoolCaptchaImage.alt = '學校系統驗證碼載入中';
+        showStatus(loginStatus, '正在載入學校驗證碼...', 'normal');
+        try {
+            const res = await fetch(`${API_BASE}/school-captcha/image?t=${Date.now()}`, {
+                credentials: 'include'
+            });
+            const contentType = res.headers.get('content-type') || '';
+            if (!res.ok) {
+                if (contentType.includes('application/json')) {
+                    const errData = await res.json();
+                    throw new Error(errData.message || `HTTP ${res.status}`);
+                }
+                throw new Error(`HTTP ${res.status}`);
+            }
+            if (contentType.includes('image/')) {
+                const blob = await res.blob();
+                captchaObjectUrl = URL.createObjectURL(blob);
+                schoolCaptchaImage.src = captchaObjectUrl;
+                schoolCaptchaImage.alt = '學校系統驗證碼';
+                showStatus(loginStatus, '請輸入圖中的驗證碼。', 'normal');
+                return;
+            }
+
+            if (contentType.includes('application/json')) {
+                const data = await res.json();
+                throw new Error(data.message || '驗證碼載入失敗');
+            }
+
+            const raw = await res.text();
+            throw new Error(`伺服器回傳非圖片內容（HTTP ${res.status}）: ${raw.slice(0, 80)}`);
+        } catch (error) {
+            showStatus(loginStatus, `驗證碼載入失敗：${error.message}`, 'error');
+        }
+    };
+
     const openLoginModal = () => {
         toggleModal(loginModal, true);
         if (demoFillLoginBtn) {
@@ -67,7 +113,8 @@ export function setupSyncFeature() {
         if (isDemoModeEnabled()) {
             showStatus(loginStatus, '教學模式已啟用，先點「一鍵填入教學帳密」。', 'normal');
         } else {
-            loginStatus.textContent = '';
+            captchaInput.value = '';
+            loadSchoolCaptcha();
         }
         usernameInput.focus();
         emitOnboardingEvent(ONBOARDING_EVENTS.LOGIN_MODAL_OPEN);
@@ -133,9 +180,15 @@ export function setupSyncFeature() {
     const handleLogin = async () => {
         const username = usernameInput.value.trim();
         const password = passwordInput.value.trim();
+        const captchaCode = captchaInput.value.trim();
 
         if (!username || !password) {
             showStatus(loginStatus, '請輸入帳號密碼', 'error');
+            return;
+        }
+
+        if (!isDemoModeEnabled() && !captchaCode) {
+            showStatus(loginStatus, '請輸入驗證碼', 'error');
             return;
         }
 
@@ -173,7 +226,7 @@ export function setupSyncFeature() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify({ username, password, turnstile_token: turnstileToken })
+                body: JSON.stringify({ username, password, captcha_code: captchaCode, turnstile_token: turnstileToken })
             });
             const data = await res.json();
 
@@ -181,13 +234,18 @@ export function setupSyncFeature() {
                 showStatus(loginStatus, '登入成功', 'success');
                 emitOnboardingEvent(ONBOARDING_EVENTS.LOGIN_SUCCESS);
                 setTimeout(() => {
-                    toggleModal(loginModal, false);
+                    closeLogin();
                     openSelectExamModal();
                     passwordInput.value = '';
+                    captchaInput.value = '';
                     loginStatus.textContent = '';
                 }, 500);
             } else {
                 showStatus(loginStatus, data.message || '登入失敗', 'error');
+                if (data.need_refresh_captcha) {
+                    captchaInput.value = '';
+                    await loadSchoolCaptcha();
+                }
 
             }
         } catch (error) {
@@ -212,9 +270,23 @@ export function setupSyncFeature() {
         demoFillLoginBtn.addEventListener('click', fillDemoCredentials);
     }
 
+    if (refreshSchoolCaptcha) {
+        refreshSchoolCaptcha.addEventListener('click', async () => {
+            captchaInput.value = '';
+            await loadSchoolCaptcha();
+        });
+    }
+
     // Close Login Modal
-    closeLoginModal.addEventListener('click', () => toggleModal(loginModal, false));
-    cancelLogin.addEventListener('click', () => toggleModal(loginModal, false));
+    const closeLogin = () => {
+        if (captchaObjectUrl) {
+            URL.revokeObjectURL(captchaObjectUrl);
+            captchaObjectUrl = '';
+        }
+        toggleModal(loginModal, false);
+    };
+    closeLoginModal.addEventListener('click', closeLogin);
+    cancelLogin.addEventListener('click', closeLogin);
 
     // 3. Select Exam Logic
     const openSelectExamModal = async (forceReload = false) => {
