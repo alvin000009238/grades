@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from flask import g, has_request_context
 import base64
 import time
+from urllib.parse import urljoin
 
 logger = logging.getLogger('SchoolGradesServer.Fetcher')
 
@@ -77,6 +78,19 @@ class GradeFetcher:
         ts = int(time.time() * 1000)
         return f"{self.CAPTCHA_ENDPOINT}?t={ts}"
 
+    def _find_captcha_image_url(self, html: str) -> str:
+        soup = BeautifulSoup(html, "html.parser")
+        # 優先使用頁面上實際的 captcha 圖片網址（可能包含額外查詢參數）
+        node = (
+            soup.select_one('img[src*="/Auth/Auth/GetCaptcha"]')
+            or soup.select_one('img[src*="GetCaptcha"]')
+            or soup.select_one('img[id*="captcha" i]')
+            or soup.select_one('img[class*="captcha" i]')
+        )
+        if not node or not node.get("src"):
+            return ""
+        return urljoin(self.BASE + "/", node.get("src"))
+
     def prepare_login_captcha(self):
         """Prepare school login captcha and context for subsequent login POST."""
         try:
@@ -87,15 +101,17 @@ class GradeFetcher:
             html = r.text
             login_token = self._get_hidden_token(html)
             shcaptcha_gen_code = self._extract_hidden_input(html, "ShCaptchaGenCode", "10")
-            captcha_url = self._build_captcha_url()
+            captcha_url = self._find_captcha_image_url(html) or self._build_captcha_url()
 
-            image_resp = s.get(
-                captcha_url,
-                headers={
-                    "Referer": self.LOGIN_PAGE,
-                    "X-Requested-With": "XMLHttpRequest",
-                }
-            )
+            req_headers = {
+                "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+                "Referer": self.LOGIN_PAGE,
+            }
+            image_resp = s.get(captcha_url, headers=req_headers)
+            if image_resp.status_code == 403:
+                # fallback：部分情況頁面上的舊 URL 會被擋，改用最新 timestamp 再試一次
+                image_resp = s.get(self._build_captcha_url(), headers=req_headers)
             image_resp.raise_for_status()
             content_type = image_resp.headers.get("Content-Type", "image/png")
 
