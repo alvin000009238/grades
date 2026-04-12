@@ -92,13 +92,17 @@ def login():
 
 @bp.route('/api/school-captcha')
 def school_captcha():
-    fetcher = current_app.config['GRADE_FETCHER']
-    success, message, payload = fetcher.prepare_login_captcha()
-    if not success:
-        return jsonify({'success': False, 'message': message}), 502
+    try:
+        fetcher = current_app.config['GRADE_FETCHER']
+        success, message, payload = fetcher.prepare_login_captcha()
+        if not success:
+            return jsonify({'success': False, 'message': message}), 502
 
-    session['school_login_context'] = payload['context']
-    return jsonify({'success': True, 'image_data_url': payload['image_data_url']})
+        session['school_login_context'] = payload['context']
+        return jsonify({'success': True, 'image_data_url': payload['image_data_url']})
+    except Exception as exc:
+        logger.error(f'Failed to load school captcha: {exc}', exc_info=True)
+        return jsonify({'success': False, 'message': '驗證碼服務暫時異常，請稍後再試'}), 500
 
 
 @bp.route('/api/logout', methods=['POST'])

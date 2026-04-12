@@ -71,7 +71,14 @@ export function setupSyncFeature() {
             const res = await fetch(`${API_BASE}/school-captcha`, {
                 credentials: 'include'
             });
-            const data = await res.json();
+            const contentType = res.headers.get('content-type') || '';
+            let data;
+            if (contentType.includes('application/json')) {
+                data = await res.json();
+            } else {
+                const raw = await res.text();
+                throw new Error(`伺服器回傳非 JSON 內容（HTTP ${res.status}）: ${raw.slice(0, 80)}`);
+            }
             if (!res.ok || !data.success || !data.image_data_url) {
                 throw new Error(data.message || '驗證碼載入失敗');
             }
