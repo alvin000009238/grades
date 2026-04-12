@@ -738,6 +738,36 @@ visibility: visible;
 
 }
 
+.captcha-row {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+.school-captcha-image {
+
+    flex: 1;
+
+    min-height: 48px;
+
+    max-height: 56px;
+
+    border: 1px solid var(--md-sys-color-outline);
+
+    border-radius: var(--radius-sm);
+
+    object-fit: contain;
+
+    background: var(--color-surface);
+
+    padding: 4px;
+
+}
+
 
 
 .toggle-password-btn {
@@ -811,6 +841,5 @@ visibility: visible;
     color: var(--color-danger);
 
 }
-
 
 
