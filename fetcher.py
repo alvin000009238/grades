@@ -119,6 +119,7 @@ class GradeFetcher:
             html = r.text
             login_token = self._get_hidden_token(html)
             shcaptcha_gen_code = self._extract_hidden_input(html, "ShCaptchaGenCode", "10")
+            device_token = self._extract_hidden_input(html, "DeviceToken", "")
             captcha_url = self._find_captcha_image_url(html) or self._build_captcha_url()
 
             req_headers = {
@@ -146,6 +147,7 @@ class GradeFetcher:
             context = {
                 "login_token": login_token,
                 "shcaptcha_gen_code": shcaptcha_gen_code,
+                "device_token": device_token,
                 "cookies": {c.name: c.value for c in s.cookies if c.name and c.value is not None},
             }
 
@@ -168,11 +170,13 @@ class GradeFetcher:
 
             login_token = None
             shcaptcha_gen_code = "10"
+            device_token = ""
 
             # 優先使用前端先取得的驗證碼上下文，確保驗證碼與登入請求同步
             if login_context:
                 login_token = login_context.get("login_token")
                 shcaptcha_gen_code = login_context.get("shcaptcha_gen_code") or "10"
+                device_token = login_context.get("device_token") or ""
                 for k, v in (login_context.get("cookies") or {}).items():
                     if k and v is not None:
                         s.cookies.set(k, v)
@@ -183,6 +187,7 @@ class GradeFetcher:
                 r.raise_for_status()
                 login_token = self._get_hidden_token(r.text)
                 shcaptcha_gen_code = self._extract_hidden_input(r.text, "ShCaptchaGenCode", "10")
+                device_token = self._extract_hidden_input(r.text, "DeviceToken", "")
 
             # 2) POST login
             headers = {
@@ -201,10 +206,12 @@ class GradeFetcher:
                 "SchoolName": "國立中大壢中",
                 "GoogleToken": "8",
                 "isRegistration": "false",
-                "ShCaptchaGenCode": shcaptcha_gen_code,
-                "ShCaptcha": (captcha_code or "").strip(),
+                # 依學校實際請求欄位，驗證碼文字使用 ShCaptchaGenCode 傳送
+                "ShCaptchaGenCode": (captcha_code or "").strip() or shcaptcha_gen_code,
                 "__RequestVerificationToken": login_token,
             }
+            if device_token:
+                data["DeviceToken"] = device_token
 
             resp = s.post(self.DO_CHECK, data=data, headers=headers)
             resp.raise_for_status()
