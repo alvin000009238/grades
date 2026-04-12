@@ -2,7 +2,6 @@ import logging
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 from flask import g, has_request_context
-import base64
 import time
 from urllib.parse import urljoin
 import re
@@ -97,7 +96,7 @@ class GradeFetcher:
         text = (raw_text or "").strip()
         if not text:
             return None
-        normalized = re.sub(r'\\s+', '', text)
+        normalized = re.sub(r'\s+', '', text)
         if normalized.startswith("0x"):
             normalized = normalized[2:]
         if len(normalized) < 64 or len(normalized) % 2 != 0:
@@ -142,8 +141,6 @@ class GradeFetcher:
                     return False, "學校驗證碼回應格式異常", None
                 content_type = "image/png"
 
-            image_b64 = base64.b64encode(image_bytes).decode("ascii")
-
             context = {
                 "login_token": login_token,
                 "shcaptcha_gen_code": shcaptcha_gen_code,
@@ -152,7 +149,6 @@ class GradeFetcher:
             }
 
             payload = {
-                "image_data_url": f"data:{content_type};base64,{image_b64}",
                 "image_bytes": image_bytes,
                 "content_type": content_type,
                 "context": context,
@@ -161,6 +157,8 @@ class GradeFetcher:
         except Exception as e:
             _log('error', '', f"Prepare captcha exception: {e}")
             return False, f"取得學校驗證碼失敗: {str(e)}", None
+        finally:
+            s.close()
 
     def login_and_get_tokens(self, username, password, captcha_code=None, login_context=None):
         """Login via requests session, return (success, message, cookies_dict, student_no, token)."""
@@ -206,7 +204,6 @@ class GradeFetcher:
                 "SchoolName": "國立中大壢中",
                 "GoogleToken": "8",
                 "isRegistration": "false",
-                # 依學校實際請求欄位，驗證碼文字使用 ShCaptchaGenCode 傳送
                 "ShCaptchaGenCode": (captcha_code or "").strip() or shcaptcha_gen_code,
                 "__RequestVerificationToken": login_token,
             }

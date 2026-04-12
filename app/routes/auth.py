@@ -81,29 +81,13 @@ def login():
     session.pop('school_login_context', None)
 
     if not success:
-        need_refresh_captcha = '驗證碼' in (message or '')
-        return jsonify({'success': False, 'message': message, 'need_refresh_captcha': need_refresh_captcha}), 401
+        # 驗證碼為一次性使用，登入失敗後一律需要重新取得
+        return jsonify({'success': False, 'message': message, 'need_refresh_captcha': True}), 401
 
     session.update(payload)
     logger.info('Login successful')
 
     return jsonify({'success': True, 'message': message})
-
-
-@bp.route('/api/school-captcha')
-def school_captcha():
-    try:
-        fetcher = current_app.config['GRADE_FETCHER']
-        success, message, payload = fetcher.prepare_login_captcha()
-        if not success:
-            # 避免反向代理/CDN 將 502 轉成 HTML 錯誤頁，前端改以 success 判斷
-            return jsonify({'success': False, 'message': message}), 200
-
-        session['school_login_context'] = payload['context']
-        return jsonify({'success': True, 'image_data_url': payload['image_data_url']})
-    except Exception as exc:
-        logger.error(f'Failed to load school captcha: {exc}', exc_info=True)
-        return jsonify({'success': False, 'message': '驗證碼服務暫時異常，請稍後再試'}), 200
 
 
 @bp.route('/api/school-captcha/image')

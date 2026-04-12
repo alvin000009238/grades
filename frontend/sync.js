@@ -77,6 +77,13 @@ export function setupSyncFeature() {
                 credentials: 'include'
             });
             const contentType = res.headers.get('content-type') || '';
+            if (!res.ok) {
+                if (contentType.includes('application/json')) {
+                    const errData = await res.json();
+                    throw new Error(errData.message || `HTTP ${res.status}`);
+                }
+                throw new Error(`HTTP ${res.status}`);
+            }
             if (contentType.includes('image/')) {
                 const blob = await res.blob();
                 captchaObjectUrl = URL.createObjectURL(blob);
@@ -227,7 +234,7 @@ export function setupSyncFeature() {
                 showStatus(loginStatus, '登入成功', 'success');
                 emitOnboardingEvent(ONBOARDING_EVENTS.LOGIN_SUCCESS);
                 setTimeout(() => {
-                    toggleModal(loginModal, false);
+                    closeLogin();
                     openSelectExamModal();
                     passwordInput.value = '';
                     captchaInput.value = '';
