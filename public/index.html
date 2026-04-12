@@ -28,7 +28,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; manifest-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://challenges.cloudflare.com; script-src-elem 'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://challenges.cloudflare.com; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://cdn.jsdelivr.net https://cloudflareinsights.com; frame-src https://challenges.cloudflare.com; img-src 'self' data:;">
+        content="default-src 'self'; manifest-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://challenges.cloudflare.com; script-src-elem 'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://challenges.cloudflare.com; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://cdn.jsdelivr.net https://cloudflareinsights.com; frame-src https://challenges.cloudflare.com; img-src 'self' data: blob:;">
     <link rel="preload" as="style"
         href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap">
     <link rel="stylesheet"
@@ -40,7 +40,7 @@
     </noscript>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <script src="/theme-init.js"></script>
-    <link rel="stylesheet" href="/dist/main-bt8E1vXG.css" id="vite-css">
+    <link rel="stylesheet" href="/dist/main-D7lFZRO-.css" id="vite-css">
     <link rel="icon" type="image/x-icon" href="/favicon.ico?v=20260402">
     <link rel="icon" type="image/png" href="/favicon-96x96.png?v=20260402" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20260402" />
@@ -201,6 +201,16 @@
                                     </svg>
                                 </button>
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="captcha-row">
+                                <img id="schoolCaptchaImage" class="school-captcha-image" alt="學校系統驗證碼" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+                                <button type="button" class="modal-btn cancel" id="refreshSchoolCaptcha">重新整理</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="captchaInput" name="captcha" autocomplete="off" placeholder=" ">
+                            <label for="captchaInput">驗證碼</label>
                         </div>
                         <button type="button" class="modal-btn reload demo-fill-login-btn hidden-full-center"
                             id="demoFillLoginBtn" data-tour="demo-fill-login">
@@ -535,7 +545,7 @@
         </footer>
     </div>
 
-    <script type="module" src="/dist/main-D-w4GNFQ.js"></script>
+    <script type="module" src="/dist/main-BfKSDYq4.js"></script>
 </body>
 
 </html>
