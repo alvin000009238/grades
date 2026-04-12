@@ -1,7 +1,12 @@
 
 
-def login_and_build_session_payload(fetcher, username, password):
-    success, message, cookies, student_no, token = fetcher.login_and_get_tokens(username, password)
+def login_and_build_session_payload(fetcher, username, password, captcha_code=None, login_context=None):
+    success, message, cookies, student_no, token = fetcher.login_and_get_tokens(
+        username,
+        password,
+        captcha_code=captcha_code,
+        login_context=login_context,
+    )
 
     if not success:
         return False, message, None
