@@ -9,11 +9,14 @@
 
 本專案實作了自動化的成績查詢流程，全程透過原生的 HTTP 請求（使用 Python `requests` 模組）與學校系統的 API 介接，免去開啟實際瀏覽器的負擔。由於摒棄了複雜的網站前端渲染，它能提供非常快速且輕量化的連線體驗，並支援取得成績後建立分享連結的功能。
 
+本 repo 也包含 Android 原生版 App，位於 [`android/`](android/)。Android 版使用 Kotlin、Jetpack Compose、Material 3 與 OkHttp，手機端直接連線學校系統，不依賴 Flask server。詳細建置、測試與安裝方式請見 [`android/README.md`](android/README.md)。
+
 ## Table of Contents
 
 - [Background](#background)
 - [Install](#install)
 - [Usage](#usage)
+- [Android App](#android-app)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Maintainers](#maintainers)
 - [License](#license)
@@ -85,6 +88,33 @@ python server.py
 
 > [!WARNING]
 > 本應用預設以 `debug=True` 運行於 Flask 的內建伺服器（Development Server），這並不適合直接暴露於公共網路環境，也不適用於生產模式部署。
+
+## Android App
+
+Android 原生版位於 `android/`，目前設定如下：
+
+- `applicationId`: `com.clhs.score`
+- minSdk: 29
+- targetSdk: 36
+- compileSdk: 36
+- Android Gradle Plugin: 9.0.0
+- Gradle wrapper: 9.3.1
+
+常用指令：
+
+```powershell
+cd android
+.\gradlew.bat test
+.\gradlew.bat compileDebugAndroidTestKotlin
+.\gradlew.bat assembleDebug
+```
+
+debug APK 會輸出到：
+
+```text
+android/app/build/outputs/apk/debug/app-debug.apk
+```
+
 
 ## Maintainers
 
