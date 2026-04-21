@@ -50,11 +50,11 @@ def health_check():
             redis_client.ping()
             redis_status = 'connected'
         except Exception as e:
-            logger.error(f'Health check: Redis ping failed: {e}')
+            logger.error(f'Health check: Redis ping failed: {e}', exc_info=True)
             return jsonify({
                 'status': 'error',
                 'redis': 'disconnected',
-                'detail': str(e),
+                'detail': '伺服器內部錯誤',
             }), 503
 
     return jsonify({'status': 'ok', 'redis': redis_status}), 200
