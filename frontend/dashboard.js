@@ -130,25 +130,29 @@ function updateStatistics(subjects) {
         return;
     }
 
-    const scores = subjects.map(subject => subject.scoreValue);
-    const highest = Math.max(...scores);
-
-    // 計算加權平均
+    // ⚡ Bolt: Combined O(n) loops (map, max, forEach) into a single iteration
+    // to reduce overhead, avoid RangeError in Math.max(...scores) for large arrays,
+    // and minimize GC churn.
+    let highest = -Infinity;
     let totalWeightedScore = 0;
     let totalWeight = 0;
 
-    subjects.forEach(subject => {
+    for (let i = 0; i < subjects.length; i++) {
+        const subject = subjects[i];
         const score = subject.scoreValue;
         const weight = getSubjectWeight(subject.SubjectName);
+
+        if (score > highest) highest = score;
+
         totalWeightedScore += score * weight;
         totalWeight += weight;
-    });
+    }
 
     const weightedAvg = totalWeight > 0 ? totalWeightedScore / totalWeight : 0;
 
     document.getElementById('avgScore').textContent = weightedAvg.toFixed(1);
     document.getElementById('totalSubjects').textContent = subjects.length;
-    document.getElementById('highestScore').textContent = highest;
+    document.getElementById('highestScore').textContent = highest === -Infinity ? 0 : highest;
 }
 
 // 生成成績卡片
