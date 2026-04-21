@@ -130,25 +130,27 @@ function updateStatistics(subjects) {
         return;
     }
 
-    const scores = subjects.map(subject => subject.scoreValue);
-    const highest = Math.max(...scores);
-
-    // 計算加權平均
+    let highest = -Infinity;
     let totalWeightedScore = 0;
     let totalWeight = 0;
 
-    subjects.forEach(subject => {
+    // 整合迴圈：尋找最高分並計算加權總分，避免建立暫存陣列及二次遍歷
+    for (let i = 0; i < subjects.length; i++) {
+        const subject = subjects[i];
         const score = subject.scoreValue;
         const weight = getSubjectWeight(subject.SubjectName);
+
+        if (score > highest) highest = score;
+
         totalWeightedScore += score * weight;
         totalWeight += weight;
-    });
+    }
 
     const weightedAvg = totalWeight > 0 ? totalWeightedScore / totalWeight : 0;
 
     document.getElementById('avgScore').textContent = weightedAvg.toFixed(1);
     document.getElementById('totalSubjects').textContent = subjects.length;
-    document.getElementById('highestScore').textContent = highest;
+    document.getElementById('highestScore').textContent = highest === -Infinity ? '--' : highest;
 }
 
 // 生成成績卡片
@@ -313,13 +315,21 @@ function cleanSubjectName(name) {
     return name.replace(/<br\/>/g, '');
 }
 
+const SCORE_LEVELS = Object.freeze({
+    EXCELLENT: Object.freeze({ text: '頂標以上', class: 'excellent' }),
+    GOOD: Object.freeze({ text: '前標以上', class: 'good' }),
+    AVERAGE: Object.freeze({ text: '均標以上', class: 'average' }),
+    BELOW: Object.freeze({ text: '後標以上', class: 'below' }),
+    POOR: Object.freeze({ text: '底標以下', class: 'poor' })
+});
+
 // 取得成績等級
 function getScoreLevel(score, std) {
-    if (score >= std["頂標"]) return { text: '頂標以上', class: 'excellent' };
-    if (score >= std["前標"]) return { text: '前標以上', class: 'good' };
-    if (score >= std["均標"]) return { text: '均標以上', class: 'average' };
-    if (score >= std["後標"]) return { text: '後標以上', class: 'below' };
-    return { text: '底標以下', class: 'poor' };
+    if (score >= std["頂標"]) return SCORE_LEVELS.EXCELLENT;
+    if (score >= std["前標"]) return SCORE_LEVELS.GOOD;
+    if (score >= std["均標"]) return SCORE_LEVELS.AVERAGE;
+    if (score >= std["後標"]) return SCORE_LEVELS.BELOW;
+    return SCORE_LEVELS.POOR;
 }
 
 // 生成分佈圖
