@@ -130,19 +130,23 @@ function updateStatistics(subjects) {
         return;
     }
 
-    const scores = subjects.map(subject => subject.scoreValue);
-    const highest = Math.max(...scores);
-
-    // 計算加權平均
+    // ⚡ Bolt: Combined array iterations to avoid multiple O(n) passes
+    // and prevent RangeError from Math.max(...scores) on large arrays
+    let highest = -Infinity;
     let totalWeightedScore = 0;
     let totalWeight = 0;
 
-    subjects.forEach(subject => {
+    for (const subject of subjects) {
         const score = subject.scoreValue;
+
+        // ⚡ Compute max score
+        if (score > highest) highest = score;
+
+        // ⚡ Compute weighted average
         const weight = getSubjectWeight(subject.SubjectName);
         totalWeightedScore += score * weight;
         totalWeight += weight;
-    });
+    }
 
     const weightedAvg = totalWeight > 0 ? totalWeightedScore / totalWeight : 0;
 
