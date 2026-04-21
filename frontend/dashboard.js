@@ -130,19 +130,26 @@ function updateStatistics(subjects) {
         return;
     }
 
-    const scores = subjects.map(subject => subject.scoreValue);
-    const highest = Math.max(...scores);
+    // 效能優化: 結合原本的三次遍歷 (.map, Math.max, .forEach) 成為單一迴圈
+    // 減少 O(N) 次數並避免產生中間陣列與 Call Stack Exceeded 風險
+    let highest = -Infinity;
 
     // 計算加權平均
     let totalWeightedScore = 0;
     let totalWeight = 0;
 
-    subjects.forEach(subject => {
+    for (let i = 0; i < subjects.length; i++) {
+        const subject = subjects[i];
         const score = subject.scoreValue;
+
+        if (score > highest) {
+            highest = score;
+        }
+
         const weight = getSubjectWeight(subject.SubjectName);
         totalWeightedScore += score * weight;
         totalWeight += weight;
-    });
+    }
 
     const weightedAvg = totalWeight > 0 ? totalWeightedScore / totalWeight : 0;
 
