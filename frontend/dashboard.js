@@ -130,19 +130,20 @@ function updateStatistics(subjects) {
         return;
     }
 
-    const scores = subjects.map(subject => subject.scoreValue);
-    const highest = Math.max(...scores);
+    let highest = -Infinity;
 
-    // 計算加權平均
+    // 計算加權平均與最高分 (Combined loop for performance optimization)
     let totalWeightedScore = 0;
     let totalWeight = 0;
 
-    subjects.forEach(subject => {
+    for (const subject of subjects) {
         const score = subject.scoreValue;
+        if (score > highest) highest = score;
+
         const weight = getSubjectWeight(subject.SubjectName);
         totalWeightedScore += score * weight;
         totalWeight += weight;
-    });
+    }
 
     const weightedAvg = totalWeight > 0 ? totalWeightedScore / totalWeight : 0;
 
