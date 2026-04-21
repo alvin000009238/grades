@@ -79,7 +79,9 @@ def create_app():
 
     app.config['GRADE_FETCHER'] = GradeFetcher()
 
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+    proxy_count = int(os.environ.get('PROXY_COUNT', 1))
+    if proxy_count > 0:
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=proxy_count, x_proto=proxy_count, x_host=proxy_count, x_prefix=proxy_count)
 
     allowed_origins = os.environ.get('CORS_ORIGINS', 'http://localhost:5000,http://127.0.0.1:5000').split(',')
     cors.init_app(app, supports_credentials=True, origins=allowed_origins)
