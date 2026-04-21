@@ -54,7 +54,7 @@ def health_check():
             return jsonify({
                 'status': 'error',
                 'redis': 'disconnected',
-                'detail': str(e),
+                'detail': '伺服器內部錯誤',
             }), 503
 
     return jsonify({'status': 'ok', 'redis': redis_status}), 200
