@@ -81,8 +81,8 @@ def create_share_link():
         write_share_metadata(redis_client, share_id, student_no, share_ttl)
         return jsonify({'success': True, 'id': share_id})
     except Exception as exc:
-        logger.error(f'Error creating share: {exc}', exc_info = True)
-        return jsonify({'error': str(exc)}), 500
+        logger.error(f'Error creating share: {exc}', exc_info=True)
+        return jsonify({'error': '伺服器內部錯誤'}), 500
 
 
 @bp.route('/api/share/<share_id>', methods=['PUT'])
@@ -147,7 +147,7 @@ def update_share_link(share_id):
         return jsonify({'success': True, 'id': share_id})
     except Exception as exc:
         logger.error(f'Error updating share: {exc}', exc_info=True)
-        return jsonify({'error': str(exc)}), 500
+        return jsonify({'error': '伺服器內部錯誤'}), 500
 
 
 @bp.route('/api/share/<share_id>', methods=['GET'])
@@ -166,8 +166,8 @@ def get_shared_grades(share_id):
 
         return jsonify({'success': True, 'data': data})
     except Exception as exc:
-        logger.error(f'Error reading share: {exc}', exc_info = True)
-        return jsonify({'error': str(exc)}), 500
+        logger.error(f'Error reading share: {exc}', exc_info=True)
+        return jsonify({'error': '伺服器內部錯誤'}), 500
 
 
 @bp.route('/share/<share_id>')
