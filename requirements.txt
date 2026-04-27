@@ -20,6 +20,7 @@ redis==7.3.0
 
 # Utilities
 python-dotenv==1.2.2
+
 # Testing
 pytest==8.3.3
 pytest-cov==5.0.0
