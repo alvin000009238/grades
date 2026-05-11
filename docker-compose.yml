@@ -2,13 +2,11 @@ services:
   app:
     build: .
     image: ghcr.io/${GHCR_IMAGE:-alvin000009238/grades}:latest
+    env_file:
+      - .env
     environment:
       - PYTHONUNBUFFERED=1
-      - SECRET_KEY=${SECRET_KEY}
-      - CORS_ORIGINS=${CORS_ORIGINS}
       - REDIS_URL=redis://redis:6379/0
-      - TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}
-      - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
       - TZ=Asia/Taipei
     ports:
       - "5000:5000"
@@ -32,8 +30,8 @@ services:
   tunnel:
     image: cloudflare/cloudflared:latest
     command: tunnel run
-    environment:
-      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    env_file:
+      - .env
     deploy:
       restart_policy:
         condition: any
