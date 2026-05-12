@@ -68,6 +68,7 @@ def get_http_session() -> TimeoutSession:
     """
     Returns a requests.Session customized with default timeouts and automatic retries.
     Configurable via environment variables.
+    This session does NOT use any proxy — suitable for Turnstile, internal services, etc.
     """
     try:
         total_retries = int(os.environ.get("HTTP_RETRY_TOTAL", 3))
@@ -105,4 +106,30 @@ def get_http_session() -> TimeoutSession:
     session.mount("http://", adapter)
     session.mount("https://", adapter)
     
+    return session
+
+
+def get_school_http_session() -> TimeoutSession:
+    """
+    Returns a requests.Session for school system requests.
+    If SCHOOL_SOCKS_PROXY is set (e.g. socks5://tailscale:1055), routes traffic
+    through a Tailscale exit node. Otherwise behaves identically to get_http_session().
+    """
+    session = get_http_session()
+
+    socks_proxy = os.environ.get("SCHOOL_SOCKS_PROXY", "").strip()
+    if socks_proxy:
+        session.proxies = {
+            "http": socks_proxy,
+            "https": socks_proxy,
+        }
+        # 只記錄 proxy host:port，不記錄任何 auth 資訊
+        try:
+            from urllib.parse import urlparse
+            parsed = urlparse(socks_proxy)
+            safe_addr = f"{parsed.hostname}:{parsed.port}"
+        except Exception:
+            safe_addr = "(parse error)"
+        logger.info(f"School HTTP session using SOCKS proxy: {safe_addr}")
+
     return session

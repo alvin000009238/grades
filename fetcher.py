@@ -52,9 +52,9 @@ class GradeFetcher:
 
     def __init__(self, session_factory=None):
         if session_factory is None:
-            # Delay import to avoid circular dependency if any, or just use the injected one
-            from app.services.http_client import get_http_session
-            self.session_factory = get_http_session
+            # 使用學校系統專用的 HTTP session，當環境設定 SOCKS proxy 時會走 Tailscale exit node
+            from app.services.http_client import get_school_http_session
+            self.session_factory = get_school_http_session
         else:
             self.session_factory = session_factory
 

@@ -8,6 +8,7 @@ services:
       - PYTHONUNBUFFERED=1
       - REDIS_URL=redis://redis:6379/0
       - TZ=Asia/Taipei
+      - SCHOOL_SOCKS_PROXY=${TS_EXIT_NODE:+socks5://tailscale:1055}
     ports:
       - "5000:5000"
 
@@ -26,6 +27,23 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
+
+  tailscale:
+    image: tailscale/tailscale:latest
+    hostname: ${TS_HOSTNAME:-grades-docker}
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY:-}
+      - TS_EXTRA_ARGS=--exit-node=${TS_EXIT_NODE:-}
+      - TS_TAILSCALED_EXTRA_ARGS=--socks5-server=0.0.0.0:1055
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=true
+    volumes:
+      - tailscale_state:/var/lib/tailscale
+    deploy:
+      restart_policy:
+        condition: any
+    profiles:
+      - tailscale
 
   tunnel:
     image: cloudflare/cloudflared:latest
@@ -46,3 +64,4 @@ services:
 
 volumes:
   redis_data:
+  tailscale_state:
