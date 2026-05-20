@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,6 +46,7 @@ import com.clhs.score.data.scoreDistributions
 import com.clhs.score.data.shortenSubjectName
 import kotlinx.coroutines.delay
 import kotlin.math.floor
+import kotlin.math.roundToInt
 
 private val SubjectPositive = Color(0xFF0B7D3B)
 private val SubjectWarning = Color(0xFFE87500)
@@ -304,9 +306,15 @@ private fun DistributionRow(item: com.clhs.score.data.ScoreDistribution, total: 
 
 @Composable
 internal fun StandardPositionBar(score: Double, standard: GradeStandard) {
-    val marks = listOfNotNull(standard.bottom, standard.back, standard.average, standard.front, standard.top)
-    val low = marks.minOrNull() ?: 0.0
-    val high = marks.maxOrNull()?.coerceAtLeast(low + 1.0) ?: 100.0
+    val marks = listOfNotNull(
+        standard.bottom?.let { StandardMarkSpec("底", it) },
+        standard.back?.let { StandardMarkSpec("後", it) },
+        standard.average?.let { StandardMarkSpec("均", it) },
+        standard.front?.let { StandardMarkSpec("前", it) },
+        standard.top?.let { StandardMarkSpec("頂", it) },
+    )
+    val low = marks.minOfOrNull { it.value } ?: 0.0
+    val high = marks.maxOfOrNull { it.value }?.coerceAtLeast(low + 1.0) ?: 100.0
     val fraction = ((score - low) / (high - low)).coerceIn(0.0, 1.0).toFloat()
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text("班級五標", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -330,12 +338,40 @@ internal fun StandardPositionBar(score: Double, standard: GradeStandard) {
                     .background(MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(999.dp)),
             )
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-            StandardMark(modifier = Modifier.weight(1f), label = "底", value = standard.bottom)
-            StandardMark(modifier = Modifier.weight(1f), label = "後", value = standard.back)
-            StandardMark(modifier = Modifier.weight(1f), label = "均", value = standard.average)
-            StandardMark(modifier = Modifier.weight(1f), label = "前", value = standard.front)
-            StandardMark(modifier = Modifier.weight(1f), label = "頂", value = standard.top)
+        ProportionalStandardMarks(marks = marks, low = low, high = high)
+    }
+}
+
+private data class StandardMarkSpec(
+    val label: String,
+    val value: Double,
+)
+
+@Composable
+private fun ProportionalStandardMarks(marks: List<StandardMarkSpec>, low: Double, high: Double) {
+    val range = (high - low).takeIf { it > 0.0 } ?: 1.0
+    Layout(
+        modifier = Modifier.fillMaxWidth(),
+        content = {
+            marks.forEach { mark ->
+                StandardMark(modifier = Modifier, label = mark.label, value = mark.value)
+            }
+        },
+    ) { measurables, constraints ->
+        val placeables = measurables.map { measurable ->
+            measurable.measure(constraints.copy(minWidth = 0))
+        }
+        val width = constraints.maxWidth
+        val height = placeables.maxOfOrNull { it.height } ?: 0
+        layout(width, height) {
+            placeables.forEachIndexed { index, placeable ->
+                val mark = marks[index]
+                val fraction = ((mark.value - low) / range).coerceIn(0.0, 1.0)
+                val x = (fraction * width - placeable.width / 2.0)
+                    .roundToInt()
+                    .coerceIn(0, (width - placeable.width).coerceAtLeast(0))
+                placeable.placeRelative(x, 0)
+            }
         }
     }
 }
