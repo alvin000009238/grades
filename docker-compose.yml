@@ -1,7 +1,7 @@
 services:
   app:
     build: .
-    image: ghcr.io/${GHCR_IMAGE:-alvin000009238/grades}:latest
+    image: ghcr.io/${GHCR_IMAGE:-alvin000009238/clhs_score}:latest
     env_file:
       - .env
     environment:
@@ -30,7 +30,7 @@ services:
 
   tailscale:
     image: tailscale/tailscale:latest
-    hostname: ${TS_HOSTNAME:-grades-docker}
+    hostname: ${TS_HOSTNAME:-score-docker}
     environment:
       - TS_AUTHKEY=${TS_AUTHKEY:-}
       - TS_EXTRA_ARGS=--exit-node=${TS_EXIT_NODE:-}

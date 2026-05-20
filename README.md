@@ -32,8 +32,8 @@
 ### 1. 取得專案原始碼
 
 ```bash
-git clone https://github.com/alvin000009238/grades.git
-cd grades
+git clone https://github.com/alvin000009238/clhs_score.git
+cd clhs_score
 ```
 
 ### 2. 環境變數設定

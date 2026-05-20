@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (container) {
             container.innerHTML = `
                 <span class="footer-divider">|</span>
-                <a href="https://github.com/alvin000009238/grades/commit/${commitHash}" target="_blank" rel="noopener noreferrer"
+                <a href="https://github.com/alvin000009238/clhs_score/commit/${commitHash}" target="_blank" rel="noopener noreferrer"
                     class="footer-link mono">
                     ${shortHash}
                 </a>
