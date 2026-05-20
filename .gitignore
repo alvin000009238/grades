@@ -33,6 +33,9 @@ venv.bak/
 
 # Environment Variables (CRITICAL for security)
 .env
+*.jks
+*.keystore
+*.p12
 
 # Application Data & Temporary Files
 grades_raw.json
@@ -47,6 +50,7 @@ shared_grades/
 *.md
 !README.md
 !AGENTS.md
+!CHANGELOG.md
 0_build_and_deploy.txt
 # Exclude specific JSONs but allow config templates if any
 

@@ -1,0 +1,171 @@
+name: Android Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build signed release APK
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: |
+          set +o pipefail
+          yes | sdkmanager --licenses > /dev/null
+          set -o pipefail
+          sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+
+      - name: Decode release keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+        run: |
+          if [[ -z "$KEYSTORE_BASE64" || -z "$KEYSTORE_PASSWORD" || -z "$KEY_ALIAS" || -z "$KEY_PASSWORD" ]]; then
+            echo "::error::Missing Android release signing secrets."
+            exit 1
+          fi
+
+          mkdir -p "$RUNNER_TEMP/android-signing"
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/android-signing/release.jks"
+
+          {
+            echo "ANDROID_RELEASE_KEYSTORE=$RUNNER_TEMP/android-signing/release.jks"
+            echo "ANDROID_RELEASE_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD"
+            echo "ANDROID_RELEASE_KEY_ALIAS=$KEY_ALIAS"
+            echo "ANDROID_RELEASE_KEY_PASSWORD=$KEY_PASSWORD"
+          } >> "$GITHUB_ENV"
+
+      - name: Make Gradle wrapper executable
+        working-directory: android
+        run: chmod +x gradlew
+
+      - name: Extract release notes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os
+          import re
+          import sys
+
+          tag = os.environ["GITHUB_REF_NAME"]
+          version = tag.removeprefix("v")
+          changelog = Path("CHANGELOG.md")
+          if not changelog.exists():
+              print("::error::CHANGELOG.md is missing.")
+              sys.exit(1)
+
+          lines = changelog.read_text(encoding="utf-8").splitlines()
+          heading = re.compile(rf"^## \[{re.escape(version)}\](?:\s+-\s+.*)?\s*$")
+          next_heading = re.compile(r"^## \[")
+          start = None
+          for index, line in enumerate(lines):
+              if heading.match(line):
+                  start = index + 1
+                  break
+
+          if start is None:
+              print(f"::error::CHANGELOG.md has no section for version {version}.")
+              sys.exit(1)
+
+          end = len(lines)
+          for index in range(start, len(lines)):
+              if next_heading.match(lines[index]):
+                  end = index
+                  break
+
+          notes = "\n".join(lines[start:end]).strip()
+          if not notes:
+              print(f"::error::CHANGELOG.md section for version {version} is empty.")
+              sys.exit(1)
+
+          output = Path(os.environ["RUNNER_TEMP"]) / "release-notes.md"
+          output.write_text(notes + "\n", encoding="utf-8")
+          print(f"Release notes written to {output}")
+          PY
+
+      - name: Build signed release APK
+        working-directory: android
+        run: |
+          version_name="${GITHUB_REF_NAME#v}"
+          ./gradlew --no-daemon test assembleRelease \
+            -PversionName="$version_name" \
+            -PversionCode="${GITHUB_RUN_NUMBER}"
+
+      - name: Prepare APK artifact
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          apk_name="clhs-socre-${tag}-arm64-v8a-release.apk"
+          apk_path="$RUNNER_TEMP/$apk_name"
+          cp android/app/build/outputs/apk/release/app-release.apk "$apk_path"
+          echo "APK_PATH=$apk_path" >> "$GITHUB_ENV"
+          echo "APK_NAME=$apk_name" >> "$GITHUB_ENV"
+
+      - name: Verify APK signature and ABI
+        run: |
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK_PATH"
+          python3 - <<'PY'
+          from zipfile import ZipFile
+          import os
+          import sys
+
+          apk_path = os.environ["APK_PATH"]
+          allowed_abis = {"arm64-v8a"}
+          with ZipFile(apk_path) as apk:
+              abis = {
+                  name.split("/")[1]
+                  for name in apk.namelist()
+                  if name.startswith("lib/") and len(name.split("/")) > 2
+              }
+
+          invalid_abis = abis - allowed_abis
+          if invalid_abis:
+              print(f"::error::APK contains unsupported native ABIs: {sorted(invalid_abis)}")
+              sys.exit(1)
+
+          print(f"Native ABIs in APK: {sorted(abis) or 'none'}")
+          PY
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            gh release edit "$GITHUB_REF_NAME" \
+              --title "CLHS Socre $GITHUB_REF_NAME" \
+              --notes-file "$RUNNER_TEMP/release-notes.md"
+            gh release upload "$GITHUB_REF_NAME" "$APK_PATH" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "$APK_PATH" \
+              --verify-tag \
+              --title "CLHS Socre $GITHUB_REF_NAME" \
+              --notes-file "$RUNNER_TEMP/release-notes.md"
+          fi
