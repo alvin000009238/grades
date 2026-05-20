@@ -18,9 +18,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -30,6 +32,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -110,7 +113,7 @@ fun GradesScreen(
                         title = {
                             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                                 Text(
-                                    text = "成績查詢",
+                                    text = "壢中成績",
                                     style = MaterialTheme.typography.titleLarge,
                                     fontWeight = FontWeight.Bold,
                                 )
@@ -124,23 +127,26 @@ fun GradesScreen(
                             }
                         },
                         actions = {
-                            TextButton(
+                            IconButton(
                                 enabled = !state.isLoadingStructure && !state.isLoadingGrades,
                                 onClick = onReload,
-                                colors = ButtonDefaults.textButtonColors(
-                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.42f),
-                                ),
                             ) {
-                                Text("重新整理")
+                                Icon(
+                                    imageVector = Icons.Filled.Refresh,
+                                    contentDescription = "重新整理",
+                                    tint = if (!state.isLoadingStructure && !state.isLoadingGrades) {
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.42f)
+                                    }
+                                )
                             }
-                            TextButton(
-                                onClick = onLogout,
-                                colors = ButtonDefaults.textButtonColors(
-                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                ),
-                            ) {
-                                Text("登出")
+                            IconButton(onClick = onLogout) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                                    contentDescription = "登出",
+                                    tint = MaterialTheme.colorScheme.error
+                                )
                             }
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
@@ -232,8 +238,8 @@ private fun headerStudentText(state: GradesUiState): String {
     if (student != null) {
         return listOf(
             student.studentName.takeIf { it.isNotBlank() },
-            "${student.className.ifBlank { "--" }} 座號 ${student.seatNo.ifBlank { "--" }}",
-            "學號 ${student.studentNo.ifBlank { state.studentNo.ifBlank { "--" } }}",
+            "${student.className.ifBlank { "--" }} ${student.seatNo.ifBlank { "--" }}",
+            "${student.studentNo.ifBlank { state.studentNo.ifBlank { "--" } }}",
         ).filterNotNull().joinToString("｜")
     }
     return state.studentNo.takeIf { it.isNotBlank() }?.let { "學號 $it" } ?: "登入後顯示學生資訊"
@@ -514,7 +520,7 @@ private fun InsightCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("AI 分析摘要", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+            Text("分析", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
             DashboardInsightRow(
                 label = "風險",
                 text = riskInsightText(analysis, insights),
@@ -590,7 +596,7 @@ private fun StrengthWeaknessCard(analysis: GradeAnalysis) {
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Text("強弱摘要", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+        Text("摘要", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
         SubjectHighlightRow(title = "優勢科目", subjects = analysis.strengths, color = PositiveColor, emptyText = "尚無明顯高於平均的科目")
         SubjectHighlightRow(title = "待加強科目", subjects = analysis.weaknesses, color = NegativeColor, emptyText = "尚無明顯低於平均的科目")
     }

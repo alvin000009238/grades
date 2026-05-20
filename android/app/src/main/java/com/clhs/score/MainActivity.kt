@@ -23,15 +23,15 @@ class MainActivity : ComponentActivity() {
                 ScoreApp(
                     loginState = loginState,
                     gradesState = gradesState,
-                    onUsernameChange = viewModel::updateUsername,
-                    onPasswordChange = viewModel::updatePassword,
-                    onCaptchaChange = viewModel::updateCaptchaCode,
-                    onRefreshCaptcha = viewModel::refreshCaptcha,
-                    onLogin = viewModel::login,
+                    onWebViewLoginSuccess = viewModel::loginWithWebViewCookies,
                     onSelectYear = viewModel::selectYear,
                     onSelectExam = viewModel::selectExam,
                     onReload = viewModel::reloadStructure,
-                    onLogout = viewModel::logout,
+                    onLogout = {
+                        android.webkit.CookieManager.getInstance().removeAllCookies(null)
+                        android.webkit.CookieManager.getInstance().flush()
+                        viewModel.logout()
+                    },
                     onToggleSubject = viewModel::toggleSubjectExpanded,
                     onDismissLoginError = viewModel::clearLoginError,
                     onDismissGradesError = viewModel::clearGradesError,

@@ -25,7 +25,7 @@
 
 ## 功能
 
-- 登入頁：帳號、密碼、驗證碼圖片、刷新驗證碼、登入狀態與錯誤提示
+- 登入頁：內嵌學校系統 WebView 登入，具備浮動控制按鈕並支援密碼自動填入
 - 成績查詢：年學期與考試選擇，登入後直連學校 API 取得成績
 - 總覽：摘要卡、重點解讀、本地推估洞察、快速入口、強弱科摘要
 - 科目：精簡科目卡，點擊後展開五標落點、分佈摘要與上一考比較
@@ -54,7 +54,7 @@ Compose UI
 
 主要模組：
 
-- `data/SchoolGradeClient.kt`: 集中處理學校登入、captcha、token、成績 API 流程
+- `data/SchoolGradeClient.kt`: 集中處理 Cookie 擷取、登入與成績 API 流程
 - `data/GradeRepository.kt`: session restore、login、logout、structure loading、grade fetching
 - `data/GradeAnalysis.kt`: 成績分析、上一考比較、近三次趨勢、本地洞察與排名粗估
 - `viewmodel/ScoreViewModel.kt`: UI state、背景比較與趨勢載入

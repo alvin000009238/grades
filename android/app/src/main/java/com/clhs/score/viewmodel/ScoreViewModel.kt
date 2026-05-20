@@ -40,12 +40,7 @@ private data class HistoricalExamRequest(
 )
 
 data class LoginUiState(
-    val username: String = "",
-    val password: String = "",
-    val captchaCode: String = "",
-    val challenge: CaptchaChallenge? = null,
-    val isCaptchaLoading: Boolean = false,
-    val isSubmitting: Boolean = false,
+    val isWebViewLoginInProgress: Boolean = false,
     val errorMessage: String? = null,
 )
 
@@ -90,93 +85,10 @@ class ScoreViewModel(
     val gradesState: StateFlow<GradesUiState> = _gradesState
 
     init {
-        restoreSessionOrCaptcha()
+        restoreSession()
     }
 
-    fun updateUsername(value: String) {
-        _loginState.update { it.copy(username = value, errorMessage = null) }
-    }
 
-    fun updatePassword(value: String) {
-        _loginState.update { it.copy(password = value, errorMessage = null) }
-    }
-
-    fun updateCaptchaCode(value: String) {
-        _loginState.update { it.copy(captchaCode = value, errorMessage = null) }
-    }
-
-    fun refreshCaptcha() {
-        viewModelScope.launch {
-            _loginState.update { it.copy(isCaptchaLoading = true, errorMessage = null, captchaCode = "") }
-            runCatching { repository.refreshCaptcha() }
-                .onSuccess { challenge ->
-                    _loginState.update {
-                        it.copy(
-                            challenge = challenge,
-                            isCaptchaLoading = false,
-                            errorMessage = null,
-                        )
-                    }
-                }
-                .onFailure { error ->
-                    _loginState.update {
-                        it.copy(
-                            isCaptchaLoading = false,
-                            errorMessage = error.message ?: "取得驗證碼失敗",
-                        )
-                    }
-                }
-        }
-    }
-
-    fun login() {
-        val current = _loginState.value
-        val challenge = current.challenge ?: run {
-            _loginState.update { it.copy(errorMessage = "請先取得驗證碼") }
-            refreshCaptcha()
-            return
-        }
-        viewModelScope.launch {
-            _loginState.update { it.copy(isSubmitting = true, errorMessage = null) }
-            runCatching {
-                repository.login(
-                    username = current.username,
-                    password = current.password,
-                    captchaCode = current.captchaCode,
-                    challenge = challenge,
-                )
-            }.onSuccess { authenticatedSession ->
-                session = authenticatedSession
-                _loginState.update {
-                    it.copy(
-                        password = "",
-                        captchaCode = "",
-                        isSubmitting = false,
-                        errorMessage = null,
-                    )
-                }
-                _gradesState.update {
-                    it.copy(
-                        isLoggedIn = true,
-                        studentNo = authenticatedSession.studentNo,
-                        errorMessage = null,
-                    )
-                }
-                loadStructure()
-            }.onFailure { error ->
-                _loginState.update {
-                    it.copy(
-                        captchaCode = "",
-                        isSubmitting = false,
-                        errorMessage = error.message ?: "登入失敗",
-                    )
-                }
-                if ((error as? SchoolException)?.refreshCaptcha == true) {
-                    refreshCaptcha()
-                }
-            }
-        }
-    }
 
     fun selectYear(value: String) {
         val year = _gradesState.value.structure.firstOrNull { it.value == value } ?: return
@@ -251,10 +163,50 @@ class ScoreViewModel(
         repository.logout()
         session = null
         _gradesState.value = GradesUiState()
-        _loginState.update {
-            LoginUiState(username = it.username)
+        _loginState.value = LoginUiState()
+    }
+
+    fun loginWithWebViewCookies(studentNo: String, cookieString: String) {
+        viewModelScope.launch {
+            _loginState.update { it.copy(isWebViewLoginInProgress = true, errorMessage = null) }
+            runCatching {
+                val cookies = parseCookieString(cookieString)
+                if (cookies.isEmpty()) throw SchoolException("未取得有效的登入 cookies")
+                repository.loginWithCookies(studentNo, cookies)
+            }.onSuccess { authenticatedSession ->
+                session = authenticatedSession
+                _loginState.update {
+                    it.copy(isWebViewLoginInProgress = false, errorMessage = null)
+                }
+                _gradesState.update {
+                    it.copy(
+                        isLoggedIn = true,
+                        studentNo = authenticatedSession.studentNo,
+                        errorMessage = null,
+                    )
+                }
+                loadStructure()
+            }.onFailure { error ->
+                _loginState.update {
+                    it.copy(
+                        isWebViewLoginInProgress = false,
+                        errorMessage = error.message ?: "WebView 登入後處理失敗",
+                    )
+                }
+            }
         }
-        refreshCaptcha()
+    }
+
+    private fun parseCookieString(cookieString: String): Map<String, String> {
+        if (cookieString.isBlank()) return emptyMap()
+        return cookieString.split(";")
+            .map { it.trim() }
+            .filter { it.contains("=") }
+            .associate { part ->
+                val idx = part.indexOf('=')
+                part.substring(0, idx).trim() to part.substring(idx + 1).trim()
+            }
+            .filterKeys { it.isNotBlank() }
     }
 
     fun clearLoginError() {
@@ -265,10 +217,9 @@ class ScoreViewModel(
         _gradesState.update { it.copy(errorMessage = null) }
     }
 
-    private fun restoreSessionOrCaptcha() {
+    private fun restoreSession() {
         val restored = repository.restoreSession()
         if (restored == null) {
-            refreshCaptcha()
             return
         }
         session = restored

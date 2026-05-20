@@ -36,4 +36,13 @@ class GradeRepository(
         sessionStore.clear()
         client.clearSession()
     }
+
+    suspend fun loginWithCookies(
+        studentNo: String,
+        cookies: Map<String, String>,
+    ): AuthenticatedSession {
+        val session = client.loginWithCookies(studentNo, cookies)
+        sessionStore.saveSession(session)
+        return session
+    }
 }

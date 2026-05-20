@@ -199,6 +199,27 @@ class SchoolGradeClient(
         cookieJar.replace(session.cookies, domain = baseUrl.host)
     }
 
+    suspend fun loginWithCookies(
+        studentNo: String,
+        cookies: Map<String, String>,
+    ): AuthenticatedSession = withContext(Dispatchers.IO) {
+        cookieJar.replace(cookies, domain = baseUrl.host)
+        val gradesPage = execute(
+            Request.Builder()
+                .url(gradesPageUrl())
+                .headers(defaultHeaders(referer = loginPageUrl().toString()))
+                .get()
+                .build(),
+        ).body.string()
+        val apiToken = hiddenInput(gradesPage, "__RequestVerificationToken")
+            ?: throw SchoolException("找不到成績 API token，登入狀態可能無效")
+        AuthenticatedSession(
+            studentNo = studentNo,
+            apiToken = apiToken,
+            cookies = cookieJar.snapshot(),
+        )
+    }
+
     fun clearSession() {
         cookieJar.clear()
     }
